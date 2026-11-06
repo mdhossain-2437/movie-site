@@ -88,6 +88,18 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
     );
     await expect(metadataSection).toBeVisible();
 
+    // Non-overlap invariant: Quick Actions rail must never overlap synopsis text on desktop
+    const synopsisBox = await page.getByTestId("hero-synopsis-column").boundingBox();
+    const quickRailBox = await page.locator("div[aria-label='Quick Actions']").boundingBox();
+    expect(synopsisBox).not.toBeNull();
+    expect(quickRailBox).not.toBeNull();
+    if (synopsisBox && quickRailBox) {
+      expect(
+        synopsisBox.x + synopsisBox.width,
+        `Desktop synopsis right edge (${synopsisBox.x + synopsisBox.width}) must stay clear of Quick Actions rail left edge (${quickRailBox.x})`,
+      ).toBeLessThanOrEqual(quickRailBox.x - 12);
+    }
+
     // Zero horizontal overflow invariant
     const hasOverflow = await page.evaluate(() => {
       const doc = document.documentElement;
@@ -217,11 +229,23 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
       }
     }
 
-    // Mobile quick-action rail buttons bounding box audit (>= 44x44px)
+    // Mobile quick-action rail non-overlap & touch target audit (>= 44x44px)
+    const mobileSynopsisBox = await page.getByTestId("hero-synopsis-column").boundingBox();
+    const mobileRailBox = await page.locator("div[aria-label='Quick Actions']").boundingBox();
+    expect(mobileSynopsisBox).not.toBeNull();
+    expect(mobileRailBox).not.toBeNull();
+    if (mobileSynopsisBox && mobileRailBox) {
+      expect(
+        mobileSynopsisBox.y + mobileSynopsisBox.height,
+        `Mobile synopsis bottom (${mobileSynopsisBox.y + mobileSynopsisBox.height}) must not overlap Quick Actions rail top (${mobileRailBox.y})`,
+      ).toBeLessThanOrEqual(mobileRailBox.y);
+    }
+
     const quickRailControls = page.locator(
-      "div[aria-label='Quick actions rail'] a, div[aria-label='Quick actions rail'] button",
+      "div[aria-label='Quick Actions'] a, div[aria-label='Quick Actions'] button",
     );
     const quickCount = await quickRailControls.count();
+    expect(quickCount).toBeGreaterThanOrEqual(2);
     for (let i = 0; i < quickCount; i++) {
       const ctrl = quickRailControls.nth(i);
       const box = await ctrl.boundingBox();
@@ -260,6 +284,15 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
     const videoShell = page.locator("div[data-player-state]");
     await expect(videoShell).toBeVisible();
     await expect(page.getByRole("button", { name: /Authorize & Load Stream/i })).toBeVisible();
+
+    // Skip link must be visually hidden (sr-only, <=1x1px) until keyboard focused
+    const skipLinkBox = await page
+      .getByRole("link", { name: /Skip to video player/i })
+      .boundingBox();
+    if (skipLinkBox) {
+      expect(skipLinkBox.width).toBeLessThanOrEqual(2);
+      expect(skipLinkBox.height).toBeLessThanOrEqual(2);
+    }
 
     // Zero horizontal overflow invariant
     const hasOverflow = await page.evaluate(() => {

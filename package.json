@@ -21,7 +21,8 @@
     "db:generate": "pnpm --filter @movie/db generate",
     "db:migrate": "pnpm --filter @movie/db migrate",
     "db:seed": "pnpm --filter @movie/db seed",
-    "db:seed:dev": "pnpm --filter @movie/db seed:dev"
+    "db:seed:dev": "pnpm --filter @movie/db seed:dev",
+    "worker:start": "pnpm --filter @movie/db worker"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",

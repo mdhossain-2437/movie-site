@@ -1,0 +1,143 @@
+# Hardened Pilot Control-Plane Stack for boxd `dark-crow` (fra · 4 vCPU / 16 GB RAM)
+# Media segments must be served via private object storage + CDN edge; this host runs
+# control-plane authorization, RBAC/MFA, Drizzle PG pilot ledger, and isolated probe jobs.
+name: cinematic-graphite-pilot
+
+services:
+  caddy:
+    image: caddy:2.9-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_HOSTNAME: ${SITE_HOSTNAME:-dark-crow.boxd.sh}
+    volumes:
+      - ../caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - edge
+    depends_on:
+      web:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+
+  web:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: cinematic-graphite-web:${IMAGE_TAG:-pilot}
+    restart: unless-stopped
+    expose:
+      - "3000"
+    env_file:
+      - ${ENV_FILE:-../../.env.production}
+    environment:
+      NODE_ENV: production
+      APP_ENV: production
+      PORT: "3000"
+      DATABASE_URL: postgresql://movie_app:${POSTGRES_PASSWORD}@postgres:5432/movie_platform
+      REDIS_URL: redis://redis:6379
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - edge
+      - internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.50"
+          memory: 2G
+
+  worker:
+    image: cinematic-graphite-web:${IMAGE_TAG:-pilot}
+    restart: unless-stopped
+    command: ["pnpm", "worker:start"]
+    read_only: true
+    tmpfs:
+      - /tmp:size=512M,noexec,nosuid,nodev
+    env_file:
+      - ${ENV_FILE:-../../.env.production}
+    environment:
+      NODE_ENV: production
+      APP_ENV: production
+      DATABASE_URL: postgresql://movie_app:${POSTGRES_PASSWORD}@postgres:5432/movie_platform
+      REDIS_URL: redis://redis:6379
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    networks:
+      - internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 2G
+
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: movie_platform
+      POSTGRES_USER: movie_app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U movie_app -d movie_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 2G
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "60 1", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 512M
+
+networks:
+  edge:
+    driver: bridge
+  internal:
+    internal: true
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres_data:
+  redis_data:

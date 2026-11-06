@@ -1,0 +1,36 @@
+{
+	admin off
+}
+
+{$SITE_HOSTNAME:dark-crow.boxd.sh} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	@ingest path /api/v1/admin/ingestions*
+	handle @ingest {
+		request_body {
+			max_size 10MB
+		}
+		reverse_proxy web:3000 {
+			health_uri /api/v1/health
+			health_interval 15s
+		}
+	}
+
+	handle {
+		request_body {
+			max_size 2MB
+		}
+		reverse_proxy web:3000 {
+			health_uri /api/v1/health
+			health_interval 15s
+		}
+	}
+}

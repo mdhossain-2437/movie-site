@@ -128,7 +128,10 @@ async function WatchPageBody({ params }: { params: Promise<{ slug: string }> }) 
 export default function WatchPage(props: { params: Promise<{ slug: string }> }) {
   return (
     <div className="bg-canvas text-text flex min-h-dvh flex-col">
-      <a href="#main" className="cg-skip-link">
+      <a
+        href="#main"
+        className="cg-skip-link focus:bg-text focus:text-canvas sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-sm focus:px-4 focus:py-2 focus:text-sm focus:font-semibold"
+      >
         Skip to video player
       </a>
       <header className="border-border bg-canvas-raised border-b">

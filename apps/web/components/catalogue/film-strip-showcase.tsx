@@ -61,11 +61,16 @@ function ProceduralFilmArt({ index, title }: { index: number; title: string }) {
             <stop offset="60%" stopColor="#818D9B" stopOpacity="0.15" />
             <stop offset="100%" stopColor="#080A0D" stopOpacity="0.95" />
           </linearGradient>
-          <radialGradient id={`spot-${index}`} cx="50%" cy="30%" r="70%">
-            <stop offset="0%" stopColor="#D8B36A" stopOpacity="0.3" />
-            <stop offset="50%" stopColor="#181F28" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#080A0D" stopOpacity="0.95" />
+          <radialGradient id={`spot-${index}`} cx="50%" cy="28%" r="72%">
+            <stop offset="0%" stopColor="#D8B36A" stopOpacity="0.42" />
+            <stop offset="48%" stopColor="#222B36" stopOpacity="0.72" />
+            <stop offset="100%" stopColor="#080A0D" stopOpacity="0.96" />
           </radialGradient>
+          <linearGradient id={`canvas-fade-${index}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#080A0D" stopOpacity="0.1" />
+            <stop offset="65%" stopColor="#080A0D" stopOpacity="0.05" />
+            <stop offset="100%" stopColor="#080A0D" stopOpacity="0.82" />
+          </linearGradient>
         </defs>
 
         <rect width="200" height="320" fill={`url(#spot-${index})`} />
@@ -165,7 +170,7 @@ function ProceduralFilmArt({ index, title }: { index: number; title: string }) {
         )}
 
         {/* Ambient grain vignette */}
-        <rect width="200" height="320" fill="url(#canvas-fade)" opacity="0.5" />
+        <rect width="200" height="320" fill={`url(#canvas-fade-${index})`} opacity="0.65" />
       </svg>
 
       {/* Atmospheric bottom scrim */}

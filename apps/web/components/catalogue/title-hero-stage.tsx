@@ -85,11 +85,53 @@ export function TitleHeroStage({
         aria-label={`Hero showcase for ${title.localizedTitleEn}`}
         className="border-border/80 from-surface-1/95 via-surface-2/70 to-canvas relative w-full overflow-hidden rounded-lg border bg-gradient-to-b p-6 shadow-2xl sm:p-10 lg:p-14"
       >
-        {/* Ambient atmospheric backdrop radial gradient */}
+        {/* Ambient atmospheric backdrop radial gradient & procedural aperture */}
         <div
           aria-hidden="true"
-          className="bg-accent/5 pointer-events-none absolute -top-24 left-1/2 h-[480px] w-[900px] -translate-x-1/2 rounded-full blur-3xl"
-        />
+          className="pointer-events-none absolute inset-0 overflow-hidden select-none"
+        >
+          <div className="bg-accent/10 absolute -top-20 left-1/2 h-[520px] w-[920px] -translate-x-1/2 rounded-full blur-3xl" />
+          <svg
+            viewBox="0 0 1200 640"
+            fill="none"
+            className="absolute inset-0 h-full w-full object-cover opacity-35"
+          >
+            <defs>
+              <radialGradient id="hero-amber-aura" cx="50%" cy="54%" r="48%">
+                <stop offset="0%" stopColor="#D8B36A" stopOpacity="0.38" />
+                <stop offset="55%" stopColor="#181F28" stopOpacity="0.2" />
+                <stop offset="100%" stopColor="#080A0D" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            <rect width="1200" height="640" fill="url(#hero-amber-aura)" />
+            <circle
+              cx="600"
+              cy="350"
+              r="210"
+              stroke="#D8B36A"
+              strokeOpacity="0.22"
+              strokeWidth="1"
+            />
+            <circle
+              cx="600"
+              cy="350"
+              r="310"
+              stroke="#D8B36A"
+              strokeOpacity="0.12"
+              strokeWidth="1"
+              strokeDasharray="6 6"
+            />
+            <line
+              x1="120"
+              y1="520"
+              x2="1080"
+              y2="520"
+              stroke="#D8B36A"
+              strokeOpacity="0.14"
+              strokeWidth="1"
+            />
+          </svg>
+        </div>
 
         {/* Top Centered Breadcrumb */}
         <nav aria-label="Breadcrumb" className="relative z-10 mb-8 flex justify-center sm:mb-12">
@@ -129,8 +171,8 @@ export function TitleHeroStage({
           </ol>
         </nav>
 
-        {/* Hero Stage Grid: Top-Left Title + Top-Right Synopsis & Badges */}
-        <div className="relative z-10 grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_380px]">
+        {/* Hero Stage Grid: Top-Left Title + Top-Right Synopsis & Badges (reserves lg:pr-20 for right rail) */}
+        <div className="relative z-10 grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_380px] lg:pr-20">
           {/* Top-Left: Giant Editorial Title */}
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -173,7 +215,7 @@ export function TitleHeroStage({
           </div>
 
           {/* Top-Right: Concise Synopsis + Lawful AvailabilityBadge */}
-          <div className="space-y-4 lg:pl-4 lg:text-right">
+          <div data-testid="hero-synopsis-column" className="space-y-4 lg:pl-4 lg:text-right">
             <div className="flex flex-wrap items-center gap-2 lg:justify-end">
               <AvailabilityBadge kind={title.availability.badgeKind} />
               <Badge tone="neutral">Territory: {territoryCode}</Badge>
@@ -195,11 +237,11 @@ export function TitleHeroStage({
         </div>
 
         {/* Center Circular Translucent Play CTA Stage */}
-        <div className="relative z-10 my-10 flex flex-col items-center justify-center text-center sm:my-14">
+        <div className="relative z-10 my-8 flex flex-col items-center justify-center text-center sm:my-12 lg:pr-20">
           {title.availability.streamAllowed ? (
             <Link
               href={`/watch/${title.slug}`}
-              className="group rounded-pill border-accent/80 bg-surface-1/70 hover:border-accent focus:border-accent relative flex h-20 w-20 items-center justify-center border-2 backdrop-blur-md transition-all duration-300 hover:scale-105 hover:shadow-[0_0_36px_rgba(216,179,106,0.35)] focus:scale-105 focus:outline-none sm:h-24 sm:w-24"
+              className="group rounded-pill border-accent/80 bg-surface-1/70 hover:border-accent focus:border-accent relative flex h-20 w-20 items-center justify-center border-2 backdrop-blur-md transition-all duration-300 hover:scale-105 hover:shadow-[0_0_36px_rgba(216,179,106,0.35)] focus:scale-105 focus:outline-none motion-reduce:transform-none motion-reduce:transition-none sm:h-24 sm:w-24"
               aria-label={`Play stream for ${title.localizedTitleEn}`}
             >
               {/* Pulsing ring aura */}
@@ -211,7 +253,7 @@ export function TitleHeroStage({
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
-                className="fill-accent text-accent h-8 w-8 translate-x-0.5 transition-transform duration-300 group-hover:scale-110 sm:h-10 sm:w-10"
+                className="fill-accent text-accent h-8 w-8 translate-x-0.5 transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none sm:h-10 sm:w-10"
               >
                 <polygon points="6,3 20,12 6,21" />
               </svg>
@@ -241,40 +283,10 @@ export function TitleHeroStage({
           )}
         </div>
 
-        {/* Bottom-Left Structured Metadata Pill Rows */}
-        <div className="border-border/60 relative z-10 border-t pt-4">
-          <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs sm:gap-3">
-            <div className="border-border/80 bg-surface-1/80 rounded-pill text-text-secondary flex items-center gap-1.5 border px-3 py-1 backdrop-blur-xs">
-              <span className="text-text-muted uppercase">Country:</span>
-              <span className="text-text font-semibold">BD</span>
-            </div>
-
-            <div className="border-border/80 bg-surface-1/80 rounded-pill text-text-secondary flex max-w-xs items-center gap-1.5 truncate border px-3 py-1 backdrop-blur-xs">
-              <span className="text-text-muted uppercase">Licensor:</span>
-              <span className="text-text truncate font-semibold">{studioSource}</span>
-            </div>
-
-            <div className="border-border/80 bg-surface-1/80 rounded-pill text-text-secondary flex items-center gap-1.5 border px-3 py-1 backdrop-blur-xs">
-              <span className="text-text-muted uppercase">Time:</span>
-              <span className="text-text font-semibold">{formatRuntime(title.runtimeMinutes)}</span>
-            </div>
-
-            <div className="border-border/80 bg-surface-1/80 rounded-pill text-text-secondary flex items-center gap-1.5 border px-3 py-1 backdrop-blur-xs">
-              <span className="text-text-muted uppercase">Date:</span>
-              <span className="text-text font-semibold">{title.releaseYear}</span>
-            </div>
-
-            <div className="border-border/80 bg-surface-1/80 rounded-pill text-text-secondary flex items-center gap-1.5 border px-3 py-1 backdrop-blur-xs">
-              <span className="text-text-muted uppercase">Rate:</span>
-              <span className="text-text font-semibold">{title.maturityRating}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right-Edge Vertical Floating Quick-Action Rail */}
+        {/* Responsive Quick-Action Rail: Normal-flow horizontal pill bar on <lg, Right-gutter vertical rail on lg+ */}
         <div
           aria-label="Quick Actions"
-          className="rounded-pill border-border bg-surface-1/90 absolute top-1/2 right-3 z-20 flex -translate-y-1/2 flex-col gap-2 border p-1.5 shadow-2xl backdrop-blur-md sm:right-6"
+          className="rounded-pill border-border bg-surface-1/90 relative z-20 mx-auto mb-6 flex w-fit flex-row items-center justify-center gap-2 border p-1.5 shadow-2xl backdrop-blur-md lg:absolute lg:top-1/2 lg:right-6 lg:mb-0 lg:-translate-y-1/2 lg:flex-col"
         >
           {/* Download Action */}
           {title.availability.downloadAllowed && title.featureAssetId ? (
@@ -341,7 +353,7 @@ export function TitleHeroStage({
             </svg>
           </a>
 
-          {/* Trailer Anchor */}
+          {/* Trailer / Credits Anchor */}
           <a
             href="#credits"
             className="rounded-pill text-text-secondary hover:bg-surface-2 hover:text-accent flex h-11 w-11 items-center justify-center transition-colors"
@@ -364,6 +376,36 @@ export function TitleHeroStage({
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
           </a>
+        </div>
+
+        {/* Bottom-Left Structured Metadata Pill Rows */}
+        <div className="border-border/60 relative z-10 border-t pt-4 lg:pr-20">
+          <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs sm:gap-3">
+            <div className="border-border/80 bg-surface-1/80 rounded-pill text-text-secondary flex items-center gap-1.5 border px-3 py-1 backdrop-blur-xs">
+              <span className="text-text-muted uppercase">Country:</span>
+              <span className="text-text font-semibold">BD</span>
+            </div>
+
+            <div className="border-border/80 bg-surface-1/80 rounded-pill text-text-secondary flex max-w-xs items-center gap-1.5 truncate border px-3 py-1 backdrop-blur-xs">
+              <span className="text-text-muted uppercase">Licensor:</span>
+              <span className="text-text truncate font-semibold">{studioSource}</span>
+            </div>
+
+            <div className="border-border/80 bg-surface-1/80 rounded-pill text-text-secondary flex items-center gap-1.5 border px-3 py-1 backdrop-blur-xs">
+              <span className="text-text-muted uppercase">Time:</span>
+              <span className="text-text font-semibold">{formatRuntime(title.runtimeMinutes)}</span>
+            </div>
+
+            <div className="border-border/80 bg-surface-1/80 rounded-pill text-text-secondary flex items-center gap-1.5 border px-3 py-1 backdrop-blur-xs">
+              <span className="text-text-muted uppercase">Date:</span>
+              <span className="text-text font-semibold">{title.releaseYear}</span>
+            </div>
+
+            <div className="border-border/80 bg-surface-1/80 rounded-pill text-text-secondary flex items-center gap-1.5 border px-3 py-1 backdrop-blur-xs">
+              <span className="text-text-muted uppercase">Rate:</span>
+              <span className="text-text font-semibold">{title.maturityRating}</span>
+            </div>
+          </div>
         </div>
       </section>
 

@@ -11,7 +11,8 @@
     "generate": "drizzle-kit generate",
     "migrate": "node --experimental-strip-types ./src/cli/migrate.ts",
     "seed": "node --experimental-strip-types ./src/cli/seed.ts",
-    "seed:dev": "node --experimental-strip-types ./src/seed-dev-showcase.ts"
+    "seed:dev": "node --experimental-strip-types ./src/seed-dev-showcase.ts",
+    "worker": "node --experimental-strip-types ./src/cli/worker.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.15",
