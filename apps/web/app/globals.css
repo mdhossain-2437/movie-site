@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/cinematic-graphite.tokens.css";
+@import "../styles/experience.css";
 
 /*
  * Cinematic Graphite → Tailwind bridge.

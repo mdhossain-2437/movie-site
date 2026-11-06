@@ -10,7 +10,8 @@ export default function GlobalRouteError({
   reset: () => void;
 }) {
   return (
-    <main id="main" className="cg-container flex flex-1 flex-col justify-center py-16">
+    <main id="main" className="error-scene cg-container flex flex-1 flex-col justify-center py-16">
+      <p className="error-kicker">An unexpected intermission.</p>
       <ErrorState
         title="Something interrupted this view"
         description="The request could not be completed safely. Try again, or return to the home screen."

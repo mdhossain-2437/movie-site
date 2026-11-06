@@ -45,7 +45,7 @@ export default function TakedownPolicyPage() {
 
         <div className="flex flex-wrap gap-3 pt-2">
           <ButtonLink href="/report-content" variant="primary">
-            Submit a Rights Notice
+            Read Notice Requirements
           </ButtonLink>
           <ButtonLink href="/legal/copyright" variant="secondary">
             Copyright Policy

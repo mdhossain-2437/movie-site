@@ -1,111 +1,197 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ConsumerShell } from "@/components/layout/site-shell";
-import { AvailabilityBadge, Badge, ButtonLink } from "@/components/ui";
+import { FeaturedHero } from "@/components/experience/featured-hero";
+import {
+  ArtBackdrop,
+  EmptyArchive,
+  FixtureNotice,
+  SectionHeading,
+} from "@/components/catalogue/common";
+import { CollectionTile, DirectorIndex, TitleRail } from "@/components/catalogue/editorial";
+import { Icon } from "@/components/ui/icon";
+import {
+  getFeaturedTitles,
+  getBrowseFacets,
+  listCollections,
+  listDirectors,
+  listTitles,
+} from "@/lib/catalogue/repository";
 
 export const metadata: Metadata = {
-  title: "Home · Cinematic Graphite",
+  title: { absolute: "Cinematic Graphite — The rights-first film archive" },
   description:
-    "Lawful movie discovery and rights-gated media distribution platform. Only owned, licensed, or counsel-verified public-domain films are published.",
+    "A considered space for cinema. Explore films, filmmakers and original editorial collections, with transparent rights-aware availability.",
 };
 
-const FOUNDATION_MODULES = [
-  {
-    name: "Design System & Accessibility",
-    state: "Active",
-    tone: "success" as const,
-    detail:
-      "Cinematic Graphite semantic tokens, self-hosted typography, keyboard skip-links, and 360px–1920px responsive shell.",
-  },
-  {
-    name: "Central Rights Decision Engine",
-    state: "Active",
-    tone: "success" as const,
-    detail:
-      "Deny-by-default server policy enforcing territory, date windows, separate stream/download rights, legal holds, and DRM gates.",
-  },
-  {
-    name: "Private Quarantine Storage Adapter",
-    state: "Active",
-    tone: "success" as const,
-    detail:
-      "Multipart ingest with SHA-256 checksum verification, opaque non-PII object keys, and short-lived HMAC delivery URLs.",
-  },
-  {
-    name: "Database, Identity & Catalogue Gate",
-    state: "Milestone M2",
-    tone: "info" as const,
-    detail:
-      "PostgreSQL persistence, RBAC sessions, editorial draft workflow, and rights-verified public catalogue publication.",
-  },
-] as const;
-
 export default function Home() {
+  const featured = getFeaturedTitles();
+  const titles = listTitles();
+  const collections = listCollections();
+  const allDirectors = listDirectors();
+  const directors = ["f-w-murnau", "fritz-lang", "buster-keaton", "lotte-reiniger"].flatMap(
+    (slug) => {
+      const person = allDirectors.find((candidate) => candidate.slug === slug);
+      return person ? [person] : [];
+    },
+  );
+  const facets = getBrowseFacets();
+  const archive = [
+    "nosferatu",
+    "metropolis",
+    "the-cabinet-of-dr-caligari",
+    "man-with-a-movie-camera",
+    "the-general",
+    "the-adventures-of-prince-achmed",
+    "a-trip-to-the-moon",
+    "battleship-potemkin",
+  ].flatMap((slug) => {
+    const title = titles.find((candidate) => candidate.slug === slug);
+    return title ? [title] : [];
+  });
   return (
-    <ConsumerShell>
-      <section aria-labelledby="hero-heading" className="py-6 sm:py-12">
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Badge tone="accent">Milestone M1 · Foundation Active</Badge>
-          <AvailabilityBadge kind="rights_pending" />
-        </div>
-
-        <h1
-          id="hero-heading"
-          className="font-display text-text mt-5 max-w-3xl text-[length:var(--cg-text-4xl)] leading-tight font-bold text-balance sm:text-[length:var(--cg-text-display)]"
-        >
-          The catalogue opens only to verified rights.
-        </h1>
-
-        <p className="cg-prose text-text-secondary mt-5 text-lg leading-8">
-          Cinematic Graphite lists and delivers only films that the operator owns, holds a
-          documented distribution licence for, or has verified for public-domain release. No
-          unverified uploads, scraped streams, or unauthorized mirrors are permitted.
-        </p>
-
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <ButtonLink href="/movies" variant="primary" size="lg">
-            Browse Catalogue Shell
-          </ButtonLink>
-          <ButtonLink href="/search" variant="secondary" size="lg">
-            Search Catalogue
-          </ButtonLink>
-          <ButtonLink href="/admin" variant="outline" size="lg">
-            Operations Console
-          </ButtonLink>
-        </div>
-      </section>
-
-      <section aria-labelledby="readiness-heading" className="mt-10 sm:mt-14">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-text-muted font-mono text-xs tracking-wide uppercase">
-              Platform readiness
-            </p>
-            <h2
-              id="readiness-heading"
-              className="font-display text-text mt-1 text-2xl font-semibold"
-            >
-              Verified architecture foundations
-            </h2>
+    <ConsumerShell fullBleed>
+      {featured.length > 0 ? (
+        <FeaturedHero cards={featured} />
+      ) : (
+        <section className="home-hero empty-home-hero">
+          <ArtBackdrop
+            spec={{
+              motif: "sun",
+              palette: {
+                bg: "#1f0802",
+                bg2: "#b7410e",
+                ink: "#140501",
+                accent: "#ff8c1a",
+                light: "#ffd08a",
+              },
+            }}
+          />
+          <div className="hero-topline">
+            <h1>The rights-first film archive</h1>
+            <span className="eyebrow">Independent by design</span>
           </div>
-          <ButtonLink href="/legal/copyright" variant="ghost" size="sm">
-            Read Copyright &amp; Rights Policy
-          </ButtonLink>
+          <div className="hero-content">
+            <p className="hero-kicker">For the love of the frame</p>
+            <h2 className="hero-display">
+              Cinema.
+              <br />
+              Considered.
+            </h2>
+            <p className="hero-synopsis">
+              A space for remarkable films. A respect for their makers. The catalogue opens only to
+              verified rights.
+            </p>
+            <Link href="/movies" className="action-button action-primary">
+              Browse the archive
+              <Icon name="arrow-up-right" />
+            </Link>
+          </div>
+          <a className="hero-scroll" href="#archive">
+            <Icon name="arrow" />
+            Discover our approach
+          </a>
+        </section>
+      )}
+      <div className="home-body">
+        <div className="intro-band">
+          <p>
+            Not an endless feed.
+            <br />
+            <span>A new way into the world of film.</span>
+          </p>
+          <FixtureNotice compact />
         </div>
-
-        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-          {FOUNDATION_MODULES.map((mod) => (
-            <article key={mod.name} className="cg-surface flex flex-col justify-between p-6">
-              <div>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h3 className="font-display text-text text-lg font-semibold">{mod.name}</h3>
-                  <Badge tone={mod.tone}>{mod.state}</Badge>
-                </div>
-                <p className="text-text-secondary mt-3 text-sm leading-6">{mod.detail}</p>
-              </div>
-            </article>
-          ))}
+        <div id="archive">
+          {archive.length > 0 ? (
+            <TitleRail
+              cards={archive}
+              eyebrow="Stories that shaped the screen"
+              title="From the archive."
+              href="/movies"
+              linkLabel="All films"
+            />
+          ) : (
+            <EmptyArchive />
+          )}
         </div>
-      </section>
+        {directors.length > 0 ? (
+          <section className="director-section" id="filmmakers">
+            <SectionHeading
+              eyebrow="The vision behind the frame"
+              title="A world of auteurs."
+              href="/people"
+              linkLabel="All people"
+            />
+            <DirectorIndex people={directors} compact />
+          </section>
+        ) : null}
+        {collections.length > 0 ? (
+          <section className="collections-section" id="collections">
+            <SectionHeading
+              eyebrow="Different films. A shared idea."
+              title="Follow the thread."
+              href="/collections"
+              linkLabel="All collections"
+            />
+            <div className="collection-grid">
+              {collections.slice(0, 2).map((collection, i) => (
+                <CollectionTile key={collection.slug} collection={collection} index={i} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+        {facets.genres.length > 0 ? (
+          <section className="browse-section">
+            <SectionHeading eyebrow="Let curiosity lead" title="Find your kind of cinema." />
+            <div className="genre-links">
+              {facets.genres.map((genre) => (
+                <Link className="genre-link" href={`/genres/${genre.slug}`} key={genre.slug}>
+                  {genre.label}
+                  <span>{String(genre.count).padStart(2, "0")}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
+        <section className="trust-band" aria-label="A different kind of film platform">
+          <div className="trust-band-intro">
+            <p className="eyebrow">A more thoughtful archive</p>
+            <h2>
+              Cinema, with
+              <br />a conscience.
+            </h2>
+            <Link href="/legal/copyright" className="text-link">
+              Our approach
+              <Icon name="arrow-up-right" />
+            </Link>
+          </div>
+          <div>
+            <Icon name="shield" />
+            <h3>Rights before release.</h3>
+            <p>
+              Owned, licensed, or legally verified public-domain works only. No shortcuts, no
+              scraped streams.
+            </p>
+          </div>
+          <div>
+            <Icon name="globe" />
+            <h3>Clarity, wherever you are.</h3>
+            <p>
+              Territory, viewing windows and delivery rights are checked independently. Availability
+              is never assumed.
+            </p>
+          </div>
+          <div>
+            <Icon name="films" />
+            <h3>Made to be explored.</h3>
+            <p>
+              Original editorial paths through films, people and movements. No invented scores or
+              manufactured popularity.
+            </p>
+          </div>
+        </section>
+      </div>
     </ConsumerShell>
   );
 }

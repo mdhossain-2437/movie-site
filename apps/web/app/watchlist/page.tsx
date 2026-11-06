@@ -1,39 +1,72 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ConsumerShell } from "@/components/layout/site-shell";
-import { Badge, ButtonLink, EmptyState } from "@/components/ui";
+import { DeviceList } from "@/components/experience/device-list";
+import { FixtureNotice } from "@/components/catalogue/common";
+import { Icon } from "@/components/ui/icon";
+import { listTitles } from "@/lib/catalogue/repository";
 
 export const metadata: Metadata = {
-  title: "My List · Cinematic Graphite",
-  description: "Save authorized films to your personal watchlist.",
+  title: "My List",
+  description:
+    "Keep a personal list of film references on this device. Saved titles never grant streaming or download rights.",
 };
-
 export default function WatchlistPage() {
   return (
     <ConsumerShell>
-      <header className="mb-8 space-y-3">
-        <Badge tone="neutral">Personal Library</Badge>
-        <h1 className="font-display text-text text-3xl font-bold sm:text-4xl">My List</h1>
-        <p className="cg-prose text-text-secondary text-base leading-7">
-          Bookmark rights-cleared titles to watch across sessions once viewer accounts and database
-          persistence activate in Milestone M2.
+      <header className="page-header page-header-split">
+        <div>
+          <p className="eyebrow">A little collection of your own</p>
+          <h1>
+            My List<span className="cg-accent">.</span>
+          </h1>
+        </div>
+        <p>
+          For the films that catch your eye.
+          <br />
+          Keep them close. Come back when curiosity calls.
         </p>
       </header>
-
-      <EmptyState
-        eyebrow="Account session required"
-        title="Your watchlist is currently empty"
-        description="Sign-in and profile-scoped watchlists are enabled alongside PostgreSQL session management in Milestone M2."
-        actions={
-          <>
-            <ButtonLink href="/account" variant="primary">
-              Account &amp; Session Status
-            </ButtonLink>
-            <ButtonLink href="/movies" variant="secondary">
-              Browse Catalogue
-            </ButtonLink>
-          </>
+      <div className="device-notice">
+        <Icon name="info" />
+        <p>
+          This is a <strong>device-only preview list</strong>, saved in this browser. No account or
+          cloud sync is connected, and saving never unlocks playback.{" "}
+          <Link href="/account">
+            Account &amp; privacy
+            <Icon name="arrow-up-right" />
+          </Link>
+        </p>
+      </div>
+      <DeviceList
+        cards={listTitles()}
+        emptyState={
+          <section className="list-empty">
+            <div className="empty-poster-stack" aria-hidden="true">
+              <span />
+              <span />
+              <span>
+                <Icon name="plus" />
+              </span>
+            </div>
+            <p className="eyebrow">A blank frame. Endless possibilities.</p>
+            <h2>
+              Your story starts
+              <br />
+              with a little curiosity.
+            </h2>
+            <p>
+              Tap the plus beside a film to save it here. A personal path through the archive, one
+              discovery at a time.
+            </p>
+            <Link href="/movies" className="action-button action-primary">
+              Explore the archive
+              <Icon name="arrow-up-right" />
+            </Link>
+          </section>
         }
       />
+      <FixtureNotice compact />
     </ConsumerShell>
   );
 }

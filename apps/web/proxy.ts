@@ -9,10 +9,9 @@ const BASE_CSP = [
   "img-src 'self' data: blob:",
   "font-src 'self'",
   "style-src 'self' 'unsafe-inline'",
-  "script-src 'self' 'unsafe-inline'",
   "connect-src 'self'",
   "media-src 'self' blob:",
-].join("; ");
+];
 
 export function proxy(request: NextRequest) {
   const existingRequestId = request.headers.get("x-request-id");
@@ -42,7 +41,12 @@ export function proxy(request: NextRequest) {
     "camera=(), microphone=(), geolocation=(), interest-cohort=()",
   );
   response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
-  response.headers.set("Content-Security-Policy", BASE_CSP);
+  // Next's development-only error-stack reconstruction needs eval. Production stays strict.
+  const scriptPolicy =
+    process.env.NODE_ENV === "development"
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+      : "script-src 'self' 'unsafe-inline'";
+  response.headers.set("Content-Security-Policy", [...BASE_CSP, scriptPolicy].join("; "));
 
   return response;
 }

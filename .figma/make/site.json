@@ -1,0 +1,10 @@
+{
+  "description": "A setup utility that bootstraps imported projects and verifies deployment and preview readiness, helping teams prepare new Figma Make projects for release.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

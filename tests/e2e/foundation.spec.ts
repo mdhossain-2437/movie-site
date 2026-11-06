@@ -22,7 +22,7 @@ test.describe("Milestone M1 foundation routes & security headers", () => {
   }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { level: 1, name: /catalogue opens only to verified rights/i }),
+      page.getByRole("heading", { level: 1, name: /rights-first film archive/i }),
     ).toBeVisible();
 
     const skipLink = page.getByRole("link", { name: "Skip to content" });
@@ -30,10 +30,10 @@ test.describe("Milestone M1 foundation routes & security headers", () => {
     await expect(skipLink).toBeFocused();
 
     await page.goto("/movies");
-    await expect(page.getByRole("heading", { level: 1, name: "Movies" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /^Films/ })).toBeVisible();
 
     await page.goto("/search?q=satyajit");
-    await expect(page.getByText(/No rights-approved results for/i)).toBeVisible();
+    await expect(page.getByText(/No catalogue results for/i)).toBeVisible();
 
     await page.goto("/legal/takedown");
     await expect(

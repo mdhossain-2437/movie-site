@@ -1,0 +1,11 @@
+{
+  // Dependency metadata for the pnpm workspace: reinstall, then restart the dev server.
+  "installOn": [
+    "package.json",
+    "apps/*/package.json",
+    "packages/*/package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    ".npmrc"
+  ]
+}

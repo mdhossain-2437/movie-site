@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Inter, Manrope } from "next/font/google";
+import { Geist_Mono, Inter, Manrope, Noto_Sans_Bengali } from "next/font/google";
+import { Suspense } from "react";
+import { ExperienceProviders } from "@/components/experience/providers";
+import { Chrome, DockFallback } from "@/components/experience/chrome";
+import { getSearchIndex } from "@/lib/catalogue/repository";
 import "./globals.css";
 
 // next/font downloads font files at build time and self-hosts them,
@@ -22,6 +26,13 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+const bengali = Noto_Sans_Bengali({
+  variable: "--font-bengali",
+  subsets: ["bengali"],
+  display: "swap",
+  preload: false,
+});
+
 export const metadata: Metadata = {
   // Working codename only; the public brand name requires separate approval.
   title: {
@@ -39,7 +50,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${manrope.variable} ${inter.variable} ${geistMono.variable}`}>
+    <html
+      lang="en"
+      className={`${manrope.variable} ${inter.variable} ${geistMono.variable} ${bengali.variable}`}
+    >
       <body className="bg-canvas text-text flex min-h-dvh flex-col font-sans antialiased">
         <a
           href="#main"
@@ -47,7 +61,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        {children}
+        <ExperienceProviders>
+          {children}
+          <Suspense fallback={<DockFallback />}>
+            <Chrome entries={getSearchIndex()} />
+          </Suspense>
+        </ExperienceProviders>
       </body>
     </html>
   );
