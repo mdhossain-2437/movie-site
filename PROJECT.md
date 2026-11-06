@@ -42,9 +42,9 @@ Cinematic Graphite is a lawful movie discovery and authorized media distribution
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| 1 | M1: V4 Core Media Engine & Backend Evidence | Features 1–8 (`.gitignore`, schema, DAL, Range serving, capacity math, seeder, doc) | none | IN_PROGRESS |
-| 2 | M2: Score 98/100 Cinematic Editorial UI/UX Upgrade | Features 9–15 (`DESIGN.md`, Spinner, FilmStripShowcase, TitleHeroStage, Discovery Pages, FloatingDock) | M1 | PLANNED |
-| 3 | M3: Antigravity Customizations, Plugin & Visual QA | Features 16–19 (Rules, skills, local plugin bundle, Playwright visual QA spec) | M2 | PLANNED |
+| 1 | M1: V4 Core Media Engine & Backend Evidence | Features 1–8 (`.gitignore`, schema, DAL, Range serving, capacity math, seeder, doc) | none | DONE |
+| 2 | M2: Score 98/100 Cinematic Editorial UI/UX Upgrade | Features 9–15 (`DESIGN.md`, Spinner, FilmStripShowcase, TitleHeroStage, Discovery Pages, FloatingDock) | M1 | DONE |
+| 3 | M3: Antigravity Customizations, Plugin & Visual QA | Features 16–19 (Rules, skills, local plugin bundle, Playwright visual QA spec) | M2 | IN_PROGRESS |
 | 4 | M4: Production Pipeline, Verification & Git Push | Features 20–25 (boxd VPS check, Dockerfile, Compose, Caddy, Scripts, 6-gate verification, Git push) | M3 | PLANNED |
 
 ## Interface Contracts

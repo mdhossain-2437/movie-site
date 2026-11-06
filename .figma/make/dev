@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run the Next.js dev server for @movie/web directly so the supervisor manages the real process.
+cd "$(dirname "$0")/../../apps/web"
+exec ./node_modules/.bin/next dev --port "$PORT" --hostname 0.0.0.0

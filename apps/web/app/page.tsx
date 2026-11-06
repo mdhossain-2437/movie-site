@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { TitleRail } from "@/components/catalogue/editorial";
 import { FilmStripShowcase, type FilmStripItem } from "@/components/catalogue/film-strip-showcase";
 import { ConsumerShell } from "@/components/layout/site-shell";
 import { AvailabilityBadge, Badge, ButtonLink } from "@/components/ui";
+import { listTitles } from "@/lib/catalogue/repository";
 
 export const metadata: Metadata = {
   title: "Home · Cinematic Graphite",
@@ -135,6 +137,8 @@ const FOUNDATION_MODULES = [
 ] as const;
 
 export default function Home() {
+  const archiveReferences = listTitles().slice(0, 10);
+
   return (
     <ConsumerShell>
       <section aria-labelledby="hero-heading" className="py-6 sm:py-10">
@@ -160,11 +164,11 @@ export default function Home() {
           <ButtonLink href="/movies" variant="primary" size="lg">
             Browse Catalogue
           </ButtonLink>
-          <ButtonLink href="/collections/monsoon-noir-archive" variant="secondary" size="lg">
+          <ButtonLink href="/collections" variant="secondary" size="lg">
             Curated Collections
           </ButtonLink>
-          <ButtonLink href="/people/amina-rahman" variant="outline" size="lg">
-            Featured Director
+          <ButtonLink href="/people" variant="outline" size="lg">
+            Filmmakers &amp; People
           </ButtonLink>
         </div>
       </section>
@@ -178,6 +182,18 @@ export default function Home() {
         subheading="Atmospheric 7-panel interactive vertical gallery. Hover to elevate warm gold illumination and reveal technical synopses."
         items={DEFAULT_EDITORIAL_FIXTURES}
       />
+
+      {archiveReferences.length > 0 ? (
+        <div className="mt-14 max-w-full overflow-x-clip sm:mt-20">
+          <TitleRail
+            cards={archiveReferences}
+            eyebrow="Early cinema reference archive"
+            title="From the archive."
+            href="/movies"
+            linkLabel="Explore all films"
+          />
+        </div>
+      ) : null}
 
       <section aria-labelledby="readiness-heading" className="mt-14 sm:mt-20">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

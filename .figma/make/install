@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# pnpm workspace (apps/*, packages/*) pinned by the committed lockfile.
+exec pnpm install --frozen-lockfile

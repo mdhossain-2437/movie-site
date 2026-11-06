@@ -2,8 +2,10 @@ import { getDatabase, listWatchlistItems } from "@movie/db";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { TitleCard } from "@/components/catalogue/title-card";
+import { DeviceList } from "@/components/experience/device-list";
 import { ConsumerShell } from "@/components/layout/site-shell";
 import { Badge, ButtonLink, ContentRowSkeleton, EmptyState } from "@/components/ui";
+import { listTitles } from "@/lib/catalogue/repository";
 import { getCurrentSession, resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
@@ -67,6 +69,8 @@ async function WatchlistContent() {
 }
 
 export default function WatchlistPage() {
+  const archiveCards = listTitles();
+
   return (
     <ConsumerShell>
       <header className="mb-8 space-y-3">
@@ -80,6 +84,25 @@ export default function WatchlistPage() {
       <Suspense fallback={<ContentRowSkeleton count={4} />}>
         <WatchlistContent />
       </Suspense>
+
+      {archiveCards.length > 0 ? (
+        <section aria-labelledby="device-saved-heading" className="mt-14 space-y-4">
+          <div>
+            <Badge tone="neutral">Browser Preview Storage</Badge>
+            <h2 id="device-saved-heading" className="font-display text-text mt-2 text-xl font-bold">
+              Saved Archive References on This Device
+            </h2>
+          </div>
+          <DeviceList
+            cards={archiveCards}
+            emptyState={
+              <p className="text-text-muted text-sm">
+                No archive preview references are currently bookmarked in this browser.
+              </p>
+            }
+          />
+        </section>
+      ) : null}
     </ConsumerShell>
   );
 }

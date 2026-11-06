@@ -55,6 +55,40 @@ export default function CopyrightPolicyPage() {
           </p>
         </section>
 
+        <section
+          id="development-fixtures"
+          className="legal-fixture-section text-text-secondary space-y-3 text-base leading-7"
+        >
+          <p className="eyebrow">Preview data, not a release</p>
+          <h2 className="font-display text-text text-xl font-semibold">
+            Development fixtures &amp; original artwork
+          </h2>
+          <p>
+            Development and test environments contain visibly marked editorial reference records for
+            real early films. These are interface fixtures, not published catalogue offers. Their
+            age is not a legal determination: public-domain claims require independent legal review
+            for each territory, version, restoration, score and translation.
+          </p>
+          <p>
+            Every fixture remains unpublished. All seeded rights requests are pending, with zero
+            reviewed evidence and zero approved distribution grants. No video, trailer, stream
+            manifest or downloadable media file is connected. Streaming and download rights are
+            always evaluated separately on the server.
+          </p>
+          <p>
+            The posters and backdrops are original SVG illustrations generated in code for this
+            preview. No third-party commercial film poster, still, actor portrait or competitor
+            identity is used. The artwork’s provenance does not confer any right to distribute the
+            referenced films.
+          </p>
+          <p>
+            Factual metadata and translations are development editorial drafts requiring source
+            verification before publication. Fixture records are excluded from staging and
+            production catalogue reads. The device-only saved list is local to the browser and never
+            grants playback access.
+          </p>
+        </section>
+
         <div className="flex flex-wrap gap-3 pt-2">
           <ButtonLink href="/legal/takedown" variant="secondary">
             Takedown Procedure

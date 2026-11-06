@@ -4,6 +4,7 @@ import { roleRequiresMfa } from "@movie/domain";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AccountAuthForms, AccountSessionControls } from "@/components/account/auth-forms";
+import { DevicePreferences } from "@/components/experience/preferences";
 import { ConsumerShell } from "@/components/layout/site-shell";
 import { Badge, Skeleton } from "@/components/ui";
 import { getCurrentSession } from "@/lib/server/api-helpers";
@@ -90,6 +91,19 @@ export default function AccountPage() {
       <Suspense fallback={<Skeleton className="h-72 max-w-xl" />}>
         <AccountSessionPanel />
       </Suspense>
+
+      <section aria-labelledby="device-prefs-heading" className="cg-surface mt-12 p-6 sm:p-8">
+        <div className="mb-6 space-y-1">
+          <Badge tone="neutral">Display &amp; Accessibility</Badge>
+          <h2 id="device-prefs-heading" className="font-display text-text pt-1 text-xl font-bold">
+            Local Viewing Preferences
+          </h2>
+          <p className="text-text-secondary text-sm">
+            Customize motion sensitivity and Bangla poster labels on this browser.
+          </p>
+        </div>
+        <DevicePreferences />
+      </section>
     </ConsumerShell>
   );
 }

@@ -2,9 +2,12 @@ import { getDatabase, listPublishedTitles } from "@movie/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { FixtureNotice } from "@/components/catalogue/common";
+import { PosterGrid } from "@/components/catalogue/poster-card";
 import { TitleCard } from "@/components/catalogue/title-card";
 import { ConsumerShell } from "@/components/layout/site-shell";
 import { Badge, ButtonLink, ContentRowSkeleton, EmptyState } from "@/components/ui";
+import { listTitles } from "@/lib/catalogue/repository";
 import { resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
@@ -36,61 +39,78 @@ async function MoviesDirectoryResults({
     limit: 24,
   });
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <nav aria-label="Language filter" className="flex flex-wrap items-center gap-2">
-          {LANGUAGE_FILTERS.map((f) => {
-            const selected = f.value === activeLang;
-            const href = f.value ? `/movies?lang=${f.value}` : "/movies";
-            return (
-              <Link
-                key={f.label}
-                href={href}
-                aria-current={selected ? "page" : undefined}
-                className={`rounded-pill inline-flex min-h-10 items-center gap-2 border px-4 py-1.5 text-sm font-medium transition-colors ${
-                  selected
-                    ? "border-accent bg-surface-3 text-text"
-                    : "border-border bg-surface-1 text-text-secondary hover:bg-surface-2 hover:text-text"
-                }`}
-              >
-                {selected ? (
-                  <span aria-hidden="true" className="text-accent">
-                    ✓
-                  </span>
-                ) : null}
-                <span>{f.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
+  const archiveCards = listTitles();
 
-        <Badge tone="neutral">Territory: {territoryCode}</Badge>
+  return (
+    <div className="space-y-12">
+      <div className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <nav aria-label="Language filter" className="flex flex-wrap items-center gap-2">
+            {LANGUAGE_FILTERS.map((f) => {
+              const selected = f.value === activeLang;
+              const href = f.value ? `/movies?lang=${f.value}` : "/movies";
+              return (
+                <Link
+                  key={f.label}
+                  href={href}
+                  aria-current={selected ? "page" : undefined}
+                  className={`rounded-pill inline-flex min-h-10 items-center gap-2 border px-4 py-1.5 text-sm font-medium transition-colors ${
+                    selected
+                      ? "border-accent bg-surface-3 text-text"
+                      : "border-border bg-surface-1 text-text-secondary hover:bg-surface-2 hover:text-text"
+                  }`}
+                >
+                  {selected ? (
+                    <span aria-hidden="true" className="text-accent">
+                      ✓
+                    </span>
+                  ) : null}
+                  <span>{f.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          <Badge tone="neutral">Territory: {territoryCode}</Badge>
+        </div>
+
+        {items.length === 0 ? (
+          <EmptyState
+            eyebrow="0 published titles"
+            title="No rights-cleared titles are published yet"
+            description="Titles appear in this directory only after editorial metadata, attribution, and an active rights grant are approved by a separate Rights Reviewer with MFA."
+            actions={
+              <>
+                <ButtonLink href="/search" variant="secondary">
+                  Search Catalogue
+                </ButtonLink>
+                <ButtonLink href="/legal/copyright" variant="outline">
+                  Review Licensing Policy
+                </ButtonLink>
+              </>
+            }
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {items.map((item) => (
+              <TitleCard key={item.id} title={item} />
+            ))}
+          </div>
+        )}
       </div>
 
-      {items.length === 0 ? (
-        <EmptyState
-          eyebrow="0 published titles"
-          title="No rights-cleared titles are published yet"
-          description="Titles appear in this directory only after editorial metadata, attribution, and an active rights grant are approved by a separate Rights Reviewer with MFA."
-          actions={
-            <>
-              <ButtonLink href="/search" variant="secondary">
-                Search Catalogue
-              </ButtonLink>
-              <ButtonLink href="/legal/copyright" variant="outline">
-                Review Licensing Policy
-              </ButtonLink>
-            </>
-          }
-        />
-      ) : (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map((item) => (
-            <TitleCard key={item.id} title={item} />
-          ))}
-        </div>
-      )}
+      {archiveCards.length > 0 ? (
+        <section aria-labelledby="archive-ref-heading" className="space-y-6">
+          <div className="space-y-2">
+            <Badge tone="info">Development Reference Archive</Badge>
+            <h2 id="archive-ref-heading" className="font-display text-text text-2xl font-bold">
+              Early Cinema Editorial References ({archiveCards.length})
+            </h2>
+          </div>
+          <FixtureNotice compact />
+          <PosterGrid cards={archiveCards} />
+        </section>
+      ) : null}
     </div>
   );
 }

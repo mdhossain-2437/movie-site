@@ -30,7 +30,7 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 60_000,
     env: {
-      APP_ENV: "test",
+      APP_ENV: "development",
       APP_URL: BASE_URL,
     },
   },

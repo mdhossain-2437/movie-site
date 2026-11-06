@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
+import { FloatingDock } from "./floating-dock";
 import { DesktopNavLinks, MobileNavLinks, type NavItem } from "./nav-links";
 import { SearchCommandModal } from "./search-command";
-import { FloatingDock } from "./floating-dock";
 
 export const PRIMARY_NAV_ITEMS: readonly NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/movies", label: "Movies" },
+  { href: "/collections", label: "Collections" },
+  { href: "/people", label: "People" },
   { href: "/search", label: "Search" },
   { href: "/watchlist", label: "My List" },
 ];
@@ -149,6 +151,16 @@ export function SiteFooter() {
         <nav aria-label="Legal and compliance">
           <ul className="text-text-secondary flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
             <li>
+              <Link href="/collections" className="hover:text-text">
+                Collections
+              </Link>
+            </li>
+            <li>
+              <Link href="/people" className="hover:text-text">
+                People
+              </Link>
+            </li>
+            <li>
               <Link href="/legal/terms" className="hover:text-text">
                 Terms
               </Link>
@@ -180,18 +192,33 @@ export function SiteFooter() {
   );
 }
 
-export function ConsumerShell({ children }: { children: ReactNode }) {
+export function ConsumerShell({
+  children,
+  fullBleed = false,
+  className = "",
+}: {
+  children: ReactNode;
+  fullBleed?: boolean;
+  className?: string;
+}) {
   return (
     <div className="bg-canvas text-text flex min-h-screen max-w-full flex-col overflow-x-clip">
       <SiteHeader />
       <main
         id="main"
-        className="cg-container max-w-full flex-1 overflow-x-clip py-10 pb-28 sm:py-14 sm:pb-32"
+        tabIndex={-1}
+        className={
+          fullBleed
+            ? `consumer-main max-w-full flex-1 overflow-x-clip pb-28 sm:pb-32 ${className}`.trim()
+            : `cg-container max-w-full flex-1 overflow-x-clip py-10 pb-28 sm:py-14 sm:pb-32 ${className}`.trim()
+        }
       >
         {children}
       </main>
       <SiteFooter />
-      <FloatingDock />
+      <Suspense fallback={null}>
+        <FloatingDock />
+      </Suspense>
     </div>
   );
 }
