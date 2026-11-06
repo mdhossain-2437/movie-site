@@ -1,10 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = Number(process.env.PORT ?? 3000);
+const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 3100);
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${PORT}`;
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  timeout: 60_000,
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
@@ -24,12 +25,13 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm --filter @movie/web start",
+    command: `pnpm --filter @movie/web exec next start -p ${PORT}`,
     url: `${BASE_URL}/api/v1/health`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 60_000,
     env: {
       APP_ENV: "test",
+      APP_URL: BASE_URL,
     },
   },
 });

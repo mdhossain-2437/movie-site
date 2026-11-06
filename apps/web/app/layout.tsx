@@ -40,7 +40,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${manrope.variable} ${inter.variable} ${geistMono.variable}`}>
-      <body className="bg-canvas text-text flex min-h-dvh flex-col font-sans antialiased">
+      <body className="bg-canvas text-text flex min-h-dvh max-w-full flex-col overflow-x-clip font-sans antialiased">
         <a
           href="#main"
           className="focus:bg-text focus:text-canvas sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-sm focus:px-4 focus:py-2"

@@ -4,17 +4,9 @@ import type {
   ResolutionTier,
   RightsGrantStatus,
 } from "@movie/contracts";
-import {
-  boolean,
-  index,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-  uniqueIndex,
-} from "drizzle-orm/pg-core";
-import { titles } from "./catalogue";
-import { users } from "./identity";
+import { boolean, index, jsonb, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { titles } from "./catalogue.ts";
+import { users } from "./identity.ts";
 
 export const rightsHolders = pgTable("rights_holders", {
   id: text("id").primaryKey(),
@@ -35,9 +27,7 @@ export const rightsEvidence = pgTable(
     titleId: text("title_id")
       .notNull()
       .references(() => titles.id, { onDelete: "cascade" }),
-    basis: text("basis")
-      .$type<"OWNED" | "LICENSED" | "PUBLIC_DOMAIN_VERIFIED">()
-      .notNull(),
+    basis: text("basis").$type<"OWNED" | "LICENSED" | "PUBLIC_DOMAIN_VERIFIED">().notNull(),
     documentRef: text("document_ref").notNull(),
     evidenceSha256: text("evidence_sha256").notNull(),
     submittedByUserId: text("submitted_by_user_id")

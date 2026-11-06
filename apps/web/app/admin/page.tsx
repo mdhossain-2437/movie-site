@@ -1,57 +1,9 @@
 import type { Role } from "@movie/contracts";
-import { ROLE_PERMISSIONS, roleRequiresMfa } from "@movie/domain";
-import { Badge, ButtonLink } from "@/components/ui";
-
-const ADMIN_MODULES = [
-  {
-    title: "Catalogue & Localized Metadata",
-    milestone: "M2",
-    status: "Schema & DAL Next",
-    tone: "info" as const,
-    summary:
-      "Draft-first title ingestion, English/Bangla localized metadata, cast/crew credits, and source attribution.",
-  },
-  {
-    title: "Rights Grants & Evidence Gate",
-    milestone: "M1 Core / M2 DB",
-    status: "Policy Engine Active",
-    tone: "success" as const,
-    summary:
-      "Central evaluateRights() enforces territory, date window, stream vs download separation, and separation of duties.",
-  },
-  {
-    title: "Media Quarantine & Ingest",
-    milestone: "M1 Mock / M3 Live",
-    status: "Adapter Active",
-    tone: "success" as const,
-    summary:
-      "Multipart upload session lifecycle, SHA-256 checksum verification, and automatic quarantine on integrity mismatch.",
-  },
-  {
-    title: "Playback, Packaging & DRM",
-    milestone: "M4",
-    status: "Planned",
-    tone: "neutral" as const,
-    summary:
-      "HLS/DASH CMAF renditions, subtitle/audio tracks, short-lived playback sessions, and fail-closed DRM adapter.",
-  },
-  {
-    title: "Storage Replication & Backups",
-    milestone: "M5",
-    status: "Planned",
-    tone: "neutral" as const,
-    summary:
-      "Private S3-compatible primary storage and optional operator-owned archive connector with zero public Drive hotlinks.",
-  },
-  {
-    title: "Takedowns, Legal Hold & Audit Log",
-    milestone: "M5",
-    status: "Policy Defined",
-    tone: "warning" as const,
-    summary:
-      "Emergency unpublish kill-switch, active session revocation, non-destructive legal hold, and immutable audit events.",
-  },
-] as const;
+import { getAdminDashboardSummary, getDatabase } from "@movie/db";
+import { AuthorizationError, ROLE_PERMISSIONS, roleRequiresMfa } from "@movie/domain";
+import { Suspense } from "react";
+import { Badge, ButtonLink, Skeleton } from "@/components/ui";
+import { getCurrentSession } from "@/lib/server/api-helpers";
 
 const PRIVILEGED_ROLES: readonly Role[] = [
   "SUPER_ADMIN",
@@ -60,6 +12,103 @@ const PRIVILEGED_ROLES: readonly Role[] = [
   "MEDIA_OPERATOR",
   "EDITOR",
 ];
+
+async function AdminLiveMetricsPanel() {
+  const { session } = await getCurrentSession();
+  const db = await getDatabase();
+
+  let summary: Awaited<ReturnType<typeof getAdminDashboardSummary>> | null = null;
+  let authRequired = false;
+
+  try {
+    summary = await getAdminDashboardSummary(db, {
+      actor: session?.actor ?? null,
+      requestId: "rsc_admin_dashboard",
+    });
+  } catch (err) {
+    if (err instanceof AuthorizationError) {
+      authRequired = true;
+    } else {
+      throw err;
+    }
+  }
+
+  if (authRequired || !summary) {
+    return (
+      <section className="cg-surface flex flex-col justify-between gap-4 p-6 sm:flex-row sm:items-center">
+        <div className="space-y-1">
+          <Badge tone="warning">Staff Authentication Required</Badge>
+          <h2 className="font-display text-text pt-1 text-lg font-semibold">
+            Sign in with an authorized staff role to inspect live ledger records
+          </h2>
+          <p className="text-text-secondary text-xs">
+            Mutating endpoints (`/api/v1/admin/*`) enforce server-side RBAC, CSRF origin checks, and
+            TOTP multi-factor authentication.
+          </p>
+        </div>
+        <ButtonLink href="/account" variant="primary" size="sm">
+          Sign In
+        </ButtonLink>
+      </section>
+    );
+  }
+
+  return (
+    <section aria-labelledby="live-metrics-heading" className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="live-metrics-heading" className="font-display text-text text-lg font-semibold">
+          Live Control Plane Ledger
+        </h2>
+        <Badge tone="success">Staff Session: {session?.displayName}</Badge>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="cg-surface p-4">
+          <p className="text-text-muted font-mono text-xs uppercase">Total Titles</p>
+          <p className="font-display text-text mt-2 text-2xl font-bold">
+            {summary.counts.totalTitles}
+          </p>
+        </div>
+        <div className="cg-surface p-4">
+          <p className="text-text-muted font-mono text-xs uppercase">Published</p>
+          <p className="font-display text-text mt-2 text-2xl font-bold">
+            {summary.counts.publishedTitles}
+          </p>
+        </div>
+        <div className="cg-surface p-4">
+          <p className="text-text-muted font-mono text-xs uppercase">Pending Rights Grants</p>
+          <p className="font-display text-text mt-2 text-2xl font-bold">
+            {summary.counts.pendingRightsGrants}
+          </p>
+        </div>
+        <div className="cg-surface p-4">
+          <p className="text-text-muted font-mono text-xs uppercase">Open Takedown Cases</p>
+          <p className="font-display text-text mt-2 text-2xl font-bold">
+            {summary.counts.openTakedownCases}
+          </p>
+        </div>
+      </div>
+
+      {summary.recentAudit.length > 0 ? (
+        <div className="border-border bg-surface-1 rounded-lg border p-4">
+          <h3 className="font-display text-text text-sm font-semibold">
+            Recent Immutable Audit Events
+          </h3>
+          <ul className="divide-border mt-3 divide-y text-xs">
+            {summary.recentAudit.map((ev) => (
+              <li key={ev.id} className="flex flex-wrap justify-between gap-2 py-2">
+                <span className="text-text font-mono">{ev.action}</span>
+                <span className="text-text-muted font-mono">
+                  {ev.targetType}:{ev.targetId}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </section>
+  );
+}
 
 export default function AdminOverviewPage() {
   return (
@@ -73,41 +122,24 @@ export default function AdminOverviewPage() {
         </h1>
         <p className="cg-prose text-text-secondary text-sm leading-6">
           Separated from consumer discovery chrome for high-density operational review. Mutating
-          actions activate in Milestone M2 behind PostgreSQL RBAC sessions, CSRF checks, and
-          verified MFA.
+          actions run behind PostgreSQL RBAC sessions, separation-of-duties checks, and verified
+          MFA.
         </p>
       </section>
 
-      <section aria-labelledby="modules-heading" className="space-y-4">
+      <Suspense fallback={<Skeleton className="h-36 w-full" />}>
+        <AdminLiveMetricsPanel />
+      </Suspense>
+
+      <section aria-labelledby="rbac-heading" className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 id="modules-heading" className="font-display text-text text-lg font-semibold">
-            Control Plane Modules
+          <h2 id="rbac-heading" className="font-display text-text text-lg font-semibold">
+            Active RBAC &amp; Separation-of-Duties Matrix
           </h2>
           <ButtonLink href="/api/v1/health" variant="outline" size="sm">
             Inspect Health JSON
           </ButtonLink>
         </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {ADMIN_MODULES.map((mod) => (
-            <article key={mod.title} className="cg-surface flex flex-col justify-between p-5">
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-text-muted font-mono text-xs">{mod.milestone}</span>
-                  <Badge tone={mod.tone}>{mod.status}</Badge>
-                </div>
-                <h3 className="font-display text-text text-base font-semibold">{mod.title}</h3>
-                <p className="text-text-secondary text-xs leading-5">{mod.summary}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section aria-labelledby="rbac-heading" className="space-y-4">
-        <h2 id="rbac-heading" className="font-display text-text text-lg font-semibold">
-          Active RBAC &amp; Separation-of-Duties Matrix
-        </h2>
         <div className="border-border bg-surface-1 overflow-x-auto rounded-lg border">
           <table className="w-full border-collapse text-left text-xs">
             <thead>

@@ -9,7 +9,7 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { users } from "./identity";
+import { users } from "./identity.ts";
 
 export const titles = pgTable(
   "titles",
@@ -22,10 +22,7 @@ export const titles = pgTable(
     originalLanguage: text("original_language").notNull().default("en"),
     releaseYear: integer("release_year").notNull(),
     runtimeMinutes: integer("runtime_minutes").notNull(),
-    maturityRating: text("maturity_rating")
-      .$type<MaturityRating>()
-      .notNull()
-      .default("UNRATED"),
+    maturityRating: text("maturity_rating").$type<MaturityRating>().notNull().default("UNRATED"),
     legalHold: boolean("legal_hold").notNull().default(false),
     isDevelopmentFixture: boolean("is_development_fixture").notNull().default(false),
     publishedAt: timestamp("published_at", { withTimezone: true }),

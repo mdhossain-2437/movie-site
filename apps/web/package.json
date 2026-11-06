@@ -15,6 +15,7 @@
     "@movie/contracts": "workspace:*",
     "@movie/db": "workspace:*",
     "@movie/domain": "workspace:*",
+    "@movie/media": "workspace:*",
     "@movie/observability": "workspace:*",
     "@movie/storage": "workspace:*",
     "next": "16.4.5",

@@ -274,6 +274,7 @@ export class StorageIntegrityError extends Error {
 export class InMemoryStorageAdapter implements StorageAdapter {
   private readonly uploads = new Map<string, InMemoryUploadRecord>();
   private readonly objects = new Map<string, StoredObjectMetadata>();
+  private readonly objectBytes = new Map<string, Uint8Array>();
   private readonly signingSecret: string;
 
   constructor(options?: { signingSecret?: string }) {
@@ -486,6 +487,14 @@ export class InMemoryStorageAdapter implements StorageAdapter {
       createdAt: now,
     };
 
+    const combinedBytes = new Uint8Array(totalSize);
+    let offset = 0;
+    for (const chunk of orderedChunks) {
+      combinedBytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    this.objectBytes.set(this.key(record.bucket, record.objectKey), combinedBytes);
+
     this.objects.set(this.key(record.bucket, record.objectKey), verified);
     record.completedResult = verified;
     record.parts.clear();
@@ -570,8 +579,38 @@ export class InMemoryStorageAdapter implements StorageAdapter {
     return timingSafeEqual(sigBuf, expBuf);
   }
 
+  async readBytes(bucket: string, objectKey: string): Promise<Uint8Array | null> {
+    return this.objectBytes.get(this.key(bucket, objectKey)) ?? null;
+  }
+
+  async putDirectObject(
+    bucket: string,
+    objectKey: string,
+    bytes: Uint8Array,
+    contentType = "application/octet-stream",
+    now = new Date(),
+  ): Promise<StoredObjectMetadata> {
+    const sha256 = await computeSha256Hex([bytes]);
+    const etag = createHash("sha256").update(bytes).digest("hex").slice(0, 32);
+    const meta: StoredObjectMetadata = {
+      bucket,
+      objectKey,
+      sizeBytes: bytes.byteLength,
+      sha256,
+      contentType,
+      etag,
+      visibility: "private",
+      quarantineState: "VERIFIED",
+      createdAt: now,
+    };
+    this.objects.set(this.key(bucket, objectKey), meta);
+    this.objectBytes.set(this.key(bucket, objectKey), new Uint8Array(bytes));
+    return meta;
+  }
+
   async deleteObject(bucket: string, objectKey: string): Promise<void> {
     this.objects.delete(this.key(bucket, objectKey));
+    this.objectBytes.delete(this.key(bucket, objectKey));
   }
 
   async cleanupExpiredUploads(now = new Date()): Promise<number> {
@@ -585,3 +624,5 @@ export class InMemoryStorageAdapter implements StorageAdapter {
     return cleaned;
   }
 }
+
+export * from "./range.ts";

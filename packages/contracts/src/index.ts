@@ -115,6 +115,39 @@ export const ReplicationStatusSchema = z.enum([
 ]);
 export type ReplicationStatus = z.infer<typeof ReplicationStatusSchema>;
 
+export const DeliveryEventTypeSchema = z.enum([
+  "PLAYBACK_REQUESTED",
+  "PLAYBACK_AUTHORIZED",
+  "MANIFEST_LOADED",
+  "FIRST_FRAME",
+  "REBUFFER_STARTED",
+  "REBUFFER_ENDED",
+  "QUALITY_CHANGED",
+  "PLAYBACK_ERROR",
+  "ENDED",
+  "ABANDONED",
+]);
+export type DeliveryEventType = z.infer<typeof DeliveryEventTypeSchema>;
+export const PlaybackQoeEventTypeSchema = DeliveryEventTypeSchema;
+export type PlaybackQoeEventType = DeliveryEventType;
+
+export const DrmSystemSchema = z.enum(["WIDEVINE", "FAIRPLAY", "PLAYREADY"]);
+export type DrmSystem = z.infer<typeof DrmSystemSchema>;
+
+export const PlaybackQoeEventInputSchema = z.object({
+  playbackToken: z.string().min(16).max(256),
+  eventType: DeliveryEventTypeSchema,
+  startupLatencyMs: z.number().int().min(0).max(300_000).optional(),
+  rebufferDurationMs: z.number().int().min(0).max(300_000).optional(),
+  renditionProfile: z.string().max(64).optional(),
+  regionCode: z.string().length(2).optional(),
+  errorCode: z.string().max(64).optional(),
+  correlationId: z.string().max(128).optional(),
+  metrics: z.record(z.string(), z.unknown()).optional(),
+  occurredAt: z.coerce.date().optional(),
+});
+export type PlaybackQoeEventInput = z.infer<typeof PlaybackQoeEventInputSchema>;
+
 export const MaturityRatingSchema = z.enum(["U", "PG", "PG13", "R16", "R18", "UNRATED"]);
 export type MaturityRating = z.infer<typeof MaturityRatingSchema>;
 

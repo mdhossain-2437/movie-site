@@ -23,11 +23,14 @@ redundant libraries. pnpm 11 blocks dependency lifecycle (build) scripts unless 
    | `unrs-resolver` | Native resolver used by `eslint-config-next` import rules |
    | `esbuild` | Native binary used by Vite/Vitest |
    | `@tailwindcss/oxide` | Tailwind CSS v4 native engine |
-   | `@prisma/client`, `@prisma/engines`, `prisma` | Reserved for the M2 database package (not yet installed) |
+   | `@prisma/client`, `@prisma/engines`, `prisma` | Legacy reservation (superseded by Drizzle ORM in ADR 0003; no native engine build needed) |
 
-5. **Adding a dependency** requires: stable release (no canary/beta/rc), check that the platform or an
+5. **Milestone M2 Database Dependencies (`@movie/db`):** `drizzle-orm@0.45.4`, `drizzle-kit@0.31.11`,
+   `pg@8.23.1`, `@types/pg@8.23.1`, and `@electric-sql/pglite@0.5.15` (pure JS/TS + prebuilt WASM,
+   requiring zero additional `allowBuilds` lifecycle exceptions).
+6. **Adding a dependency** requires: stable release (no canary/beta/rc), check that the platform or an
    existing dependency doesn't already cover it, licence check, and a note in the PR.
-6. **Shared dev tooling** (TypeScript, Vitest, Playwright, Prettier) lives in the root manifest;
+7. **Shared dev tooling** (TypeScript, Vitest, Playwright, Prettier) lives in the root manifest;
    runtime dependencies live in the package that uses them.
 
 ## Consequences

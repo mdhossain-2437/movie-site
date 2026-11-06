@@ -22,9 +22,12 @@ A modular-monolith web platform for lawful film discovery, localized English/Ban
 ├── apps/
 │   └── web/                  # @movie/web — Next.js 16 App Router, UI primitives, proxy.ts, Route Handlers
 ├── packages/
+│   ├── auth/                 # @movie/auth — scrypt hashing, TOTP MFA, SHA-256 hashed sessions & CSRF guards
 │   ├── config/               # @movie/config — Zod v4 environment validation & production fail-fast guards
 │   ├── contracts/            # @movie/contracts — Shared schemas, enums & RFC 9457 Problem Details
+│   ├── db/                   # @movie/db — 26-table Drizzle PostgreSQL schema, migrations & centralized DAL
 │   ├── domain/               # @movie/domain — Central RightsDecisionService, RBAC matrix & asset state machine
+│   ├── media/                # @movie/media — Quarantine header probing, safe execFile ffprobe & ABR profiles
 │   ├── observability/        # @movie/observability — Structured JSON logger with secret/URL redaction
 │   └── storage/              # @movie/storage — Private StorageAdapter, multipart quarantine & HMAC URLs
 ├── infra/
@@ -52,7 +55,11 @@ cp .env.example .env.local
 # 2. Install workspace dependencies
 pnpm install
 
-# 3. Start local development server (http://localhost:3000)
+# 3. Apply PostgreSQL migrations & baseline genre seed (zero fake movie data)
+pnpm db:migrate
+pnpm db:seed
+
+# 4. Start local development server (http://localhost:3000)
 pnpm dev
 ```
 
@@ -77,5 +84,6 @@ pnpm test:e2e       # Run Playwright E2E tests (requires Playwright Chromium ins
 - [Security Threat Model (`docs/security/threat-model.md`)](./docs/security/threat-model.md)
 - [Rights & Takedown Governance (`docs/security/rights-and-takedown.md`)](./docs/security/rights-and-takedown.md)
 - [Cost & Capacity Model (`docs/operations/cost-model.md`)](./docs/operations/cost-model.md)
+- [Operational Runbooks (`docs/operations/runbooks.md`)](./docs/operations/runbooks.md)
 - [Verification & Test Plan (`docs/testing/test-plan.md`)](./docs/testing/test-plan.md)
 - [Architecture Decision Records (`docs/adr/`)](./docs/adr/)

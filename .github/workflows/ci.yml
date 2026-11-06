@@ -50,6 +50,9 @@ jobs:
       - name: Run unit, contract & negative policy tests
         run: pnpm test
 
+      - name: Initialize local PostgreSQL schema & baseline genres
+        run: pnpm db:migrate && pnpm db:seed
+
       - name: Build Next.js 16 production bundle
         env:
           NODE_ENV: production

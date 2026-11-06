@@ -8,6 +8,13 @@
       "when": 1793956917971,
       "tag": "0000_windy_wallop",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793960000000,
+      "tag": "0001_v4_media_qoe_replication",
+      "breakpoints": true
     }
   ]
 }

@@ -14,8 +14,12 @@ export const metadata: Metadata = {
 
 const ADMIN_SECTIONS = [
   { label: "Overview", href: "/admin" },
+  { label: "Catalogue", href: "/admin/titles" },
+  { label: "Rights Ledger", href: "/admin/rights" },
+  { label: "Media & Outbox", href: "/admin/media" },
+  { label: "Takedowns", href: "/admin/takedowns" },
+  { label: "Audit Trail", href: "/admin/audit" },
   { label: "Public Site", href: "/" },
-  { label: "Takedown Policy", href: "/legal/takedown" },
 ] as const;
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

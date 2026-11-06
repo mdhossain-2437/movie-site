@@ -1,17 +1,9 @@
-import type { ResolutionTier, Role } from "@movie/contracts";
-import {
-  index,
-  integer,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-  uniqueIndex,
-} from "drizzle-orm/pg-core";
-import { titles } from "./catalogue";
-import { users } from "./identity";
-import { mediaAssets } from "./media";
-import { rightsGrants } from "./rights";
+import type { DeliveryEventType, ResolutionTier, Role } from "@movie/contracts";
+import { index, integer, jsonb, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { titles } from "./catalogue.ts";
+import { users } from "./identity.ts";
+import { mediaAssets } from "./media.ts";
+import { rightsGrants } from "./rights.ts";
 
 export const playbackSessions = pgTable(
   "playback_sessions",
@@ -48,11 +40,22 @@ export const deliveryEvents = pgTable(
     playbackSessionId: text("playback_session_id")
       .notNull()
       .references(() => playbackSessions.id, { onDelete: "cascade" }),
-    eventType: text("event_type").notNull(),
+    eventType: text("event_type").$type<DeliveryEventType>().notNull(),
+    startupLatencyMs: integer("startup_latency_ms"),
+    rebufferDurationMs: integer("rebuffer_duration_ms"),
+    renditionProfile: text("rendition_profile"),
+    regionCode: text("region_code"),
+    errorCode: text("error_code"),
+    correlationId: text("correlation_id"),
+    occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull().defaultNow(),
     metrics: jsonb("metrics").$type<Record<string, unknown>>().notNull().default({}),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("delivery_events_session_idx").on(table.playbackSessionId)],
+  (table) => [
+    index("delivery_events_session_idx").on(table.playbackSessionId),
+    index("delivery_events_type_occurred_idx").on(table.eventType, table.occurredAt),
+    index("delivery_events_occurred_idx").on(table.occurredAt),
+  ],
 );
 
 export const auditEvents = pgTable(

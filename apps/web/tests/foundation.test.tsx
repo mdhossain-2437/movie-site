@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { GET as getHealth } from "@/app/api/v1/health/route";
 import Home from "@/app/page";
 import { proxy } from "@/proxy";
+import { VideoPlayerShell } from "@/components/player/video-player-shell";
 import { AvailabilityBadge, Button, ErrorState, FilterChip } from "@/components/ui";
 import { HealthResponseSchema } from "@movie/contracts";
 
@@ -50,10 +51,28 @@ describe("Cinematic Graphite UI primitives", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: /catalogue opens only to verified rights/i }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /browse catalogue shell/i })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /browse catalogue/i })).toHaveAttribute(
       "href",
       "/movies",
     );
+  });
+
+  it("renders VideoPlayerShell in IDLE state without autoplay and displays DRM disclosure", () => {
+    render(
+      <VideoPlayerShell
+        titleSlug="meghna-chronicle-fixture"
+        localizedTitle="Meghna Chronicle"
+        runtimeMinutes={95}
+      />,
+    );
+    const authorizeBtn = screen.getByRole("button", { name: /authorize & load stream/i });
+    expect(authorizeBtn).toBeInTheDocument();
+    const videoEl = screen.getByLabelText("Video player for Meghna Chronicle");
+    expect(videoEl).toHaveAttribute("preload", "none");
+    expect(videoEl).not.toHaveAttribute("autoplay");
+    expect(
+      screen.getByText(/Signed URLs enforce short-lived access control, not DRM/i),
+    ).toBeInTheDocument();
   });
 });
 

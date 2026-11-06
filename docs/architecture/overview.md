@@ -7,10 +7,16 @@ Cinematic Graphite is structured as a modular monolith inside a `pnpm` workspace
 ```mermaid
 flowchart TD
   Browser["Browser / Mobile Web"] --> Proxy["Next.js 16 proxy.ts (CSP, Request ID, Referrer-Policy)"]
-  Proxy --> Web["@movie/web (App Router RSC + Route Handlers)"]
-  Web --> Domain["@movie/domain (RightsDecisionService, RBAC, Asset Lifecycle)"]
+  Proxy --> Web["@movie/web (App Router RSC + /api/v1/* Route Handlers)"]
+  Web --> Auth["@movie/auth (scrypt, RFC 6238 TOTP MFA, Hashed Sessions, CSRF)"]
+  Web --> DB["@movie/db (Centralized DAL, Drizzle ORM, PostgreSQL / PGlite)"]
+  Auth --> DB
+  DB --> Domain["@movie/domain (RightsDecisionService, RBAC, Asset Lifecycle)"]
+  DB --> Media["@movie/media (Quarantine Header/ffprobe Inspection & ABR Profiles)"]
+  DB --> Storage["@movie/storage (Private Quarantine & Signed Delivery Adapter)"]
+  Web --> Domain
   Web --> Contracts["@movie/contracts (Zod v4 Schemas & RFC 9457 Problem Details)"]
-  Web --> Storage["@movie/storage (Private Quarantine & Signed Delivery Adapter)"]
+  Web --> Storage
   Web --> Obs["@movie/observability (Redacted Structured Logger)"]
   Web --> Config["@movie/config (Fail-Fast Environment Validation)"]
 ```

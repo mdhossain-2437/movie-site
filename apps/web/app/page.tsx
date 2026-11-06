@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FilmStripShowcase, type FilmStripItem } from "@/components/catalogue/film-strip-showcase";
 import { ConsumerShell } from "@/components/layout/site-shell";
 import { AvailabilityBadge, Badge, ButtonLink } from "@/components/ui";
 
@@ -7,6 +8,100 @@ export const metadata: Metadata = {
   description:
     "Lawful movie discovery and rights-gated media distribution platform. Only owned, licensed, or counsel-verified public-domain films are published.",
 };
+
+const DEFAULT_EDITORIAL_FIXTURES: FilmStripItem[] = [
+  {
+    id: "fix-the-last-monsoon",
+    slug: "the-last-monsoon",
+    titleEn: "The Last Monsoon",
+    titleBn: "শেষ বর্ষা",
+    releaseYear: 2024,
+    runtimeMinutes: 118,
+    maturityRating: "PG13",
+    synopsisEn:
+      "A rain-drenched neo-noir tracking an archivist uncovering coastal land syndicates in Old Dhaka.",
+    badgeKind: "stream_allowed",
+    isDevelopmentFixture: true,
+  },
+  {
+    id: "fix-neon-bhasha",
+    slug: "neon-bhasha",
+    titleEn: "Neon Bhasha",
+    titleBn: "নিয়ন ভাষা",
+    releaseYear: 2023,
+    runtimeMinutes: 104,
+    maturityRating: "PG13",
+    synopsisEn:
+      "Cybernetic acoustic linguistics in a subterranean delta megacity running on analog relays.",
+    badgeKind: "stream_allowed",
+    isDevelopmentFixture: true,
+  },
+  {
+    id: "fix-shadows-over-buriganga",
+    slug: "shadows-over-buriganga",
+    titleEn: "Shadows Over Buriganga",
+    titleBn: "বুড়িগঙ্গার ছায়া",
+    releaseYear: 2022,
+    runtimeMinutes: 132,
+    maturityRating: "R16",
+    synopsisEn:
+      "A river police captain uncovers counterfeit chemical manifests drifting between river barges.",
+    badgeKind: "stream_allowed",
+    isDevelopmentFixture: true,
+  },
+  {
+    id: "fix-echoes-of-the-delta",
+    slug: "echoes-of-the-delta",
+    titleEn: "Echoes of the Delta",
+    titleBn: "বদ্বীপের প্রতিধ্বনি",
+    releaseYear: 2021,
+    runtimeMinutes: 92,
+    maturityRating: "U",
+    synopsisEn:
+      "Archival soundscapes of century-old wooden paddle steamers traversing the Sundarbans channels.",
+    badgeKind: "download_allowed",
+    isDevelopmentFixture: true,
+  },
+  {
+    id: "fix-midnight-at-curzon-hall",
+    slug: "midnight-at-curzon-hall",
+    titleEn: "Midnight at Curzon Hall",
+    titleBn: "কার্জন হলে মধ্যরাত",
+    releaseYear: 2024,
+    runtimeMinutes: 126,
+    maturityRating: "PG13",
+    synopsisEn:
+      "A mathematical mystery unfolding across red-brick collegiate corridors during curfew.",
+    badgeKind: "stream_allowed",
+    isDevelopmentFixture: true,
+  },
+  {
+    id: "fix-voyage-beyond-stars",
+    slug: "voyage-beyond-stars",
+    titleEn: "Voyage Beyond Stars",
+    titleBn: "নক্ষত্রের ওপারে যাত্রা",
+    releaseYear: 2025,
+    runtimeMinutes: 140,
+    maturityRating: "PG",
+    synopsisEn:
+      "A cosmic expedition navigating deep stellar magnetic storms to recover lost signal archives.",
+    badgeKind: "stream_allowed",
+    isDevelopmentFixture: true,
+  },
+  {
+    id: "fix-symphony-of-the-loom",
+    slug: "symphony-of-the-loom",
+    titleEn: "Symphony of the Loom",
+    titleBn: "তাঁতের সিম্ফনি",
+    releaseYear: 2020,
+    runtimeMinutes: 85,
+    maturityRating: "U",
+    synopsisEn:
+      "The meditative, rhythmic visual poetry of traditional Jamdani master weavers along the Shitalakshya.",
+    badgeKind: "download_allowed",
+    isDevelopmentFixture: true,
+  },
+];
 
 const FOUNDATION_MODULES = [
   {
@@ -24,28 +119,28 @@ const FOUNDATION_MODULES = [
       "Deny-by-default server policy enforcing territory, date windows, separate stream/download rights, legal holds, and DRM gates.",
   },
   {
-    name: "Private Quarantine Storage Adapter",
+    name: "PostgreSQL Persistence, Sessions & DAL",
     state: "Active",
     tone: "success" as const,
     detail:
-      "Multipart ingest with SHA-256 checksum verification, opaque non-PII object keys, and short-lived HMAC delivery URLs.",
+      "26-table relational schema, scrypt + TOTP MFA revocable sessions, separation-of-duties rights approval, and Bangla/English search.",
   },
   {
-    name: "Database, Identity & Catalogue Gate",
-    state: "Milestone M2",
-    tone: "info" as const,
+    name: "Private Quarantine Ingest & Adaptive Playback",
+    state: "Active",
+    tone: "success" as const,
     detail:
-      "PostgreSQL persistence, RBAC sessions, editorial draft workflow, and rights-verified public catalogue publication.",
+      "Multipart quarantine uploads, safe header/ffprobe validation, durable outbox worker, server-authorized playback sessions, and fail-closed DRM boundary.",
   },
 ] as const;
 
 export default function Home() {
   return (
     <ConsumerShell>
-      <section aria-labelledby="hero-heading" className="py-6 sm:py-12">
+      <section aria-labelledby="hero-heading" className="py-6 sm:py-10">
         <div className="flex flex-wrap items-center gap-2.5">
-          <Badge tone="accent">Milestone M1 · Foundation Active</Badge>
-          <AvailabilityBadge kind="rights_pending" />
+          <Badge tone="accent">Milestone M2 · Cinematic Editorial UI/UX Upgrade</Badge>
+          <AvailabilityBadge kind="stream_allowed" />
         </div>
 
         <h1
@@ -63,18 +158,28 @@ export default function Home() {
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <ButtonLink href="/movies" variant="primary" size="lg">
-            Browse Catalogue Shell
+            Browse Catalogue
           </ButtonLink>
-          <ButtonLink href="/search" variant="secondary" size="lg">
-            Search Catalogue
+          <ButtonLink href="/collections/monsoon-noir-archive" variant="secondary" size="lg">
+            Curated Collections
           </ButtonLink>
-          <ButtonLink href="/admin" variant="outline" size="lg">
-            Operations Console
+          <ButtonLink href="/people/amina-rahman" variant="outline" size="lg">
+            Featured Director
           </ButtonLink>
         </div>
       </section>
 
-      <section aria-labelledby="readiness-heading" className="mt-10 sm:mt-14">
+      {/* Concept #1: Vertical Film-Strip Showcase Stage */}
+      <FilmStripShowcase
+        breadcrumbTitle="Monsoon Noir & Archival Vault"
+        breadcrumbCategory="Editorial"
+        watermarkText="GRAPHITE"
+        heading="Curated Showcase Stage"
+        subheading="Atmospheric 7-panel interactive vertical gallery. Hover to elevate warm gold illumination and reveal technical synopses."
+        items={DEFAULT_EDITORIAL_FIXTURES}
+      />
+
+      <section aria-labelledby="readiness-heading" className="mt-14 sm:mt-20">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-text-muted font-mono text-xs tracking-wide uppercase">

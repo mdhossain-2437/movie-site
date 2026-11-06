@@ -11,7 +11,7 @@ export interface NavItem {
 export function DesktopNavLinks({ items }: { items: readonly NavItem[] }) {
   const pathname = usePathname() ?? "";
   return (
-    <ul className="hidden items-center gap-1 md:flex">
+    <ul className="hidden items-center gap-1 lg:flex">
       {items.map((item) => {
         const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
         return (

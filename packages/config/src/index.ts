@@ -38,6 +38,7 @@ export const EnvSchema = z
       .default("none"),
     VIDEO_PROVIDER_ACCOUNT_ID: z.string().min(1).optional(),
     VIDEO_PROVIDER_API_TOKEN: z.string().min(1).optional(),
+    DRM_ADAPTER_CONFIGURED: BooleanFlagSchema.default(false),
 
     TMDB_API_KEY: z.string().min(1).optional(),
     TMDB_COMMERCIAL_LICENSE_CONFIRMED: BooleanFlagSchema.default(false),

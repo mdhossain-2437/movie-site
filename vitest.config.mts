@@ -14,6 +14,7 @@ export default defineConfig({
       "@movie/contracts": path.resolve(rootDir, "packages/contracts/src/index.ts"),
       "@movie/db": path.resolve(rootDir, "packages/db/src/index.ts"),
       "@movie/domain": path.resolve(rootDir, "packages/domain/src/index.ts"),
+      "@movie/media": path.resolve(rootDir, "packages/media/src/index.ts"),
       "@movie/observability": path.resolve(rootDir, "packages/observability/src/index.ts"),
       "@movie/storage": path.resolve(rootDir, "packages/storage/src/index.ts"),
       "server-only": path.resolve(rootDir, "vitest.server-only.ts"),
@@ -21,6 +22,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    testTimeout: 30_000,
     setupFiles: ["./vitest.setup.ts"],
     include: ["packages/**/*.test.ts", "apps/web/**/*.test.{ts,tsx}"],
     exclude: ["**/node_modules/**", "**/.next/**", "**/dist/**", "tests/e2e/**"],

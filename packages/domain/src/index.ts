@@ -1,3 +1,3 @@
-export * from "./rbac";
-export * from "./asset-lifecycle";
-export * from "./rights-decision";
+export * from "./rbac.ts";
+export * from "./asset-lifecycle.ts";
+export * from "./rights-decision.ts";

@@ -1,7 +1,7 @@
 node_modules/
 .next/
 .next-docs/
-.agents/
+.agents/teamwork/
 .local-data/
 out/
 dist/

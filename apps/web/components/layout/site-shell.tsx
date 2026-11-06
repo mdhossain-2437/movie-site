@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { DesktopNavLinks, MobileNavLinks, type NavItem } from "./nav-links";
+import { SearchCommandModal } from "./search-command";
+import { FloatingDock } from "./floating-dock";
 
 export const PRIMARY_NAV_ITEMS: readonly NavItem[] = [
   { href: "/", label: "Home" },
@@ -43,7 +45,7 @@ export function BrandMark() {
 
 function DesktopNavFallback({ items }: { items: readonly NavItem[] }) {
   return (
-    <ul className="hidden items-center gap-1 md:flex">
+    <ul className="hidden items-center gap-1 lg:flex">
       {items.map((item) => (
         <li key={item.href}>
           <Link
@@ -77,36 +79,37 @@ function MobileNavFallback({ items }: { items: readonly NavItem[] }) {
 
 export function SiteHeader() {
   return (
-    <header className="border-border bg-canvas/95 sticky top-0 z-20 border-b backdrop-blur-xs">
-      <div className="cg-container flex h-16 items-center justify-between gap-4">
-        <div className="flex items-center gap-6">
+    <header className="border-border bg-canvas/95 sticky top-0 z-20 max-w-full overflow-x-clip border-b backdrop-blur-xs">
+      <div className="cg-container flex h-16 max-w-full items-center justify-between gap-2 sm:gap-4">
+        <div className="flex min-w-0 shrink items-center gap-3 sm:gap-6">
           <Link
             href="/"
-            className="font-display text-text inline-flex min-h-11 items-center gap-2.5 rounded-sm px-1 text-lg font-bold tracking-tight"
+            className="font-display text-text inline-flex min-h-11 shrink-0 items-center gap-2 rounded-sm px-1 text-base font-bold tracking-tight sm:text-lg"
           >
             <BrandMark />
-            <span>
+            <span className="truncate">
               Cinematic <span className="text-accent">Graphite</span>
             </span>
           </Link>
 
-          <nav aria-label="Primary">
+          <nav aria-label="Primary" className="hidden lg:block">
             <Suspense fallback={<DesktopNavFallback items={PRIMARY_NAV_ITEMS} />}>
               <DesktopNavLinks items={PRIMARY_NAV_ITEMS} />
             </Suspense>
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <SearchCommandModal />
           <Link
             href="/admin"
-            className="border-border bg-surface-1 text-text-secondary hover:bg-surface-2 hover:text-text inline-flex min-h-10 items-center rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors"
+            className="border-border bg-surface-1 text-text-secondary hover:bg-surface-2 hover:text-text hidden min-h-10 items-center rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors sm:inline-flex"
           >
             Operations
           </Link>
           <Link
             href="/account"
-            className="text-text-secondary hover:bg-surface-2 hover:text-text hidden min-h-10 items-center rounded-sm px-3.5 py-1.5 text-sm font-medium transition-colors md:inline-flex"
+            className="text-text-secondary hover:bg-surface-2 hover:text-text hidden min-h-10 items-center rounded-sm px-3.5 py-1.5 text-sm font-medium transition-colors lg:inline-flex"
           >
             Profile
           </Link>
@@ -179,13 +182,16 @@ export function SiteFooter() {
 
 export function ConsumerShell({ children }: { children: ReactNode }) {
   return (
-    <>
+    <div className="bg-canvas text-text flex min-h-screen max-w-full flex-col overflow-x-clip">
       <SiteHeader />
-      <main id="main" className="cg-container flex-1 py-10 sm:py-14">
+      <main
+        id="main"
+        className="cg-container max-w-full flex-1 overflow-x-clip py-10 pb-28 sm:py-14 sm:pb-32"
+      >
         {children}
       </main>
       <SiteFooter />
-      <MobileBottomNav />
-    </>
+      <FloatingDock />
+    </div>
   );
 }
