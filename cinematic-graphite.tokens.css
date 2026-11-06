@@ -1,0 +1,212 @@
+/*
+ * Cinematic Graphite — design tokens v1.0
+ * Companion: movie-platform-cinematic-design-system-v1.md
+ * Framework-neutral CSS tokens. Use in Tailwind, CSS Modules, or vanilla CSS.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* Colors: primitives */
+  --cg-graphite-950: #080a0d;
+  --cg-graphite-900: #0d1116;
+  --cg-graphite-850: #12171e;
+  --cg-graphite-800: #181f28;
+  --cg-graphite-750: #222b36;
+  --cg-graphite-700: #2b3542;
+  --cg-graphite-600: #425063;
+  --cg-ivory-50: #f4f6f8;
+  --cg-slate-200: #b2bbc7;
+  --cg-slate-400: #818d9b;
+  --cg-gold-500: #d8b36a;
+  --cg-gold-400: #e8c77f;
+  --cg-gold-600: #b9924d;
+  --cg-green-500: #49c69a;
+  --cg-amber-500: #f0b85f;
+  --cg-red-500: #f16b73;
+  --cg-blue-500: #73a9f4;
+
+  /* Colors: semantic aliases */
+  --cg-bg: var(--cg-graphite-950);
+  --cg-bg-raised: var(--cg-graphite-900);
+  --cg-surface-1: var(--cg-graphite-850);
+  --cg-surface-2: var(--cg-graphite-800);
+  --cg-surface-3: var(--cg-graphite-750);
+  --cg-border: var(--cg-graphite-700);
+  --cg-border-strong: var(--cg-graphite-600);
+  --cg-text: var(--cg-ivory-50);
+  --cg-text-secondary: var(--cg-slate-200);
+  --cg-text-muted: var(--cg-slate-400);
+  --cg-accent: var(--cg-gold-500);
+  --cg-accent-hover: var(--cg-gold-400);
+  --cg-accent-pressed: var(--cg-gold-600);
+  --cg-success: var(--cg-green-500);
+  --cg-warning: var(--cg-amber-500);
+  --cg-danger: var(--cg-red-500);
+  --cg-info: var(--cg-blue-500);
+
+  /* Typography */
+  --cg-font-display: "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --cg-font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --cg-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  --cg-text-xs: 0.75rem;
+  --cg-text-sm: 0.875rem;
+  --cg-text-base: 1rem;
+  --cg-text-lg: 1.125rem;
+  --cg-text-xl: 1.25rem;
+  --cg-text-2xl: 1.5rem;
+  --cg-text-3xl: 2rem;
+  --cg-text-4xl: 2.75rem;
+  --cg-text-display: 3.5rem;
+
+  /* Spacing: 4px base */
+  --cg-space-1: 0.25rem;
+  --cg-space-2: 0.5rem;
+  --cg-space-3: 0.75rem;
+  --cg-space-4: 1rem;
+  --cg-space-5: 1.25rem;
+  --cg-space-6: 1.5rem;
+  --cg-space-8: 2rem;
+  --cg-space-10: 2.5rem;
+  --cg-space-12: 3rem;
+  --cg-space-16: 4rem;
+  --cg-space-20: 5rem;
+  --cg-space-24: 6rem;
+
+  /* Geometry */
+  --cg-radius-xs: 0.25rem;
+  --cg-radius-sm: 0.5rem;
+  --cg-radius-md: 0.75rem;
+  --cg-radius-lg: 1rem;
+  --cg-radius-xl: 1.375rem;
+  --cg-radius-pill: 999px;
+  --cg-content-max: 90rem;
+  --cg-detail-max: 80rem;
+  --cg-prose-max: 47.5rem;
+
+  /* Motion */
+  --cg-motion-fast: 120ms;
+  --cg-motion-standard: 180ms;
+  --cg-motion-enter: 240ms;
+  --cg-motion-emphasis: 360ms;
+  --cg-ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Focus */
+  --cg-focus-width: 2px;
+  --cg-focus-offset: 3px;
+  --cg-focus-color: var(--cg-gold-400);
+
+  /* Layering */
+  --cg-z-content: 0;
+  --cg-z-header: 20;
+  --cg-z-sticky: 30;
+  --cg-z-popover: 50;
+  --cg-z-dialog: 70;
+  --cg-z-toast: 90;
+  --cg-z-player-controls: 10;
+}
+
+html {
+  background: var(--cg-bg);
+  color: var(--cg-text);
+  font-family: var(--cg-font-body);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background: var(--cg-bg);
+  color: var(--cg-text);
+}
+
+:focus-visible {
+  outline: var(--cg-focus-width) solid var(--cg-focus-color);
+  outline-offset: var(--cg-focus-offset);
+}
+
+::selection {
+  color: var(--cg-bg);
+  background: var(--cg-accent);
+}
+
+.cg-container {
+  width: min(calc(100% - 2.5rem), var(--cg-content-max));
+  margin-inline: auto;
+}
+
+.cg-detail-container {
+  width: min(calc(100% - 2.5rem), var(--cg-detail-max));
+  margin-inline: auto;
+}
+
+.cg-prose {
+  width: min(100%, var(--cg-prose-max));
+}
+
+.cg-poster {
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: var(--cg-radius-md);
+  background: var(--cg-surface-2);
+}
+
+.cg-backdrop {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--cg-radius-xl);
+  background: var(--cg-surface-2);
+}
+
+.cg-surface {
+  border: 1px solid var(--cg-border);
+  border-radius: var(--cg-radius-lg);
+  background: var(--cg-surface-1);
+}
+
+.cg-muted {
+  color: var(--cg-text-muted);
+}
+
+.cg-secondary {
+  color: var(--cg-text-secondary);
+}
+
+.cg-accent {
+  color: var(--cg-accent);
+}
+
+@media (max-width: 639px) {
+  :root {
+    --cg-text-display: 2.375rem;
+    --cg-text-4xl: 2.125rem;
+  }
+
+  .cg-container,
+  .cg-detail-container {
+    width: min(calc(100% - 2rem), var(--cg-content-max));
+  }
+}
+
+@media (min-width: 1280px) {
+  .cg-container,
+  .cg-detail-container {
+    width: min(calc(100% - 6rem), var(--cg-content-max));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Contrast is not guaranteed merely by using semantic tokens.
+   Validate every foreground/background pairing and component state against WCAG 2.2 AA. */

@@ -1,0 +1,54 @@
+@import "tailwindcss";
+@import "../styles/cinematic-graphite.tokens.css";
+
+/*
+ * Cinematic Graphite → Tailwind bridge.
+ * Source of truth for values: styles/cinematic-graphite.tokens.css
+ * (copied unchanged from /cinematic-graphite.tokens.css at the repo root).
+ */
+
+:root {
+  /* next/font exposes hashed family names via CSS variables; prefer them over raw names. */
+  --cg-font-display: var(--font-manrope), "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --cg-font-body: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --cg-font-mono:
+    var(--font-geist-mono), "Geist Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+@theme inline {
+  /* Reset Tailwind's default palette so only design-system colors are available. */
+  --color-*: initial;
+
+  --color-canvas: var(--cg-bg);
+  --color-canvas-raised: var(--cg-bg-raised);
+  --color-surface-1: var(--cg-surface-1);
+  --color-surface-2: var(--cg-surface-2);
+  --color-surface-3: var(--cg-surface-3);
+  --color-border: var(--cg-border);
+  --color-border-strong: var(--cg-border-strong);
+  --color-text: var(--cg-text);
+  --color-text-secondary: var(--cg-text-secondary);
+  --color-text-muted: var(--cg-text-muted);
+  --color-accent: var(--cg-accent);
+  --color-accent-hover: var(--cg-accent-hover);
+  --color-accent-pressed: var(--cg-accent-pressed);
+  --color-success: var(--cg-success);
+  --color-warning: var(--cg-warning);
+  --color-danger: var(--cg-danger);
+  --color-info: var(--cg-info);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-display: var(--cg-font-display);
+  --font-sans: var(--cg-font-body);
+  --font-mono: var(--cg-font-mono);
+
+  --radius-xs: var(--cg-radius-xs);
+  --radius-sm: var(--cg-radius-sm);
+  --radius-md: var(--cg-radius-md);
+  --radius-lg: var(--cg-radius-lg);
+  --radius-xl: var(--cg-radius-xl);
+  --radius-pill: var(--cg-radius-pill);
+
+  --ease-standard: var(--cg-ease-standard);
+}

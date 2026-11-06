@@ -1,0 +1,41 @@
+{
+  "name": "movie-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=24.0.0 <25",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @movie/web dev",
+    "build": "pnpm --filter @movie/web build",
+    "start": "pnpm --filter @movie/web start",
+    "lint": "pnpm --filter @movie/web lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:generate": "pnpm --filter @movie/db generate",
+    "db:migrate": "pnpm --filter @movie/db migrate",
+    "db:seed": "pnpm --filter @movie/db seed"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.2.1",
+    "jsdom": "31.0.0",
+    "prettier": "3.9.10",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "typescript": "5.9.3",
+    "vite": "8.3.6",
+    "vitest": "5.1.0"
+  }
+}

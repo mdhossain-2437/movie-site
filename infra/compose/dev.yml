@@ -1,0 +1,59 @@
+name: movie-platform-dev
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-movie_platform}
+      POSTGRES_USER: ${POSTGRES_USER:-movie_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_dev_only_change_me}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER:-movie_app} -d $${POSTGRES_DB:-movie_platform}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1G
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

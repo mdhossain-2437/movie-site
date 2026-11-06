@@ -1,0 +1,20 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# pnpm blocks dependency build scripts unless explicitly allowed.
+# Every entry below is a reviewed exception (see docs/adr/0002-dependency-policy.md).
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+  esbuild: true
+  "@tailwindcss/oxide": true
+  "@prisma/client": true
+  "@prisma/engines": true
+  prisma: true
+
+minimumReleaseAgeExclude:
+  - "@playwright/test@1.65.0"
+  - jsdom@31.0.0
+  - playwright-core@1.65.0
+  - playwright@1.65.0
