@@ -16,7 +16,7 @@ export function FloatingDock() {
       aria-label="Signature floating dock navigation"
       className="border-border/80 bg-canvas/90 fixed bottom-4 left-1/2 z-30 flex max-w-[calc(100vw-1rem)] -translate-x-1/2 items-center gap-1 rounded-xl border p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.88)] backdrop-blur-md transition-all motion-reduce:transition-none sm:bottom-5 sm:gap-1.5"
     >
-      {/* Segment 1: Vibrant Cinema Gold (#F5C518) Brand Tile */}
+      {/* Segment 1: Signature Reddish Cinema Crimson (#E50914) Brand Tile */}
       <Link
         href="/"
         aria-label="CINEVA Home"
@@ -83,7 +83,7 @@ export function FloatingDock() {
         </Link>
       </div>
 
-      {/* Segment 3: Saved / Watchlist Tile with Gold Indicator Dot */}
+      {/* Segment 3: Saved / Watchlist Tile with Crimson Indicator Dot */}
       <Link
         href="/watchlist"
         aria-current={isWatchlist ? "page" : undefined}

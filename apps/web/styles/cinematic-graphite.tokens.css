@@ -1,7 +1,7 @@
 /*
- * CINEVA — Cinema Noir & Solar Amber Design Tokens v2.0
+ * CINEVA — Cinema Noir & Reddish Cinema Crimson Design Tokens v4.0
  * Pitch Cinema Black (#000000), Warm Smoke Charcoal (#141414),
- * Blazing Solar Amber (#D95B16 / #F29F24), and Vibrant Cinema Gold (#F5C518).
+ * Theatrical Crimson Shadow (#120203 / #B8141B), and Signature Cinema Crimson (#E50914).
  */
 
 :root {
@@ -15,9 +15,24 @@
   --cg-graphite-750: #292929;
   --cg-graphite-700: #262626;
   --cg-graphite-600: #4a4642;
-  --cg-ivory-50: #ffffff;
+  --cg-ivory-50: #fef9ef;
   --cg-slate-200: #d8d3cc;
   --cg-slate-400: #8f8a83;
+
+  /* Colors: Reddish Cinema Crimson Primitives */
+  --cg-crimson-950: #120203;
+  --cg-crimson-900: #220406;
+  --cg-crimson-800: #48080d;
+  --cg-crimson-700: #780d14;
+  --cg-crimson-600: #b8141b;
+  --cg-crimson-500: #e50914;
+  --cg-crimson-400: #ff2a34;
+  --cg-crimson-300: #ff5c64;
+  --cg-on-crimson: #ffffff;
+  --cg-crimson-glass: rgba(184, 20, 27, 0.48);
+  --cg-crimson-glow: rgba(229, 9, 20, 0.35);
+
+  /* Colors: legacy primitives for backward compatibility */
   --cg-gold-500: #f5c518;
   --cg-gold-400: #ffd43b;
   --cg-gold-600: #d9a700;
@@ -26,7 +41,7 @@
   --cg-ember-800: #591b05;
   --cg-ember-600: #d95b16;
   --cg-ember-400: #f29f24;
-  --cg-bronze-glass: rgba(142, 88, 56, 0.62);
+  --cg-bronze-glass: var(--cg-crimson-glass);
   --cg-green-500: #3dd68c;
   --cg-amber-500: #f59e0b;
   --cg-red-500: #f25f5c;
@@ -43,22 +58,27 @@
   --cg-text: var(--cg-ivory-50);
   --cg-text-secondary: var(--cg-slate-200);
   --cg-text-muted: var(--cg-slate-400);
-  --cg-accent: var(--cg-gold-500);
-  --cg-accent-hover: var(--cg-gold-400);
-  --cg-accent-pressed: var(--cg-gold-600);
-  --cg-on-accent: var(--cg-on-gold);
-  --cg-ember-deep: var(--cg-ember-950);
-  --cg-ember-umbrage: var(--cg-ember-800);
-  --cg-ember: var(--cg-ember-600);
-  --cg-ember-glow: var(--cg-ember-400);
+  --cg-accent: var(--cg-crimson-500);
+  --cg-accent-hover: var(--cg-crimson-400);
+  --cg-accent-pressed: var(--cg-crimson-600);
+  --cg-on-accent: var(--cg-on-crimson);
+  --cg-color-text: var(--cg-text);
+  --cg-color-canvas: var(--cg-bg);
+  --cg-color-accent: var(--cg-accent);
+  --cg-ember-deep: var(--cg-crimson-950);
+  --cg-ember-umbrage: var(--cg-crimson-800);
+  --cg-ember: var(--cg-crimson-600);
+  --cg-ember-glow: var(--cg-crimson-400);
   --cg-success: var(--cg-green-500);
   --cg-warning: var(--cg-amber-500);
   --cg-danger: var(--cg-red-500);
   --cg-info: var(--cg-blue-500);
 
   /* Typography */
-  --cg-font-display: "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --cg-font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --cg-font-display:
+    "neue-haas-grotesk-display", "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --cg-font-body: "neue-haas-grotesk-display", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --cg-font-weight-base: 500;
   --cg-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
   --cg-text-xs: 0.75rem;
   --cg-text-sm: 0.875rem;
@@ -105,7 +125,7 @@
   /* Focus */
   --cg-focus-width: 2px;
   --cg-focus-offset: 3px;
-  --cg-focus-color: var(--cg-gold-400);
+  --cg-focus-color: var(--cg-crimson-400);
 
   /* Layering */
   --cg-z-content: 0;
@@ -187,6 +207,27 @@ body {
 
 .cg-accent {
   color: var(--cg-accent);
+}
+
+.art-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+  opacity: 0.12;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.75' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+
+.cinema-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+  background: radial-gradient(circle at center, transparent 60%, rgba(18, 2, 3, 0.6) 100%);
 }
 
 @media (max-width: 639px) {

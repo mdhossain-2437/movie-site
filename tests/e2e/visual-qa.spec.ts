@@ -31,6 +31,13 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
     const searchTrigger = page.locator("header button[aria-label*='Open quick catalogue search']");
     await expect(searchTrigger).toHaveAttribute("data-hydrated", "true");
 
+    // Verify CINEVA signature brand tile on FloatingDock
+    const brandTile = page.locator(
+      "nav[aria-label='Signature floating dock navigation'] a[aria-label='CINEVA Home']",
+    );
+    await expect(brandTile).toBeVisible();
+    await expect(brandTile).toHaveText("CINEVA");
+
     // Zero horizontal overflow invariant
     const hasOverflow = await page.evaluate(() => {
       const doc = document.documentElement;
@@ -39,6 +46,24 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
       return doc.scrollWidth > clientWidth || (body && body.scrollWidth > clientWidth);
     });
     expect(hasOverflow, "Page must have zero horizontal overflow").toBe(false);
+
+    // Verify film grain & vignette overlay safety invariants: pointer-events: none and containment
+    const grainSafety = await page.evaluate(() => {
+      const overlays = Array.from(
+        document.querySelectorAll(
+          "[class*='grain'], [class*='vignette'], [aria-hidden='true'] > div",
+        ),
+      );
+      return overlays.every((el) => {
+        const style = window.getComputedStyle(el);
+        return (
+          style.pointerEvents === "none" || el.scrollWidth <= document.documentElement.clientWidth
+        );
+      });
+    });
+    expect(grainSafety, "Film grain and vignette layers must maintain safety containment").toBe(
+      true,
+    );
 
     // Desktop interactive buttons bounding box audit (>= 24x24px)
     const buttons = page.locator("button:visible, [role='button']:visible");

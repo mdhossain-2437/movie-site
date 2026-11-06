@@ -67,11 +67,11 @@ function formatCountryName(languageCode: string, territoryCode: string): string 
 }
 
 /**
- * Full-bleed Solar Amber, Burnt Sienna & Chiaroscuro Ensemble Backdrop.
- * Captures the incandescent golden-hour desert-sun halo and dramatic layered
- * cinema silhouettes while staying 100% original SVG vector art.
+ * Full-bleed Cinema Crimson, Obsidian & Chiaroscuro Ensemble Backdrop.
+ * Captures volumetric theatrical cinema-red rays, ruby rim highlights,
+ * and dramatic layered chiaroscuro silhouettes while staying 100% original SVG vector art.
  */
-function SolarAmberHeroBackdrop() {
+function CinemaCrimsonHeroBackdrop() {
   return (
     <div
       aria-hidden="true"
@@ -83,52 +83,52 @@ function SolarAmberHeroBackdrop() {
         className="h-full w-full object-cover"
       >
         <defs>
-          <radialGradient id="solar-halo-core" cx="50%" cy="54%" r="54%">
-            <stop offset="0%" stopColor="#ffb636" />
-            <stop offset="28%" stopColor="#f29f24" />
-            <stop offset="56%" stopColor="#d95b16" />
-            <stop offset="78%" stopColor="#752406" />
-            <stop offset="100%" stopColor="#1a0601" />
+          <radialGradient id="crimson-halo-core" cx="50%" cy="54%" r="54%">
+            <stop offset="0%" stopColor="#ff2a34" />
+            <stop offset="28%" stopColor="#e50914" />
+            <stop offset="56%" stopColor="#b8141b" />
+            <stop offset="78%" stopColor="#48080d" />
+            <stop offset="100%" stopColor="#120203" />
           </radialGradient>
-          <radialGradient id="solar-sun-disc" cx="50%" cy="46%" r="36%">
-            <stop offset="0%" stopColor="#ffd25a" stopOpacity="0.92" />
-            <stop offset="52%" stopColor="#f28d18" stopOpacity="0.68" />
-            <stop offset="85%" stopColor="#b8430b" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#4a1404" stopOpacity="0" />
+          <radialGradient id="crimson-sun-disc" cx="50%" cy="46%" r="36%">
+            <stop offset="0%" stopColor="#ff5c64" stopOpacity="0.92" />
+            <stop offset="52%" stopColor="#e50914" stopOpacity="0.70" />
+            <stop offset="85%" stopColor="#780d14" stopOpacity="0.30" />
+            <stop offset="100%" stopColor="#220406" stopOpacity="0" />
           </radialGradient>
-          <linearGradient id="umbrage-silhouette" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3b1204" />
-            <stop offset="45%" stopColor="#1e0802" />
-            <stop offset="100%" stopColor="#070200" />
+          <linearGradient id="crimson-silhouette" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#220406" />
+            <stop offset="45%" stopColor="#120203" />
+            <stop offset="100%" stopColor="#050102" />
           </linearGradient>
-          <linearGradient id="umbrage-mid" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#692307" />
-            <stop offset="50%" stopColor="#2b0c02" />
-            <stop offset="100%" stopColor="#0c0301" />
+          <linearGradient id="crimson-mid" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#48080d" />
+            <stop offset="50%" stopColor="#1a0406" />
+            <stop offset="100%" stopColor="#0a0203" />
           </linearGradient>
-          <linearGradient id="rim-gold" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#ffe07d" stopOpacity="0.95" />
-            <stop offset="60%" stopColor="#f29f24" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#591b05" stopOpacity="0" />
+          <linearGradient id="rim-ruby" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ff5c64" stopOpacity="0.95" />
+            <stop offset="60%" stopColor="#ff2a34" stopOpacity="0.60" />
+            <stop offset="100%" stopColor="#48080d" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="bottom-cinema-fade" x1="0" y1="0.58" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1a0601" stopOpacity="0" />
-            <stop offset="68%" stopColor="#0d0300" stopOpacity="0.62" />
-            <stop offset="100%" stopColor="#000000" stopOpacity="0.95" />
+            <stop offset="0%" stopColor="#120203" stopOpacity="0" />
+            <stop offset="68%" stopColor="#090102" stopOpacity="0.65" />
+            <stop offset="100%" stopColor="#000000" stopOpacity="0.98" />
           </linearGradient>
         </defs>
 
-        {/* Base Roasted Espresso & Blazing Solar Dome */}
-        <rect width="1440" height="860" fill="url(#solar-halo-core)" />
-        <circle cx="720" cy="490" r="560" fill="#e67317" opacity="0.32" />
-        <circle cx="720" cy="470" r="465" fill="url(#solar-sun-disc)" />
+        {/* Base Obsidian & Volumetric Cinema Crimson Dome */}
+        <rect width="1440" height="860" fill="url(#crimson-halo-core)" />
+        <circle cx="720" cy="490" r="560" fill="#b8141b" opacity="0.35" />
+        <circle cx="720" cy="470" r="465" fill="url(#crimson-sun-disc)" />
 
-        {/* Diagonal Golden-Hour Light Rays */}
-        <polygon points="480,0 760,0 1120,860 760,860" fill="#ffc44d" opacity="0.11" />
-        <polygon points="780,0 980,0 520,860 280,860" fill="#ffb838" opacity="0.09" />
+        {/* Volumetric Cinema Crimson & Ruby Diagonal Light Rays */}
+        <polygon points="480,0 760,0 1120,860 760,860" fill="#ff2a34" opacity="0.12" />
+        <polygon points="780,0 980,0 520,860 280,860" fill="#e50914" opacity="0.09" />
 
-        {/* Distant Horizon Gliders on Left */}
-        <g stroke="#3d1203" strokeWidth="2" fill="#2b0c02" opacity="0.72">
+        {/* Distant Horizon Markers on Left */}
+        <g stroke="#220406" strokeWidth="2" fill="#120203" opacity="0.75">
           <line x1="150" y1="362" x2="232" y2="362" />
           <line x1="164" y1="357" x2="218" y2="367" strokeWidth="1.2" />
           <circle cx="191" cy="363" r="3" />
@@ -138,28 +138,28 @@ function SolarAmberHeroBackdrop() {
           <circle cx="208" cy="405" r="3" />
         </g>
 
-        {/* Upper-Left Lead Heroic Silhouette with Rim-Light & Vertical Blade */}
+        {/* Upper-Left Lead Heroic Silhouette with Ruby Rim-Light & Vertical Blade */}
         <g>
           <path
             d="M320 860 C342 540, 398 358, 492 332 C474 282, 488 188, 562 176 C634 164, 678 228, 654 316 C724 348, 766 490, 788 860 Z"
-            fill="url(#umbrage-silhouette)"
+            fill="url(#crimson-silhouette)"
           />
           <path
             d="M502 196 C546 158, 636 168, 662 248 C672 280, 660 310, 646 326"
-            stroke="url(#rim-gold)"
+            stroke="url(#rim-ruby)"
             strokeWidth="3.5"
             fill="none"
           />
-          {/* Vertical ceremonial blade catching amber glint */}
-          <polygon points="434,270 446,640 416,640" fill="#240902" />
+          {/* Vertical ceremonial blade catching crimson glint */}
+          <polygon points="434,270 446,640 416,640" fill="#160305" />
           <line
             x1="434"
             y1="270"
             x2="440"
             y2="580"
-            stroke="#f5b942"
+            stroke="#ff5c64"
             strokeWidth="1.8"
-            opacity="0.75"
+            opacity="0.80"
           />
         </g>
 
@@ -167,28 +167,28 @@ function SolarAmberHeroBackdrop() {
         <g>
           <path
             d="M726 860 C746 530, 798 382, 862 356 C842 308, 852 214, 922 206 C988 198, 1022 256, 998 332 C988 362, 964 376, 948 386 C1012 426, 1054 560, 1076 860 Z"
-            fill="url(#umbrage-mid)"
+            fill="url(#crimson-mid)"
           />
           <path
             d="M936 206 C992 208, 1018 262, 996 330"
-            stroke="url(#rim-gold)"
+            stroke="url(#rim-ruby)"
             strokeWidth="3"
             fill="none"
           />
         </g>
 
-        {/* Atmospheric Golden Mist Veil Bridging Midground & Foreground */}
-        <ellipse cx="720" cy="560" rx="560" ry="95" fill="#d95b16" opacity="0.22" />
+        {/* Atmospheric Theatrical Mist Veil Bridging Midground & Foreground */}
+        <ellipse cx="720" cy="560" rx="560" ry="95" fill="#780d14" opacity="0.25" />
 
         {/* Central Hooded Figure Framing the Play Disc */}
         <g>
           <path
             d="M535 860 C568 575, 636 386, 720 382 C804 386, 872 575, 905 860 Z"
-            fill="#1c0702"
+            fill="#120203"
           />
           <path
             d="M608 660 C628 492, 668 394, 720 390 C772 394, 812 492, 832 660"
-            stroke="url(#rim-gold)"
+            stroke="url(#rim-ruby)"
             strokeWidth="2.8"
             fill="none"
           />
@@ -197,21 +197,21 @@ function SolarAmberHeroBackdrop() {
         {/* Lower Left & Right Supporting Ensemble Silhouettes */}
         <path
           d="M235 820 C252 678, 294 612, 355 596 C338 552, 352 496, 398 496 C444 496, 460 548, 444 594 C495 616, 528 686, 540 820 Z"
-          fill="#220902"
-          opacity="0.92"
+          fill="#160305"
+          opacity="0.94"
         />
         <path
           d="M440 850 C464 724, 512 668, 576 654 C562 608, 580 556, 628 556 C676 556, 692 608, 676 654 C736 674, 774 736, 792 850 Z"
-          fill="#160501"
+          fill="#100203"
         />
         <path
           d="M820 850 C842 720, 888 662, 950 648 C936 600, 954 544, 1006 544 C1058 544, 1076 598, 1058 648 C1118 672, 1156 738, 1172 850 Z"
-          fill="#1a0601"
+          fill="#120203"
         />
         <path
           d="M1010 790 C1026 664, 1064 606, 1116 592 C1102 544, 1118 486, 1166 486 C1214 486, 1230 542, 1212 592 C1262 614, 1294 678, 1308 790 Z"
-          fill="#290b03"
-          opacity="0.88"
+          fill="#160305"
+          opacity="0.90"
         />
 
         {/* Deep Obsidian Bottom Scrim for Crystal-Clear Pills & Dock */}
@@ -256,18 +256,21 @@ export function TitleHeroStage({
 
   return (
     <article className="w-full">
-      {/* 1. Full-Bleed Solar Amber & Chiaroscuro Hero Stage (Exact Image 2 Composition) */}
+      {/* 1. Full-Bleed Theatrical Cinema Crimson & Chiaroscuro Hero Stage (Exact Image 2 Composition) */}
       <section
         aria-label={`Hero showcase for ${title.localizedTitleEn}`}
         className="relative flex min-h-[calc(100dvh-3.5rem)] w-full flex-col justify-between overflow-hidden px-6 pt-5 pb-28 sm:px-10 sm:pt-7 sm:pb-20 lg:px-14 lg:pb-14"
       >
-        <SolarAmberHeroBackdrop />
+        <CinemaCrimsonHeroBackdrop />
 
         {/* Top-Center Breadcrumb */}
         <nav aria-label="Breadcrumb" className="relative z-10 mb-6 flex justify-center">
           <ol className="text-text/75 flex flex-wrap items-center justify-center gap-2 text-xs">
             <li>
-              <Link href="/" className="hover:text-text transition-colors">
+              <Link
+                href="/"
+                className="hover:text-text transition-colors motion-reduce:transition-none"
+              >
                 Main
               </Link>
             </li>
@@ -275,7 +278,10 @@ export function TitleHeroStage({
               &gt;
             </li>
             <li>
-              <Link href="/movies" className="hover:text-text transition-colors">
+              <Link
+                href="/movies"
+                className="hover:text-text transition-colors motion-reduce:transition-none"
+              >
                 Films
               </Link>
             </li>
@@ -286,7 +292,7 @@ export function TitleHeroStage({
               <li>
                 <Link
                   href={`/people/${director.personSlug}`}
-                  className="hover:text-text transition-colors"
+                  className="hover:text-text transition-colors motion-reduce:transition-none"
                 >
                   {breadcrumbCategory}
                 </Link>
@@ -301,7 +307,7 @@ export function TitleHeroStage({
           </ol>
         </nav>
 
-        {/* Top Row: Monumental Title (Left) + Story Synopsis & Gold Pill (Right, reserves lg:pr-24) */}
+        {/* Top Row: Monumental Title (Left) + Story Synopsis & Crimson Pill (Right, reserves lg:pr-24) */}
         <div className="relative z-10 grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_360px] lg:pr-24">
           {/* Top-Left: Monumental Multi-Line Pure-White Title */}
           <div>
@@ -324,7 +330,7 @@ export function TitleHeroStage({
                   <Link
                     key={g.slug}
                     href={`/genres/${g.slug}`}
-                    className="border-text/35 bg-canvas/25 text-text/90 hover:border-text hover:bg-canvas/45 rounded-pill border px-3 py-1 text-xs backdrop-blur-xs transition-colors"
+                    className="border-text/35 bg-canvas/25 text-text/90 hover:border-text hover:bg-canvas/45 rounded-pill border px-3 py-1 text-xs backdrop-blur-xs transition-colors motion-reduce:transition-none"
                   >
                     {g.nameEn}
                   </Link>
@@ -333,7 +339,7 @@ export function TitleHeroStage({
             ) : null}
           </div>
 
-          {/* Top-Right: Story Synopsis + Vibrant Gold (#F5C518) Pill Badge */}
+          {/* Top-Right: Story Synopsis + Vibrant Crimson (#E50914) Pill Badge */}
           <div data-testid="hero-synopsis-column" className="space-y-4">
             <p className="text-text/95 max-w-[350px] text-xs leading-[1.6] sm:text-[13.5px]">
               {title.synopsisEn}
@@ -360,12 +366,12 @@ export function TitleHeroStage({
           </div>
         </div>
 
-        {/* Center Translucent Warm-Bronze Circular Play CTA (Exact Image 2 Centerpiece) */}
+        {/* Center Translucent Crimson Glass Circular Play CTA (Exact Image 2 Centerpiece) */}
         <div className="relative z-10 my-8 flex flex-col items-center justify-center text-center sm:my-10 lg:pr-20">
           {title.availability.streamAllowed ? (
             <Link
               href={`/watch/${title.slug}`}
-              className="group border-text/35 bg-bronze-glass hover:border-text/70 focus-visible:outline-accent relative flex h-22 w-22 items-center justify-center rounded-full border shadow-[0_18px_50px_rgba(0,0,0,0.5)] backdrop-blur-md transition-transform duration-300 hover:scale-105 focus:scale-105 motion-reduce:transform-none motion-reduce:transition-none sm:h-26 sm:w-26"
+              className="group border-accent/50 bg-crimson-glass hover:border-accent focus-visible:outline-accent relative flex h-22 w-22 items-center justify-center rounded-full border shadow-[0_18px_50px_rgba(0,0,0,0.5)] backdrop-blur-md transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_36px_rgba(229,9,20,0.40)] focus:scale-105 motion-reduce:transform-none motion-reduce:transition-none sm:h-26 sm:w-26"
               aria-label={`Play stream for ${title.localizedTitleEn}`}
             >
               <svg
@@ -379,7 +385,7 @@ export function TitleHeroStage({
           ) : (
             <div className="flex flex-col items-center gap-2">
               <div
-                className="border-text/30 bg-bronze-glass text-text/80 flex h-22 w-22 cursor-not-allowed items-center justify-center rounded-full border backdrop-blur-md sm:h-26 sm:w-26"
+                className="border-border bg-crimson-glass text-text/80 flex h-22 w-22 cursor-not-allowed items-center justify-center rounded-full border backdrop-blur-md sm:h-26 sm:w-26"
                 title={`Not currently streaming in ${territoryCode}`}
               >
                 <svg
@@ -410,7 +416,7 @@ export function TitleHeroStage({
           {title.availability.downloadAllowed && title.featureAssetId ? (
             <a
               href="#download-section"
-              className="text-text-secondary hover:text-text flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 px-2.5 py-2 transition-colors lg:min-h-14 lg:min-w-12"
+              className="text-text-secondary hover:text-text flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 px-2.5 py-2 transition-colors motion-reduce:transition-none lg:min-h-14 lg:min-w-12"
               aria-label="Jump to Download Section"
               title="Download Film"
             >
@@ -435,7 +441,7 @@ export function TitleHeroStage({
           ) : (
             <a
               href="#download-section"
-              className="text-text-secondary hover:text-text flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 px-2.5 py-2 transition-colors lg:min-h-14 lg:min-w-12"
+              className="text-text-secondary hover:text-text flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 px-2.5 py-2 transition-colors motion-reduce:transition-none lg:min-h-14 lg:min-w-12"
               aria-label="Jump to Download Section"
               title="Watch & Save Options"
             >
@@ -459,10 +465,10 @@ export function TitleHeroStage({
             </a>
           )}
 
-          {/* Slot 2: Cast & Reviews with Gold Dot */}
+          {/* Slot 2: Cast & Reviews with Crimson Dot */}
           <a
             href="#credits"
-            className="text-text-secondary hover:text-text flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 px-2.5 py-2 transition-colors lg:min-h-14 lg:min-w-12"
+            className="text-text-secondary hover:text-text flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 px-2.5 py-2 transition-colors motion-reduce:transition-none lg:min-h-14 lg:min-w-12"
             aria-label="Cast & Crew"
             title="Cast & Filmmakers"
           >
@@ -483,7 +489,7 @@ export function TitleHeroStage({
           {/* Slot 3: Details / Specifications */}
           <a
             href="#details"
-            className="text-text-secondary hover:text-text flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 px-2.5 py-2 transition-colors lg:min-h-14 lg:min-w-12"
+            className="text-text-secondary hover:text-text flex min-h-12 min-w-14 flex-col items-center justify-center gap-1 px-2.5 py-2 transition-colors motion-reduce:transition-none lg:min-h-14 lg:min-w-12"
             aria-label="Scroll to Details"
             title="Film Specifications"
           >
@@ -590,7 +596,7 @@ export function TitleHeroStage({
               {title.credits.map((c) => (
                 <div
                   key={`${c.personSlug}-${c.department}-${c.billingOrder}`}
-                  className="cg-surface hover:border-accent/60 flex flex-col justify-between p-4 transition-colors"
+                  className="cg-surface hover:border-accent/60 flex flex-col justify-between p-4 transition-colors motion-reduce:transition-none"
                 >
                   <div>
                     <span className="text-text-muted font-mono text-[11px] tracking-wider uppercase">
@@ -599,7 +605,7 @@ export function TitleHeroStage({
                     <p className="text-text mt-1 text-base font-semibold">
                       <Link
                         href={`/people/${c.personSlug}`}
-                        className="hover:text-accent transition-colors"
+                        className="hover:text-accent transition-colors motion-reduce:transition-none"
                       >
                         {c.nameEn}
                       </Link>

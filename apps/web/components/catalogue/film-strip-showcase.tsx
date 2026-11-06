@@ -44,7 +44,7 @@ const POSTER_BILLING: readonly [string, string][] = [
 /**
  * High-contrast silver-halide chiaroscuro cinema poster illustrations.
  * Resting state mirrors iconic 35mm monochrome gallery posters on pure #000000 black;
- * hover/focus blooms with incandescent Solar Amber (#D95B16 / #F29F24).
+ * hover/focus blooms with incandescent Cinema Crimson (#E50914 / #FF2A34).
  */
 function CinemaPosterArt({
   index,
@@ -318,7 +318,7 @@ function CinemaPosterArt({
         <span className="truncate text-right">{leadB}</span>
       </div>
 
-      {/* Solar Amber Illumination Veil on Hover / Focus */}
+      {/* Cinema Crimson Illumination Veil on Hover / Focus */}
       <div
         aria-hidden="true"
         className="from-ember/45 via-ember-glow/20 pointer-events-none absolute inset-0 bg-gradient-to-t to-transparent opacity-0 mix-blend-color transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none"
@@ -358,7 +358,10 @@ export function FilmStripShowcase({
       <nav aria-label="Breadcrumb" className="relative z-10 mb-6 flex items-center justify-center">
         <ol className="text-text-muted flex flex-wrap items-center justify-center gap-2.5 text-xs">
           <li>
-            <Link href="/" className="hover:text-text-secondary transition-colors">
+            <Link
+              href="/"
+              className="hover:text-text-secondary transition-colors motion-reduce:transition-none"
+            >
               Main
             </Link>
           </li>
@@ -366,7 +369,10 @@ export function FilmStripShowcase({
             &gt;
           </li>
           <li>
-            <Link href="/movies" className="hover:text-text-secondary transition-colors">
+            <Link
+              href="/movies"
+              className="hover:text-text-secondary transition-colors motion-reduce:transition-none"
+            >
               {breadcrumbCategory}
             </Link>
           </li>
@@ -397,7 +403,7 @@ export function FilmStripShowcase({
           {displayItems.map((item, index) => (
             <article
               key={item.id}
-              className="group bg-surface-1 ease-standard focus-within:ring-accent hover:ring-accent/80 relative w-[185px] flex-none snap-center overflow-hidden rounded-[2px] transition-all duration-300 focus-within:z-20 focus-within:-translate-y-1.5 focus-within:ring-1 hover:z-20 hover:-translate-y-1.5 hover:shadow-[0_18px_44px_rgba(217,91,22,0.28)] hover:ring-1 motion-reduce:transform-none motion-reduce:transition-none sm:w-[205px] lg:w-auto lg:max-w-[162px] lg:flex-1"
+              className="group bg-surface-1 ease-standard focus-within:ring-accent hover:ring-accent/80 relative w-[185px] flex-none snap-center overflow-hidden rounded-[2px] transition-all duration-300 focus-within:z-20 focus-within:-translate-y-1.5 focus-within:ring-1 hover:z-20 hover:-translate-y-1.5 hover:shadow-[0_18px_44px_rgba(229,9,20,0.32)] hover:ring-1 motion-reduce:transform-none motion-reduce:transition-none sm:w-[205px] lg:w-auto lg:max-w-[162px] lg:flex-1"
             >
               <Link
                 href={`/movies/${item.slug}`}

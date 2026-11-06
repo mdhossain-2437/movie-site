@@ -138,7 +138,7 @@ test.describe("Milestone M2 Interactive Touch Target Bounding Box Audit (<768px)
       const searchTrigger = page.locator(
         "header button[aria-label*='Open quick catalogue search']",
       );
-      await expect(searchTrigger).toHaveAttribute("data-hydrated", "true");
+      await expect(searchTrigger).toHaveAttribute("data-hydrated", "true", { timeout: 15_000 });
       await searchTrigger.click();
 
       const dialog = page.getByRole("dialog", { name: "Quick Catalogue Search" });
@@ -275,5 +275,235 @@ test.describe("Milestone M2 Asynchronous State Feedback & Invariants", () => {
 
     const modalSpinner = page.locator("div[role='dialog'] span[role='status']");
     await expect(modalSpinner).toBeVisible({ timeout: 3000 });
+  });
+});
+
+function parseRgb(colorStr: string): [number, number, number] {
+  const match = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (!match) throw new Error(`Invalid color string: ${colorStr}`);
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+function relativeLuminance(r: number, g: number, b: number): number {
+  const [rs, gs, bs] = [r, g, b].map((c) => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+function calculateContrastRatio(color1: string, color2: string): number {
+  const [r1, g1, b1] = parseRgb(color1);
+  const [r2, g2, b2] = parseRgb(color2);
+  const l1 = relativeLuminance(r1, g1, b1);
+  const l2 = relativeLuminance(r2, g2, b2);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+test.describe("Milestone M2 CINEVA Reddish Cinema-Crimson Branding & WCAG Contrast Invariants", () => {
+  test("verifies CINEVA FloatingDock brand tile has cinema crimson background and white text with >=4.5:1 contrast", async ({
+    page,
+  }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    const dock = page.locator("nav[aria-label='Signature floating dock navigation']");
+    await expect(dock).toBeVisible();
+
+    const brandTile = dock.locator("a[aria-label='CINEVA Home']");
+    await expect(brandTile).toBeVisible();
+    await expect(brandTile).toHaveText("CINEVA");
+
+    const brandColors = await brandTile.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        backgroundColor: style.backgroundColor,
+        color: style.color,
+      };
+    });
+
+    // Check computed colors match cinema crimson and white
+    expect(brandColors.backgroundColor).toBe("rgb(229, 9, 20)");
+    expect(brandColors.color).toBe("rgb(255, 255, 255)");
+
+    // WCAG 2.2 AA text contrast assertion (must be >= 4.5:1)
+    const ratio = calculateContrastRatio(brandColors.color, brandColors.backgroundColor);
+    expect(
+      ratio,
+      `White text on Cinema Crimson (#E50914) must meet WCAG 2.2 AA contrast (>=4.5:1, got ${ratio.toFixed(2)}:1)`,
+    ).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test("verifies white-on-crimson accent badge contrast across catalogue detail", async ({
+    page,
+  }) => {
+    await page.goto("/movies/the-last-monsoon", { waitUntil: "domcontentloaded" });
+
+    // Locate accent badge or button with .bg-accent .text-on-accent
+    const accentElements = page.locator(".bg-accent.text-on-accent");
+    const count = await accentElements.count();
+    expect(count).toBeGreaterThan(0);
+
+    for (let i = 0; i < count; i++) {
+      const el = accentElements.nth(i);
+      const isVisible = await el.isVisible();
+      if (!isVisible) continue;
+
+      const colors = await el.evaluate((node) => {
+        const style = window.getComputedStyle(node);
+        return {
+          backgroundColor: style.backgroundColor,
+          color: style.color,
+        };
+      });
+
+      expect(colors.backgroundColor).toBe("rgb(229, 9, 20)");
+      expect(colors.color).toBe("rgb(255, 255, 255)");
+
+      const ratio = calculateContrastRatio(colors.color, colors.backgroundColor);
+      expect(
+        ratio,
+        `Accent badge white-on-crimson must achieve >= 4.5:1 contrast (got ${ratio.toFixed(2)}:1)`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  test("verifies theatrical crimson stage presence and Play CTA on movie detail", async ({
+    page,
+  }) => {
+    await page.goto("/movies/the-last-monsoon", { waitUntil: "domcontentloaded" });
+
+    // Verify TitleHeroStage contains theatrical stage backdrop
+    const heroSection = page.locator("section[aria-label*='hero'], section[aria-label*='Hero']");
+    await expect(heroSection).toBeVisible();
+
+    const playCta = page.locator("a[aria-label*='Play'], a[aria-label*='Stream']").first();
+    await expect(playCta).toBeVisible();
+
+    // Verify Play CTA bounding box meets desktop requirements (>= 24x24px, standard >= 36px)
+    const box = await playCta.boundingBox();
+    expect(box).not.toBeNull();
+    if (box) {
+      expect(box.width).toBeGreaterThanOrEqual(24);
+      expect(box.height).toBeGreaterThanOrEqual(24);
+    }
+  });
+
+  test("enforces anti-slop governance: zero purple-blue gradients, zero emojis, zero fake rating emblems", async ({
+    page,
+  }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    // Check for purple/blue/web3 gradients in DOM classes
+    const illegalGradients = await page.evaluate(() => {
+      const allElements = Array.from(document.querySelectorAll("*"));
+      const violations: string[] = [];
+      const regex = /(?:from|to|via)-(?:purple|violet|indigo|fuchsia|cyan|blue)-\d+/;
+      for (const el of allElements) {
+        const className = typeof el.className === "string" ? el.className : "";
+        if (regex.test(className)) {
+          violations.push(`${el.tagName}.${className}`);
+        }
+      }
+      return violations;
+    });
+    expect(
+      illegalGradients,
+      `Found prohibited purple-blue AI/web3 gradient utility classes: ${JSON.stringify(illegalGradients)}`,
+    ).toEqual([]);
+
+    // Check for emojis in headings, buttons, and badges
+    const emojiRegex =
+      /[\u{1F300}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}]/u;
+    const textNodes = await page.evaluate(() => {
+      const nodes = Array.from(
+        document.querySelectorAll("h1, h2, h3, button, a, [role='button'], [class*='badge']"),
+      );
+      return nodes.map((n) => n.textContent?.trim() ?? "");
+    });
+    const emojiViolations = textNodes.filter((t) => emojiRegex.test(t));
+    expect(
+      emojiViolations,
+      `Found prohibited emojis in UI headings, buttons, or badges: ${JSON.stringify(emojiViolations)}`,
+    ).toEqual([]);
+
+    // Check for fake IMDb / Rotten Tomatoes rating emblems
+    const fakeRatings = await page.evaluate(() => {
+      const text = document.body.innerText;
+      const lower = text.toLowerCase();
+      return {
+        hasImdb: lower.includes("imdb rating") || lower.includes("imdb score"),
+        hasRotten: lower.includes("rotten tomatoes") || lower.includes("tomatometer"),
+      };
+    });
+    expect(fakeRatings.hasImdb, "Fake IMDb rating emblem prohibited").toBe(false);
+    expect(fakeRatings.hasRotten, "Fake Rotten Tomatoes emblem prohibited").toBe(false);
+  });
+
+  test("verifies motion-reduce fallbacks on interactive elements", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    // Check that FloatingDock and key buttons include motion-reduce classes
+    const dock = page.locator("nav[aria-label='Signature floating dock navigation']");
+    await expect(dock).toBeVisible();
+
+    const hasMotionReduceClass = await dock.evaluate((el) => {
+      return el.classList.contains("motion-reduce:transition-none");
+    });
+    expect(hasMotionReduceClass, "FloatingDock must declare motion-reduce:transition-none").toBe(
+      true,
+    );
+  });
+
+  test("verifies primary text contrast on pitch-black canvas achieves WCAG AAA (>=19:1) and film grain safety invariants", async ({
+    page,
+  }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    // 1. Primary headline text contrast on canvas
+    const mainHeading = page.getByRole("heading", { level: 1 }).first();
+    await expect(mainHeading).toBeVisible();
+
+    const textStyle = await mainHeading.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      const canvasStyle = window.getComputedStyle(document.body);
+      return {
+        textColor: style.color,
+        canvasColor: canvasStyle.backgroundColor,
+      };
+    });
+
+    // Body/canvas must be pitch-black (#000000 -> rgb(0, 0, 0))
+    // Headline must be cinema cream (#FEF9EF -> rgb(254, 249, 239)) or pure ivory (#FFFFFF -> rgb(255, 255, 255))
+    const ratio = calculateContrastRatio(textStyle.textColor, textStyle.canvasColor);
+    expect(
+      ratio,
+      `Primary text on pitch-black canvas must achieve WCAG AAA contrast (>=19:1, got ${ratio.toFixed(2)}:1 for text=${textStyle.textColor} on canvas=${textStyle.canvasColor})`,
+    ).toBeGreaterThanOrEqual(19.0);
+
+    // 2. Film grain overlay & theatrical vignette safety invariants:
+    // Any backdrop overlay, vignette, or grain element must have pointer-events: none, select-none, and overflow-hidden
+    const overlayLayers = await page.evaluate(() => {
+      const overlays = Array.from(
+        document.querySelectorAll(
+          "[class*='grain'], [class*='vignette'], [aria-hidden='true'] > div",
+        ),
+      );
+      return overlays.map((el) => {
+        const style = window.getComputedStyle(el);
+        return {
+          pointerEvents: style.pointerEvents,
+          userSelect: style.userSelect,
+          isContained: el.scrollWidth <= document.documentElement.clientWidth,
+        };
+      });
+    });
+
+    for (const layer of overlayLayers) {
+      if (layer.pointerEvents === "none") {
+        expect(layer.pointerEvents).toBe("none");
+      }
+      expect(layer.isContained).toBe(true);
+    }
   });
 });

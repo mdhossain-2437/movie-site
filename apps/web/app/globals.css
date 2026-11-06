@@ -10,8 +10,11 @@
 
 :root {
   /* next/font exposes hashed family names via CSS variables; prefer them over raw names. */
-  --cg-font-display: var(--font-manrope), "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --cg-font-body: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --cg-font-display:
+    "neue-haas-grotesk-display", var(--font-manrope), "Manrope", "Inter", ui-sans-serif, system-ui,
+    sans-serif;
+  --cg-font-body:
+    "neue-haas-grotesk-display", var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
   --cg-font-mono:
     var(--font-geist-mono), "Geist Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 }
@@ -39,6 +42,12 @@
   --color-ember: var(--cg-ember);
   --color-ember-glow: var(--cg-ember-glow);
   --color-bronze-glass: var(--cg-bronze-glass);
+  --color-crimson-glass: var(--cg-crimson-glass);
+  --color-crimson-glow: var(--cg-crimson-glow);
+  --color-crimson-500: var(--cg-crimson-500);
+  --color-crimson-400: var(--cg-crimson-400);
+  --color-crimson-600: var(--cg-crimson-600);
+  --color-crimson-950: var(--cg-crimson-950);
   --color-success: var(--cg-success);
   --color-warning: var(--cg-warning);
   --color-danger: var(--cg-danger);

@@ -25,7 +25,7 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
 };
 
 const BASE_CLASSES =
-  "inline-flex items-center justify-center gap-2 transition-colors duration-[var(--cg-motion-fast)] ease-standard select-none disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 transition-colors duration-[var(--cg-motion-fast)] ease-standard select-none disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none motion-reduce:transform-none";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;

@@ -252,7 +252,7 @@ describe("Concept #2: TitleHeroStage Component", () => {
 });
 
 describe("Signature FloatingDock", () => {
-  it("renders CINEVA gold brand tile and primary segmented navigation links", () => {
+  it("renders CINEVA crimson brand tile and primary segmented navigation links", () => {
     render(<FloatingDock />);
     expect(screen.getByLabelText("CINEVA Home")).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: /films/i })).toHaveAttribute("href", "/movies");
