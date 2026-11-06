@@ -15,7 +15,7 @@ import { getGenre } from "@/lib/catalogue/repository";
 import { resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
-  title: "Genre Discovery · Cinematic Graphite",
+  title: "Genre · CINEVA",
 };
 
 async function GenreDetailBody({ params }: { params: Promise<{ slug: string }> }) {

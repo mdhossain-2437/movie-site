@@ -11,7 +11,7 @@ import { pad2 } from "@/lib/catalogue/format";
 import { listCollections } from "@/lib/catalogue/repository";
 
 export const metadata: Metadata = {
-  title: "Collections · Cinematic Graphite",
+  title: "Collections · CINEVA",
   description:
     "Editorial paths through the film archive. Follow a movement, a mood, or a shared idea.",
 };

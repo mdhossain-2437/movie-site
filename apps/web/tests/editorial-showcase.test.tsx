@@ -191,7 +191,7 @@ describe("Concept #2: TitleHeroStage Component", () => {
     expect(playLink).toHaveAttribute("href", "/watch/the-last-monsoon");
   });
 
-  it("renders structured metadata pill rows for Country, Licensor, Time, Date, Rate", () => {
+  it("renders structured metadata pill rows for Country, Studio, Time, Date, Rate", () => {
     render(
       <TitleHeroStage
         title={mockTitle}
@@ -201,7 +201,7 @@ describe("Concept #2: TitleHeroStage Component", () => {
       />,
     );
     expect(screen.getByText("Country:")).toBeInTheDocument();
-    expect(screen.getByText("Licensor:")).toBeInTheDocument();
+    expect(screen.getByText("Studio:")).toBeInTheDocument();
     expect(screen.getByText("Time:")).toBeInTheDocument();
     expect(screen.getByText("Date:")).toBeInTheDocument();
     expect(screen.getByText("Rate:")).toBeInTheDocument();
@@ -252,16 +252,15 @@ describe("Concept #2: TitleHeroStage Component", () => {
 });
 
 describe("Signature FloatingDock", () => {
-  it("renders BrandMark aperture emblem and primary navigation links", () => {
+  it("renders CINEVA gold brand tile and primary segmented navigation links", () => {
     render(<FloatingDock />);
-    expect(screen.getByLabelText("Cinematic Graphite Home")).toHaveAttribute("href", "/");
+    expect(screen.getByLabelText("CINEVA Home")).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: /films/i })).toHaveAttribute("href", "/movies");
     expect(screen.getByRole("link", { name: /collections/i })).toHaveAttribute(
       "href",
       "/collections/monsoon-noir-archive",
     );
     expect(screen.getByRole("link", { name: /watchlist/i })).toHaveAttribute("href", "/watchlist");
-    expect(screen.getByRole("link", { name: /admin/i })).toHaveAttribute("href", "/admin");
     expect(screen.getByLabelText("Account Profile")).toHaveAttribute("href", "/account");
   });
 

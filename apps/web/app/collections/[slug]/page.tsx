@@ -17,7 +17,7 @@ import { getCollection } from "@/lib/catalogue/repository";
 import { resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
-  title: "Curated Collection · Cinematic Graphite",
+  title: "Curated Collection · CINEVA",
 };
 
 async function CollectionDetailBody({ params }: { params: Promise<{ slug: string }> }) {
@@ -41,108 +41,112 @@ async function CollectionDetailBody({ params }: { params: Promise<{ slug: string
       maturityRating: t.maturityRating,
       synopsisEn: t.synopsisEn,
       badgeKind: t.availability.badgeKind,
-      isDevelopmentFixture: t.isDevelopmentFixture,
     }));
 
-    const watermark = (collection.titleEn.split(" ")[0] ?? "ARCHIVE").toUpperCase();
+    const watermark = collection.titleEn.split(" ")[0] ?? "Archive";
 
     return (
-      <div className="cg-container space-y-12 py-10 sm:py-14">
-        <section aria-labelledby="collection-heading" className="cg-surface p-6 sm:p-10">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge tone="accent">Editorial Curated Collection</Badge>
-            <Badge tone="neutral">{titles.length} Titles Cleared</Badge>
-            <Badge tone="neutral">Territory: {territoryCode}</Badge>
-          </div>
-
-          <h1
-            id="collection-heading"
-            className="font-display text-text mt-4 text-3xl font-bold sm:text-5xl"
-          >
-            {collection.titleEn}
-          </h1>
-
-          {collection.titleBn ? (
-            <p
-              className="font-display text-text-secondary mt-2 text-2xl font-semibold sm:text-3xl"
-              lang="bn"
-            >
-              {collection.titleBn}
-            </p>
-          ) : null}
-
-          {collection.description ? (
-            <p className="cg-prose text-text-secondary mt-5 text-base leading-relaxed sm:text-lg">
-              {collection.description}
-            </p>
-          ) : null}
-        </section>
-
+      <div className="w-full">
         {showcaseItems.length > 0 ? (
           <FilmStripShowcase
             breadcrumbTitle={collection.titleEn}
             breadcrumbCategory="Collections"
             watermarkText={watermark}
-            heading={`Titles in ${collection.titleEn}`}
-            subheading="Curated vertical gallery sorted in editorial archival sequence."
+            renderBreadcrumbAsH1
             items={showcaseItems}
           />
-        ) : (
-          <div className="cg-surface text-text-muted p-8 text-center">
-            No published titles currently cleared for this territory ({territoryCode}).
-          </div>
-        )}
-
-        {titles.length > 0 ? (
-          <section aria-labelledby="catalog-heading" className="space-y-4">
-            <h2 id="catalog-heading" className="font-display text-text text-2xl font-bold">
-              All Titles in Collection
-            </h2>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {titles.map((t) => (
-                <article
-                  key={t.id}
-                  className="cg-surface hover:border-accent/60 flex flex-col justify-between p-5 transition-colors"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-text-muted font-mono text-xs">
-                        {t.releaseYear} · {t.runtimeMinutes}m
-                      </span>
-                      <AvailabilityBadge kind={t.availability.badgeKind} />
-                    </div>
-                    <h3 className="font-display text-text mt-2 text-lg font-semibold">
-                      <Link
-                        href={`/movies/${t.slug}`}
-                        className="hover:text-accent transition-colors"
-                      >
-                        {t.localizedTitleEn}
-                      </Link>
-                    </h3>
-                    {t.localizedTitleBn ? (
-                      <p className="text-text-secondary mt-0.5 text-xs" lang="bn">
-                        {t.localizedTitleBn}
-                      </p>
-                    ) : null}
-                    <p className="text-text-secondary mt-2 line-clamp-2 text-xs leading-relaxed">
-                      {t.synopsisEn}
-                    </p>
-                  </div>
-                  <div className="border-border mt-4 flex items-center justify-between border-t pt-3">
-                    <ButtonLink href={`/movies/${t.slug}`} variant="outline" size="sm">
-                      View Details
-                    </ButtonLink>
-                    {t.availability.streamAllowed ? (
-                      <ButtonLink href={`/watch/${t.slug}`} variant="primary" size="sm">
-                        Stream
-                      </ButtonLink>
-                    ) : null}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
         ) : null}
+
+        <div className="cg-container space-y-12 py-12 sm:py-16">
+          <section aria-labelledby="collection-about-heading" className="cg-surface p-6 sm:p-10">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="accent">Curated Collection</Badge>
+              <Badge tone="neutral">{titles.length} Films</Badge>
+            </div>
+
+            {showcaseItems.length === 0 ? (
+              <h1
+                id="collection-about-heading"
+                className="font-display text-text mt-4 text-3xl font-bold sm:text-5xl"
+              >
+                {collection.titleEn}
+              </h1>
+            ) : (
+              <h2
+                id="collection-about-heading"
+                className="font-display text-text mt-4 text-3xl font-bold sm:text-5xl"
+              >
+                {collection.titleEn}
+              </h2>
+            )}
+
+            {collection.titleBn ? (
+              <p
+                className="font-display text-text-secondary mt-2 text-2xl font-semibold sm:text-3xl"
+                lang="bn"
+              >
+                {collection.titleBn}
+              </p>
+            ) : null}
+
+            {collection.description ? (
+              <p className="cg-prose text-text-secondary mt-5 text-base leading-relaxed sm:text-lg">
+                {collection.description}
+              </p>
+            ) : null}
+          </section>
+
+          {titles.length > 0 ? (
+            <section aria-labelledby="catalog-heading" className="space-y-4">
+              <h2 id="catalog-heading" className="font-display text-text text-2xl font-bold">
+                Films in This Collection
+              </h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {titles.map((t) => (
+                  <article
+                    key={t.id}
+                    className="cg-surface hover:border-accent/60 flex flex-col justify-between p-5 transition-colors"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-text-muted font-mono text-xs">
+                          {t.releaseYear} · {t.runtimeMinutes}m
+                        </span>
+                        <AvailabilityBadge kind={t.availability.badgeKind} />
+                      </div>
+                      <h3 className="font-display text-text mt-2 text-lg font-semibold">
+                        <Link
+                          href={`/movies/${t.slug}`}
+                          className="hover:text-accent transition-colors"
+                        >
+                          {t.localizedTitleEn}
+                        </Link>
+                      </h3>
+                      {t.localizedTitleBn ? (
+                        <p className="text-text-secondary mt-0.5 text-xs" lang="bn">
+                          {t.localizedTitleBn}
+                        </p>
+                      ) : null}
+                      <p className="text-text-secondary mt-2 line-clamp-2 text-xs leading-relaxed">
+                        {t.synopsisEn}
+                      </p>
+                    </div>
+                    <div className="border-border mt-4 flex items-center justify-between border-t pt-3">
+                      <ButtonLink href={`/movies/${t.slug}`} variant="outline" size="sm">
+                        Details
+                      </ButtonLink>
+                      {t.availability.streamAllowed ? (
+                        <ButtonLink href={`/watch/${t.slug}`} variant="primary" size="sm">
+                          Watch
+                        </ButtonLink>
+                      ) : null}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </div>
       </div>
     );
   }

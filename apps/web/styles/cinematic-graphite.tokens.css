@@ -1,30 +1,36 @@
 /*
- * Cinematic Graphite — design tokens v1.0
- * Companion: movie-platform-cinematic-design-system-v1.md
- * Framework-neutral CSS tokens. Use in Tailwind, CSS Modules, or vanilla CSS.
+ * CINEVA — Cinema Noir & Solar Amber Design Tokens v2.0
+ * Pitch Cinema Black (#000000), Warm Smoke Charcoal (#141414),
+ * Blazing Solar Amber (#D95B16 / #F29F24), and Vibrant Cinema Gold (#F5C518).
  */
 
 :root {
   color-scheme: dark;
 
   /* Colors: primitives */
-  --cg-graphite-950: #080a0d;
-  --cg-graphite-900: #0d1116;
-  --cg-graphite-850: #12171e;
-  --cg-graphite-800: #181f28;
-  --cg-graphite-750: #222b36;
-  --cg-graphite-700: #2b3542;
-  --cg-graphite-600: #425063;
-  --cg-ivory-50: #f4f6f8;
-  --cg-slate-200: #b2bbc7;
-  --cg-slate-400: #818d9b;
-  --cg-gold-500: #d8b36a;
-  --cg-gold-400: #e8c77f;
-  --cg-gold-600: #b9924d;
-  --cg-green-500: #49c69a;
-  --cg-amber-500: #f0b85f;
-  --cg-red-500: #f16b73;
-  --cg-blue-500: #73a9f4;
+  --cg-graphite-950: #000000;
+  --cg-graphite-900: #090909;
+  --cg-graphite-850: #141414;
+  --cg-graphite-800: #1e1e1e;
+  --cg-graphite-750: #292929;
+  --cg-graphite-700: #262626;
+  --cg-graphite-600: #4a4642;
+  --cg-ivory-50: #ffffff;
+  --cg-slate-200: #d8d3cc;
+  --cg-slate-400: #8f8a83;
+  --cg-gold-500: #f5c518;
+  --cg-gold-400: #ffd43b;
+  --cg-gold-600: #d9a700;
+  --cg-on-gold: #0a0a0a;
+  --cg-ember-950: #1a0601;
+  --cg-ember-800: #591b05;
+  --cg-ember-600: #d95b16;
+  --cg-ember-400: #f29f24;
+  --cg-bronze-glass: rgba(142, 88, 56, 0.62);
+  --cg-green-500: #3dd68c;
+  --cg-amber-500: #f59e0b;
+  --cg-red-500: #f25f5c;
+  --cg-blue-500: #60a5fa;
 
   /* Colors: semantic aliases */
   --cg-bg: var(--cg-graphite-950);
@@ -40,6 +46,11 @@
   --cg-accent: var(--cg-gold-500);
   --cg-accent-hover: var(--cg-gold-400);
   --cg-accent-pressed: var(--cg-gold-600);
+  --cg-on-accent: var(--cg-on-gold);
+  --cg-ember-deep: var(--cg-ember-950);
+  --cg-ember-umbrage: var(--cg-ember-800);
+  --cg-ember: var(--cg-ember-600);
+  --cg-ember-glow: var(--cg-ember-400);
   --cg-success: var(--cg-green-500);
   --cg-warning: var(--cg-amber-500);
   --cg-danger: var(--cg-red-500);
@@ -128,7 +139,7 @@ body {
 }
 
 ::selection {
-  color: var(--cg-bg);
+  color: var(--cg-on-accent);
   background: var(--cg-accent);
 }
 
@@ -149,7 +160,7 @@ body {
 .cg-poster {
   aspect-ratio: 2 / 3;
   overflow: hidden;
-  border-radius: var(--cg-radius-md);
+  border-radius: var(--cg-radius-xs);
   background: var(--cg-surface-2);
 }
 
@@ -207,6 +218,3 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
-
-/* Contrast is not guaranteed merely by using semantic tokens.
-   Validate every foreground/background pairing and component state against WCAG 2.2 AA. */

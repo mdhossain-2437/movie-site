@@ -30,23 +30,23 @@ Every visual component and layout must align with the calibrated taste parameter
 Only the following semantic CSS token utilities may be used in component markup:
 
 - **Canvas & Backgrounds**:
-  - `bg-canvas` (`#080A0D`): Deep obsidian base canvas.
-  - `bg-canvas-raised` (`#0D1116`): Raised base canvas, footers, modal backdrops.
-  - `bg-surface-1` (`#12171E`): Primary cards, floating dock, input backgrounds.
-  - `bg-surface-2` (`#181F28`): Elevated surfaces, hover states, secondary controls.
-  - `bg-surface-3` (`#222B36`): Active pressed surfaces, popovers.
+  - `bg-canvas` (`#000000`): Pitch cinema black base canvas.
+  - `bg-canvas-raised` (`#090909`): Raised black canvas, footers, modal backdrops.
+  - `bg-surface-1` (`#141414`): Warm smoke charcoal cards, segmented dock, inputs.
+  - `bg-surface-2` (`#1E1E1E`): Elevated smoke surfaces, hover states, secondary controls.
+  - `bg-surface-3` (`#292929`): Active pressed surfaces, popovers.
 - **Borders**:
-  - `border-border` (`#2B3542`): Primary hairline border (1px).
-  - `border-border-strong` (`#425063`): Focused and highlighted hairline borders.
-  - `border-accent` (`#D8B36A`): Warm gold accent highlights.
-- **Brand & Accents**:
-  - `text-accent`, `bg-accent`, `border-accent` (`#D8B36A`): Warm gold brand accent.
-  - `text-accent-hover` (`#E8C77F`): Interactive hover gold glow.
-  - `text-accent-pressed` (`#B9924D`): Pressed/active gold state.
+  - `border-border` (`#262626`): Primary smoke hairline border (1px).
+  - `border-border-strong` (`#4A4642`): Focused and highlighted warm borders.
+  - `border-accent` (`#F5C518`): Vibrant Cinema Gold accent highlights.
+- **Brand, Solar Stage & Accents**:
+  - `text-accent`, `bg-accent`, `border-accent` (`#F5C518`): Vibrant Cinema Gold brand accent.
+  - `text-on-accent` (`#0A0A0A`): High-contrast dark ink on solid gold badges.
+  - `bg-ember` (`#D95B16`), `bg-ember-glow` (`#F29F24`), `bg-ember-deep` (`#1A0601`), `bg-bronze-glass`: Full-bleed Solar Amber & Burnt Sienna hero stage palette.
 - **Typography & Foreground**:
-  - `text-text` (`#F4F6F8`): Primary high-contrast ivory body and titles.
-  - `text-text-secondary` (`#B2BBC7`): Secondary text, synopses, metadata values.
-  - `text-text-muted` (`#818D9B`): Tertiary text, timestamps, captions.
+  - `text-text` (`#FFFFFF`): Pure cinema ivory primary titles and body (`21:1` on `#000000`).
+  - `text-text-secondary` (`#D8D3CC`): Warm silver synopses and metadata values.
+  - `text-text-muted` (`#8F8A83`): Warm muted breadcrumbs, timestamps, captions.
 - **State & Rights Indicators**:
   - `text-success`, `bg-success/15`, `border-success/30` (`#49C69A`): Authorized rights (`Stream + Download`).
   - `text-warning`, `bg-warning/15`, `border-warning/30` (`#F0B85F`): Territorial restriction or review.

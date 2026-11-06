@@ -8,8 +8,8 @@ import { Badge, Button, ButtonLink, ContentRowSkeleton, EmptyState } from "@/com
 import { resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
-  title: "Search · Cinematic Graphite",
-  description: "Search published films, cast, crew, and localized Bangla or English titles.",
+  title: "Search · CINEVA",
+  description: "Search films, cast, directors, and Bangla or English titles on CINEVA.",
 };
 
 function normalizeQuery(raw: string | string[] | undefined): string {

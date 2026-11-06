@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
 import { AvailabilityBadge } from "@/components/ui";
 
 export interface FilmStripItem {
@@ -28,153 +27,313 @@ export interface FilmStripShowcaseProps {
   watermarkText: string;
   heading?: string;
   subheading?: string;
+  renderBreadcrumbAsH1?: boolean;
   items: FilmStripItem[];
 }
 
-/**
- * Deterministic procedural SVG poster art generator.
- * Produces distinctive, copyright-safe, atmospheric geometric compositions
- * in obsidian (#080A0D), graphite (#181F28), and warm gold (#D8B36A).
- */
-function ProceduralFilmArt({ index, title }: { index: number; title: string }) {
-  const seed = useMemo(() => {
-    let hash = 0;
-    for (let i = 0; i < title.length; i++) {
-      hash = (hash << 5) - hash + title.charCodeAt(i);
-      hash |= 0;
-    }
-    return Math.abs(hash) + index;
-  }, [index, title]);
+const POSTER_BILLING: readonly [string, string][] = [
+  ["AMINA RAHMAN", "TARIQ ANAM"],
+  ["NUSRAT IMROSE", "CHANCHAL"],
+  ["MOSHARRAF", "JAYA AHSAN"],
+  ["FAZLE RABBI", "SHAMOL MAWLA"],
+  ["AUPEE KARIM", "INTEKHAB"],
+  ["RAFIATH RASHID", "FS NAYEEM"],
+  ["DILARA ZAMAN", "AFZAL HOSSAIN"],
+];
 
-  const variant = seed % 7;
+/**
+ * High-contrast silver-halide chiaroscuro cinema poster illustrations.
+ * Resting state mirrors iconic 35mm monochrome gallery posters on pure #000000 black;
+ * hover/focus blooms with incandescent Solar Amber (#D95B16 / #F29F24).
+ */
+function CinemaPosterArt({
+  index,
+  title,
+  releaseYear,
+}: {
+  index: number;
+  title: string;
+  releaseYear: number;
+}) {
+  const variant = index % 7;
+  const [leadA, leadB] = POSTER_BILLING[variant] ?? ["ORIGINAL", "FEATURE"];
+  const uid = `poster-${index}-${variant}`;
+  const shortTitle = title.toUpperCase();
 
   return (
-    <div className="from-surface-2 to-canvas relative h-full w-full overflow-hidden bg-gradient-to-b">
+    <div className="bg-canvas relative h-full w-full overflow-hidden">
       <svg
         aria-hidden="true"
-        viewBox="0 0 200 320"
-        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transform-none"
+        viewBox="0 0 220 480"
+        preserveAspectRatio="xMidYMid slice"
+        className="h-full w-full object-cover transition-transform duration-500 ease-out group-focus-within:scale-[1.04] group-hover:scale-[1.04] motion-reduce:transform-none"
       >
         <defs>
-          <linearGradient id={`gold-glow-${index}`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#D8B36A" stopOpacity="0.45" />
-            <stop offset="60%" stopColor="#818D9B" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#080A0D" stopOpacity="0.95" />
+          <linearGradient id={`${uid}-sky-mid`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#6c6c6c" />
+            <stop offset="45%" stopColor="#9e9e9e" />
+            <stop offset="78%" stopColor="#2a2a2a" />
+            <stop offset="100%" stopColor="#050505" />
           </linearGradient>
-          <radialGradient id={`spot-${index}`} cx="50%" cy="28%" r="72%">
-            <stop offset="0%" stopColor="#D8B36A" stopOpacity="0.42" />
-            <stop offset="48%" stopColor="#222B36" stopOpacity="0.72" />
-            <stop offset="100%" stopColor="#080A0D" stopOpacity="0.96" />
+          <linearGradient id={`${uid}-sky-bright`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#dedede" />
+            <stop offset="52%" stopColor="#b8b8b8" />
+            <stop offset="85%" stopColor="#262626" />
+            <stop offset="100%" stopColor="#080808" />
+          </linearGradient>
+          <linearGradient id={`${uid}-noir`} x1="0" y1="0" x2="1" y2="0.2">
+            <stop offset="0%" stopColor="#020202" />
+            <stop offset="52%" stopColor="#0c0c0c" />
+            <stop offset="82%" stopColor="#585858" />
+            <stop offset="100%" stopColor="#bcbcbc" />
+          </linearGradient>
+          <linearGradient id={`${uid}-monolith`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#4c4c4c" />
+            <stop offset="35%" stopColor="#1b1b1b" />
+            <stop offset="100%" stopColor="#050505" />
+          </linearGradient>
+          <radialGradient id={`${uid}-rim`} cx="50%" cy="34%" r="55%">
+            <stop offset="0%" stopColor="#e5e5e5" stopOpacity="0.85" />
+            <stop offset="50%" stopColor="#545454" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#050505" stopOpacity="0.98" />
           </radialGradient>
-          <linearGradient id={`canvas-fade-${index}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#080A0D" stopOpacity="0.1" />
-            <stop offset="65%" stopColor="#080A0D" stopOpacity="0.05" />
-            <stop offset="100%" stopColor="#080A0D" stopOpacity="0.82" />
+          <linearGradient id={`${uid}-bottom-scrim`} x1="0" y1="0.55" x2="0" y2="1">
+            <stop offset="0%" stopColor="#000000" stopOpacity="0" />
+            <stop offset="65%" stopColor="#000000" stopOpacity="0.72" />
+            <stop offset="100%" stopColor="#000000" stopOpacity="0.96" />
           </linearGradient>
         </defs>
 
-        <rect width="200" height="320" fill={`url(#spot-${index})`} />
-
+        {/* Variant 0: Hovering Obsidian Monolith in Mist */}
         {variant === 0 && (
-          // Concentric aperture rings & horizon line
-          <g stroke="#D8B36A" strokeWidth="1" fill="none" opacity="0.6">
-            <circle cx="100" cy="130" r="75" strokeDasharray="4 4" />
-            <circle cx="100" cy="130" r="50" />
-            <circle cx="100" cy="130" r="25" strokeWidth="1.5" />
-            <line x1="20" y1="230" x2="180" y2="230" strokeWidth="1.5" />
-            <line x1="40" y1="240" x2="160" y2="240" strokeOpacity="0.4" />
+          <g>
+            <rect width="220" height="480" fill={`url(#${uid}-sky-mid)`} />
+            <ellipse cx="110" cy="330" rx="130" ry="38" fill="#d4d4d4" opacity="0.35" />
+            {/* Giant suspended dark ovoid monolith */}
+            <ellipse
+              cx="116"
+              cy="205"
+              rx="42"
+              ry="132"
+              transform="rotate(4 116 205)"
+              fill={`url(#${uid}-monolith)`}
+            />
+            <path
+              d="M92 86 C74 150, 74 260, 98 330"
+              stroke="#d8d8d8"
+              strokeWidth="1.6"
+              fill="none"
+              opacity="0.55"
+            />
+            {/* Horizon land & lone figure */}
+            <path d="M0 372 Q65 364 130 370 T220 368 L220 480 L0 480 Z" fill="#0d0d0d" />
+            <rect x="64" y="354" width="3" height="15" fill="#050505" />
+            <circle cx="65.5" cy="352" r="2" fill="#050505" />
+            <text
+              x="110"
+              y="224"
+              textAnchor="middle"
+              fill="#e5e5e5"
+              fontSize="6"
+              letterSpacing="2.1"
+              opacity="0.82"
+            >
+              EVERY TIDE REMEMBERS
+            </text>
           </g>
         )}
 
+        {/* Variant 1: Dual Chiaroscuro Profiles & Subterranean Vortex */}
         {variant === 1 && (
-          // Monolithic delta angles & vertical slit
-          <g fill="none">
-            <polygon
-              points="100,30 180,240 20,240"
-              stroke="#D8B36A"
-              strokeWidth="1.2"
-              opacity="0.5"
+          <g>
+            <rect width="220" height="480" fill="#0b0b0b" />
+            <rect width="220" height="340" fill={`url(#${uid}-rim)`} />
+            {/* Left & Right opposing dramatic bust silhouettes */}
+            <path
+              d="M12 225 C18 165, 34 148, 52 145 C50 128, 58 106, 78 106 C98 106, 106 126, 102 148 C112 162, 118 192, 116 235 Z"
+              fill="#141414"
+              stroke="#9a9a9a"
+              strokeWidth="0.8"
             />
-            <line
-              x1="100"
-              y1="20"
-              x2="100"
-              y2="270"
-              stroke="#D8B36A"
-              strokeWidth="2"
-              strokeOpacity="0.8"
+            <path
+              d="M124 235 C126 186, 136 164, 150 154 C146 132, 156 112, 176 114 C194 116, 202 136, 196 156 C206 170, 212 198, 214 235 Z"
+              fill="#1b1b1b"
+              stroke="#bcbcbc"
+              strokeWidth="0.8"
             />
+            {/* Giant acoustic vortex ring in mist */}
+            <circle cx="110" cy="318" r="64" fill="#070707" stroke="#8f8f8f" strokeWidth="3" />
             <circle
-              cx="100"
-              cy="90"
-              r="14"
-              fill="#D8B36A"
-              fillOpacity="0.25"
-              stroke="#D8B36A"
+              cx="110"
+              cy="318"
+              r="46"
+              fill="#020202"
+              stroke="#525252"
               strokeWidth="1"
+              strokeDasharray="3 3"
+            />
+            <ellipse cx="110" cy="372" rx="115" ry="34" fill="#cfcfcf" opacity="0.45" />
+          </g>
+        )}
+
+        {/* Variant 2: Towering Silhouette & Wind-Swept Horizon */}
+        {variant === 2 && (
+          <g>
+            <rect width="220" height="480" fill="#121212" />
+            <rect width="220" height="390" fill={`url(#${uid}-sky-bright)`} opacity="0.88" />
+            {/* Monumental upper portrait silhouette */}
+            <path
+              d="M28 245 C36 178, 62 152, 86 144 C80 116, 94 84, 124 84 C154 84, 168 114, 158 144 C180 156, 198 188, 204 245 Z"
+              fill="#171717"
+            />
+            <path
+              d="M124 84 C154 84, 168 114, 158 144"
+              stroke="#f2f2f2"
+              strokeWidth="2"
+              fill="none"
+            />
+            {/* Hooded figure in silver mist */}
+            <path
+              d="M58 340 C72 268, 92 246, 110 246 C128 246, 148 268, 162 340 Z"
+              fill="#2c2c2c"
+            />
+            <ellipse cx="110" cy="274" rx="14" ry="18" fill="#0d0d0d" />
+            {/* Sweeping river dunes */}
+            <path d="M0 356 Q95 330 220 364 L220 480 L0 480 Z" fill="#dcdcdc" opacity="0.7" />
+            <path d="M0 392 Q120 368 220 398 L220 480 L0 480 Z" fill="#141414" />
+          </g>
+        )}
+
+        {/* Variant 3: Stark Half-Face Noir Chiaroscuro */}
+        {variant === 3 && (
+          <g>
+            <rect width="220" height="480" fill={`url(#${uid}-noir)`} />
+            {/* Left pitch-black shadow mass */}
+            <rect width="108" height="480" fill="#030303" />
+            {/* Dramatic low-key half-lit face emerging on right */}
+            <path
+              d="M108 72 C148 72, 186 108, 192 168 C196 206, 184 248, 174 278 C164 306, 142 326, 108 330 Z"
+              fill="#787878"
+              opacity="0.55"
+            />
+            <path d="M148 168 Q168 162 182 170 Q168 176 148 172 Z" fill="#ededed" opacity="0.85" />
+            <circle cx="164" cy="170" r="3.5" fill="#090909" />
+            <path
+              d="M108 135 C135 142, 152 195, 145 232 C136 238, 124 238, 114 234"
+              fill="#111111"
+            />
+            <path d="M90 330 L220 365 L220 480 L70 480 Z" fill="#070707" />
+          </g>
+        )}
+
+        {/* Variant 4: High-Key Silver Sky & Architectural Silhouette */}
+        {variant === 4 && (
+          <g>
+            <rect width="220" height="480" fill="#dadada" />
+            {/* Collegiate skyline rising from silhouetted scholar profile */}
+            <rect x="44" y="156" width="14" height="58" fill="#1b1b1b" />
+            <rect x="64" y="138" width="22" height="76" fill="#2c2c2c" />
+            <rect x="92" y="122" width="18" height="92" fill="#141414" />
+            <rect x="116" y="146" width="24" height="68" fill="#363636" />
+            <rect x="146" y="162" width="16" height="52" fill="#1f1f1f" />
+            {/* Spidery radio tower arch */}
+            <path
+              d="M128 146 L138 108 L148 146 M120 128 L156 120"
+              stroke="#1a1a1a"
+              strokeWidth="1.3"
+              fill="none"
+            />
+            {/* Bold dark profile silhouette at lower right */}
+            <path
+              d="M68 214 L172 214 C188 238, 196 276, 190 326 C186 365, 198 415, 220 450 L220 480 L96 480 C92 432, 72 412, 58 382 C46 356, 54 328, 42 308 C34 294, 48 272, 52 250 C54 232, 60 220, 68 214 Z"
+              fill="#0e0e0e"
             />
           </g>
         )}
 
-        {variant === 2 && (
-          // Archival anamorphic prism & rays
-          <g stroke="#D8B36A" opacity="0.65">
-            <path d="M30 220 L100 50 L170 220 Z" fill="none" strokeWidth="1" />
-            <line x1="100" y1="50" x2="30" y2="270" strokeWidth="0.75" strokeOpacity="0.4" />
-            <line x1="100" y1="50" x2="170" y2="270" strokeWidth="0.75" strokeOpacity="0.4" />
-            <line x1="100" y1="50" x2="100" y2="280" strokeWidth="1.5" />
-            <ellipse cx="100" cy="220" rx="45" ry="12" fill="none" strokeWidth="1" />
-          </g>
-        )}
-
-        {variant === 3 && (
-          // Starburst lattice & geometric aperture
-          <g stroke="#D8B36A" strokeWidth="1" fill="none" opacity="0.6">
-            <rect x="40" y="70" width="120" height="150" rx="4" strokeDasharray="3 3" />
-            <circle cx="100" cy="145" r="40" strokeWidth="1.5" />
-            <line x1="100" y1="80" x2="100" y2="210" />
-            <line x1="45" y1="145" x2="155" y2="145" />
-            <polygon points="100,115 125,145 100,175 75,145" fill="#D8B36A" fillOpacity="0.2" />
-          </g>
-        )}
-
-        {variant === 4 && (
-          // Waveform monsoon curves
-          <g stroke="#D8B36A" fill="none" opacity="0.6">
-            <path d="M10 100 Q 100 30 190 100 T 10 180" strokeWidth="1" />
-            <path d="M10 130 Q 100 60 190 130 T 10 210" strokeWidth="1.2" />
-            <path d="M10 160 Q 100 90 190 160 T 10 240" strokeWidth="1.5" strokeOpacity="0.8" />
-            <circle cx="100" cy="100" r="16" fill="#D8B36A" fillOpacity="0.3" strokeWidth="1" />
-          </g>
-        )}
-
+        {/* Variant 5: Diagonal Split Sci-Fi Horizon */}
         {variant === 5 && (
-          // Stepped architectural perspective
-          <g stroke="#D8B36A" strokeWidth="1" fill="none" opacity="0.65">
-            <polygon points="20,260 180,260 150,60 50,60" />
-            <polygon points="40,240 160,240 135,90 65,90" strokeOpacity="0.4" />
-            <polygon points="60,220 140,220 120,120 80,120" strokeWidth="1.5" />
-            <line x1="100" y1="40" x2="100" y2="270" strokeWidth="1" strokeDasharray="2 2" />
+          <g>
+            <rect width="220" height="480" fill="#0a0a0a" />
+            <polygon points="0,0 116,0 92,310 0,280" fill="#262626" />
+            <polygon points="116,0 220,0 220,295 92,310" fill="#474747" />
+            {/* Dual rim-lit navigator silhouettes */}
+            <circle cx="58" cy="96" r="28" fill="#7c7c7c" />
+            <path d="M12 245 C18 168, 38 136, 62 134 C86 136, 98 168, 102 245 Z" fill="#121212" />
+            <circle cx="166" cy="88" r="32" fill="#969696" />
+            <path
+              d="M118 250 C124 166, 146 132, 174 132 C198 132, 214 168, 218 250 Z"
+              fill="#191919"
+            />
+            {/* Diagonal light beam */}
+            <line x1="114" y1="0" x2="90" y2="320" stroke="#e8e8e8" strokeWidth="2" opacity="0.6" />
           </g>
         )}
 
+        {/* Variant 6: Sun-Bleached Silver Horizon & Twin Silhouettes */}
         {variant === 6 && (
-          // Eclipse crescent & dual horizon
-          <g fill="none" stroke="#D8B36A" opacity="0.7">
-            <circle cx="100" cy="120" r="55" strokeWidth="1" />
-            <path d="M100 65 A 55 55 0 0 1 155 120" strokeWidth="2.5" />
-            <line x1="20" y1="210" x2="180" y2="210" strokeWidth="1.5" />
-            <line x1="30" y1="225" x2="170" y2="225" strokeOpacity="0.4" />
-            <line x1="40" y1="240" x2="160" y2="240" strokeOpacity="0.2" />
+          <g>
+            <rect width="220" height="480" fill="#d4d4d4" />
+            {/* Dramatic twin silhouettes upper left/right */}
+            <path
+              d="M0 250 L0 96 C18 82, 46 84, 58 112 C68 136, 62 166, 78 192 L92 250 Z"
+              fill="#1c1c1c"
+            />
+            <path
+              d="M220 255 L220 88 C196 72, 162 78, 148 108 C138 132, 142 162, 118 196 L102 255 Z"
+              fill="#2a2a2a"
+            />
+            {/* Textured landscape horizon */}
+            <rect x="0" y="248" width="220" height="232" fill="#8c8c8c" />
+            <path d="M0 326 L220 312 L220 480 L0 480 Z" fill="#181818" />
+            <rect x="16" y="424" width="188" height="20" fill="#e2e2e2" opacity="0.88" />
           </g>
         )}
 
-        {/* Ambient grain vignette */}
-        <rect width="200" height="320" fill={`url(#canvas-fade-${index})`} opacity="0.65" />
+        {/* Bottom Cinema Vignette */}
+        <rect width="220" height="480" fill={`url(#${uid}-bottom-scrim)`} />
+
+        {/* Poster Release Billing Line */}
+        <text
+          x="110"
+          y="458"
+          textAnchor="middle"
+          fill="#a6a6a6"
+          fontSize="6.2"
+          fontWeight="600"
+          letterSpacing="2"
+        >
+          CINEVA · {releaseYear}
+        </text>
       </svg>
 
-      {/* Atmospheric bottom scrim */}
-      <div className="from-canvas via-canvas/80 pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t to-transparent" />
+      {/* Crisp Unclipped Top Poster Billing Names */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-2.5 top-2.5 z-10 flex items-center justify-between gap-1 text-[6.5px] font-bold tracking-[0.12em] uppercase ${
+          variant === 4 || variant === 6 ? "text-canvas/85" : "text-text/80"
+        }`}
+      >
+        <span className="truncate">{leadA}</span>
+        <span className="truncate text-right">{leadB}</span>
+      </div>
+
+      {/* Solar Amber Illumination Veil on Hover / Focus */}
+      <div
+        aria-hidden="true"
+        className="from-ember/45 via-ember-glow/20 pointer-events-none absolute inset-0 bg-gradient-to-t to-transparent opacity-0 mix-blend-color transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none"
+      />
+      <div
+        aria-hidden="true"
+        className="from-ember-deep/80 pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t to-transparent opacity-0 transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none"
+      />
+
+      {/* Sculptural Poster Title Overlay (Resting State) */}
+      <div className="pointer-events-none absolute inset-x-3 bottom-7 z-10 text-center transition-opacity duration-300 group-focus-within:opacity-0 group-hover:opacity-0 motion-reduce:transition-none">
+        <p className="font-display text-text line-clamp-2 text-sm leading-tight font-bold tracking-[0.16em] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)]">
+          {shortTitle}
+        </p>
+      </div>
     </div>
   );
 }
@@ -185,19 +344,19 @@ export function FilmStripShowcase({
   watermarkText,
   heading,
   subheading,
+  renderBreadcrumbAsH1 = false,
   items,
 }: FilmStripShowcaseProps) {
-  // Enforce max 7 panels side-by-side for the signature 7-panel layout
   const displayItems = items.slice(0, 7);
 
   return (
     <section
       aria-label={`${breadcrumbTitle} showcase stage`}
-      className="relative w-full max-w-full overflow-hidden overflow-x-clip py-10 sm:py-16"
+      className="bg-canvas relative flex min-h-[calc(100dvh-3.5rem)] w-full max-w-full flex-col justify-between overflow-hidden overflow-x-clip pt-4 pb-16 sm:pt-6 sm:pb-20"
     >
-      {/* Centered Top Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="mb-6 flex items-center justify-center">
-        <ol className="text-text-muted flex items-center gap-2 font-mono text-xs">
+      {/* Centered Top Breadcrumb (Exact Image 1 Composition) */}
+      <nav aria-label="Breadcrumb" className="relative z-10 mb-6 flex items-center justify-center">
+        <ol className="text-text-muted flex flex-wrap items-center justify-center gap-2.5 text-xs">
           <li>
             <Link href="/" className="hover:text-text-secondary transition-colors">
               Main
@@ -214,95 +373,70 @@ export function FilmStripShowcase({
           <li aria-hidden="true" className="text-text-muted/60">
             &gt;
           </li>
-          <li className="text-accent font-medium">{breadcrumbTitle}</li>
+          <li>
+            {renderBreadcrumbAsH1 ? (
+              <h1 className="text-text text-xs font-medium">{breadcrumbTitle}</h1>
+            ) : (
+              <span className="text-text font-medium">{breadcrumbTitle}</span>
+            )}
+          </li>
         </ol>
       </nav>
 
-      {/* Editorial Heading (Optional) */}
+      {/* Optional Heading (visually subtle when provided) */}
       {heading ? (
-        <div className="mb-8 px-4 text-center">
-          <h2 className="font-display text-text text-2xl font-bold tracking-tight sm:text-4xl">
-            {heading}
-          </h2>
-          {subheading ? (
-            <p className="text-text-secondary mx-auto mt-2 max-w-xl text-sm sm:text-base">
-              {subheading}
-            </p>
-          ) : null}
+        <div className="sr-only">
+          <h2>{heading}</h2>
+          {subheading ? <p>{subheading}</p> : null}
         </div>
       ) : null}
 
-      {/* 7 Vertical Film-Strip Panels Stage */}
-      <div className="relative z-10 w-full px-2 sm:px-4">
-        <div className="flex snap-x snap-mandatory scrollbar-none gap-3 overflow-x-auto pb-6 sm:gap-4 lg:grid lg:grid-cols-7 lg:overflow-visible lg:pb-0">
+      {/* 7 Tall Frameless Vertical Poster Strips Centered on Pitch Black */}
+      <div className="relative z-10 mx-auto my-auto w-full max-w-[1180px] px-4 sm:px-6">
+        <div className="flex snap-x snap-mandatory scrollbar-none gap-3 overflow-x-auto pb-4 sm:gap-3.5 lg:justify-center lg:overflow-visible lg:pb-0">
           {displayItems.map((item, index) => (
             <article
               key={item.id}
-              className="group border-border/80 bg-surface-1 ease-standard hover:border-accent focus-within:border-accent relative w-[220px] flex-none snap-center rounded-sm border transition-all duration-300 focus-within:z-20 focus-within:scale-[1.03] focus-within:shadow-[0_0_24px_rgba(216,179,106,0.25)] hover:z-20 hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(216,179,106,0.25)] motion-reduce:transform-none motion-reduce:transition-none sm:w-[260px] lg:w-auto"
+              className="group bg-surface-1 ease-standard focus-within:ring-accent hover:ring-accent/80 relative w-[185px] flex-none snap-center overflow-hidden rounded-[2px] transition-all duration-300 focus-within:z-20 focus-within:-translate-y-1.5 focus-within:ring-1 hover:z-20 hover:-translate-y-1.5 hover:shadow-[0_18px_44px_rgba(217,91,22,0.28)] hover:ring-1 motion-reduce:transform-none motion-reduce:transition-none sm:w-[205px] lg:w-auto lg:max-w-[162px] lg:flex-1"
             >
               <Link
                 href={`/movies/${item.slug}`}
-                className="flex h-[460px] w-full flex-col overflow-hidden rounded-sm focus:outline-none sm:h-[500px] lg:h-[520px]"
+                className="flex h-[390px] w-full flex-col overflow-hidden focus:outline-none sm:h-[420px] lg:h-[435px] xl:h-[455px]"
                 aria-label={`View film ${item.titleEn} (${item.releaseYear})`}
               >
-                {/* Poster Artwork Container */}
-                <div className="relative w-full flex-1 overflow-hidden">
-                  <ProceduralFilmArt index={index} title={item.titleEn} />
+                <div className="relative h-full w-full overflow-hidden">
+                  <CinemaPosterArt
+                    index={index}
+                    title={item.titleEn}
+                    releaseYear={item.releaseYear}
+                  />
 
-                  {/* Top Badges */}
-                  <div className="absolute inset-x-2.5 top-2.5 z-10 flex items-center justify-between gap-1">
-                    <span className="border-border/80 bg-canvas/80 text-text-secondary rounded-xs border px-1.5 py-0.5 font-mono text-[10px] backdrop-blur-xs">
-                      {item.maturityRating ?? "U"}
-                    </span>
-                    {item.isDevelopmentFixture ? (
-                      <span className="border-info/50 bg-canvas/80 text-info rounded-xs border px-1.5 py-0.5 font-mono text-[10px]">
-                        Fixture
+                  {/* Hover / Focus Slide-up Story Reveal */}
+                  <div className="border-border/80 bg-surface-1/95 ease-standard absolute inset-x-0 bottom-0 z-20 translate-y-full transform border-t p-3 opacity-0 backdrop-blur-md transition-all duration-300 group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transform-none motion-reduce:transition-none">
+                    <div className="mb-1 flex items-center justify-between gap-1">
+                      <span className="text-accent font-mono text-[10px] font-semibold">
+                        {item.releaseYear}
+                        {item.runtimeMinutes ? ` · ${item.runtimeMinutes}m` : ""}
                       </span>
-                    ) : null}
-                  </div>
-
-                  {/* Resting Title Header (Bottom of art, above expansion) */}
-                  <div className="from-surface-1 via-surface-1/90 absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t to-transparent p-3 transition-opacity duration-300 group-focus-within:opacity-0 group-hover:opacity-0 motion-reduce:transition-none">
-                    <p className="text-text-muted font-mono text-[11px]">
-                      {item.releaseYear}
-                      {item.runtimeMinutes ? ` · ${item.runtimeMinutes}m` : ""}
-                    </p>
-                    <h3 className="font-display text-text mt-0.5 truncate text-sm font-semibold">
+                    </div>
+                    <h3 className="font-display text-text text-xs leading-snug font-bold sm:text-sm">
                       {item.titleEn}
                     </h3>
                     {item.titleBn ? (
-                      <p className="text-text-secondary mt-0.5 truncate text-xs" lang="bn">
+                      <p className="text-text-secondary font-display mt-0.5 text-[11px]" lang="bn">
                         {item.titleBn}
                       </p>
                     ) : null}
-                  </div>
-                </div>
-
-                {/* Hover / Focus Slide-up Synopsis Reveal */}
-                <div className="bg-surface-1/95 border-border ease-standard absolute inset-x-0 bottom-0 z-20 translate-y-full transform border-t p-3 opacity-0 backdrop-blur-sm transition-all duration-300 group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transform-none motion-reduce:transition-none sm:p-4">
-                  <div className="mb-1.5 flex items-center justify-between gap-1">
-                    <span className="text-accent font-mono text-[11px] font-medium">
-                      {item.releaseYear}
-                      {item.runtimeMinutes ? ` · ${item.runtimeMinutes}m` : ""}
-                    </span>
-                    {item.badgeKind ? <AvailabilityBadge kind={item.badgeKind} /> : null}
-                  </div>
-                  <h3 className="font-display text-text text-sm leading-snug font-bold sm:text-base">
-                    {item.titleEn}
-                  </h3>
-                  {item.titleBn ? (
-                    <p className="text-text-secondary font-display mt-0.5 text-xs" lang="bn">
-                      {item.titleBn}
-                    </p>
-                  ) : null}
-                  {item.synopsisEn ? (
-                    <p className="text-text-secondary mt-2 line-clamp-3 text-xs leading-relaxed">
-                      {item.synopsisEn}
-                    </p>
-                  ) : null}
-                  <div className="border-border/60 text-accent mt-3 flex items-center justify-between border-t pt-2 text-xs font-medium">
-                    <span>Explore Title</span>
-                    <span aria-hidden="true">&rarr;</span>
+                    {item.synopsisEn ? (
+                      <p className="text-text-secondary mt-1.5 line-clamp-3 text-[11px] leading-relaxed">
+                        {item.synopsisEn}
+                      </p>
+                    ) : null}
+                    {item.badgeKind ? (
+                      <div className="mt-2 origin-left scale-90">
+                        <AvailabilityBadge kind={item.badgeKind} />
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </Link>
@@ -311,12 +445,12 @@ export function FilmStripShowcase({
         </div>
       </div>
 
-      {/* Oversized Subtle Lower Backdrop Watermark Display Typography */}
+      {/* Giant Edge-to-Edge Lower Charcoal Watermark Typography (Exact Image 1 Treatment) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-1 z-0 w-full max-w-full overflow-hidden text-center select-none"
+        className="pointer-events-none absolute inset-x-0 -bottom-3 z-0 w-full max-w-full overflow-hidden text-center select-none"
       >
-        <span className="font-display text-text inline-block max-w-full text-[12vw] leading-none font-black tracking-widest whitespace-nowrap uppercase opacity-[0.05] select-none">
+        <span className="font-display text-text inline-block max-w-full text-[16vw] leading-[0.82] font-medium tracking-[-0.04em] whitespace-nowrap opacity-[0.13] select-none">
           {watermarkText}
         </span>
       </div>

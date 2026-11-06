@@ -232,13 +232,31 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
     // Mobile quick-action rail non-overlap & touch target audit (>= 44x44px)
     const mobileSynopsisBox = await page.getByTestId("hero-synopsis-column").boundingBox();
     const mobileRailBox = await page.locator("div[aria-label='Quick Actions']").boundingBox();
+    const dockBox = await dock.boundingBox();
+    const metadataBox = await page.getByTestId("hero-metadata-ledger").boundingBox();
     expect(mobileSynopsisBox).not.toBeNull();
     expect(mobileRailBox).not.toBeNull();
+    expect(dockBox).not.toBeNull();
     if (mobileSynopsisBox && mobileRailBox) {
       expect(
         mobileSynopsisBox.y + mobileSynopsisBox.height,
         `Mobile synopsis bottom (${mobileSynopsisBox.y + mobileSynopsisBox.height}) must not overlap Quick Actions rail top (${mobileRailBox.y})`,
       ).toBeLessThanOrEqual(mobileRailBox.y);
+    }
+    if (mobileRailBox && dockBox) {
+      expect(
+        mobileRailBox.y + mobileRailBox.height,
+        `Mobile Quick Actions bottom (${mobileRailBox.y + mobileRailBox.height}) must stay clear of FloatingDock top (${dockBox.y})`,
+      ).toBeLessThanOrEqual(dockBox.y - 8);
+    }
+    if (metadataBox && dockBox) {
+      const overlapsDockAtRest =
+        metadataBox.y < dockBox.y + dockBox.height &&
+        metadataBox.y + metadataBox.height > dockBox.y;
+      expect(
+        overlapsDockAtRest,
+        `Mobile metadata ledger (y=${metadataBox.y}) must not collide behind FloatingDock (y=${dockBox.y}..${dockBox.y + dockBox.height}) at initial viewport`,
+      ).toBe(false);
     }
 
     const quickRailControls = page.locator(
@@ -283,7 +301,7 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
 
     const videoShell = page.locator("div[data-player-state]");
     await expect(videoShell).toBeVisible();
-    await expect(page.getByRole("button", { name: /Authorize & Load Stream/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Watch Film/i })).toBeVisible();
 
     // Skip link must be visually hidden (sr-only, <=1x1px) until keyboard focused
     const skipLinkBox = await page

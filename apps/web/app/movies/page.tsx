@@ -11,9 +11,8 @@ import { listTitles } from "@/lib/catalogue/repository";
 import { resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
-  title: "Movies · Cinematic Graphite",
-  description:
-    "Browse rights-verified films by availability and language once editorial and rights review complete.",
+  title: "Movies · CINEVA",
+  description: "Browse acclaimed feature films, restored classics, and world cinema on CINEVA.",
 };
 
 const LANGUAGE_FILTERS = [

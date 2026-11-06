@@ -83,7 +83,7 @@ function WipeLayer({ wipe, finish }: { wipe: Wipe | null; finish: () => void }) 
   return (
     <div ref={node} className="poster-wipe" style={{ background: wipe.color }} aria-hidden="true">
       <span className="poster-wipe-label">{wipe.label}</span>
-      <span className="poster-wipe-caption">Cinematic Graphite / The archive</span>
+      <span className="poster-wipe-caption">CINEVA / Cinema Archive</span>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { ConsumerShell } from "@/components/layout/site-shell";
 import { Badge, ButtonLink } from "@/components/ui";
 
 export const metadata: Metadata = {
-  title: "Report Content or Rights Concern · Cinematic Graphite",
+  title: "Report Content or Rights Concern · CINEVA",
   description:
     "Submit a copyright, territorial licence, or metadata concern to the compliance team.",
 };

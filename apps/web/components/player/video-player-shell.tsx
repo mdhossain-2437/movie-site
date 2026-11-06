@@ -449,14 +449,14 @@ export function VideoPlayerShell({
 
         {/* Overlay states: IDLE, AUTHORIZING, ERROR, REVOKED */}
         {playerState === "IDLE" ? (
-          <div className="bg-canvas/85 absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
-            <Badge tone="info">Server-Authorized Stream</Badge>
-            <h2 className="font-display text-text text-xl font-bold sm:text-2xl">
+          <div className="from-ember-deep/90 via-canvas/90 to-canvas absolute inset-0 flex flex-col items-center justify-center gap-4 bg-gradient-to-b p-6 text-center">
+            <Badge tone="accent">CINEVA · High-Definition Feature</Badge>
+            <h2 className="font-display text-text text-2xl font-bold tracking-tight sm:text-3xl">
               {localizedTitle}
             </h2>
-            <p className="text-text-secondary max-w-md text-xs sm:text-sm">
-              Playback verifies territorial rights, active licence window, concurrency limits, and
-              DRM policy before issuing a short-lived manifest capability. Audio never auto-plays.
+            <p className="text-text-secondary max-w-md text-xs leading-relaxed sm:text-sm">
+              Stream in high definition with adaptive bitrate playback and optional subtitles. Audio
+              never auto-plays without your selection.
             </p>
             <Button
               type="button"
@@ -465,7 +465,7 @@ export function VideoPlayerShell({
               className="min-h-12 min-w-44"
               onClick={togglePlayPause}
             >
-              Authorize &amp; Load Stream
+              Watch Film
             </Button>
           </div>
         ) : null}

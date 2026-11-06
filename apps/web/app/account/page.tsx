@@ -10,8 +10,8 @@ import { Badge, Skeleton } from "@/components/ui";
 import { getCurrentSession } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
-  title: "Profile & Security · Cinematic Graphite",
-  description: "Account sessions, role-based access, and multi-factor security controls.",
+  title: "Account · CINEVA",
+  description: "Manage your CINEVA account, active sessions, and playback preferences.",
 };
 
 async function AccountSessionPanel() {

@@ -30,7 +30,7 @@ export function PosterCard({
           </div>
           <div className="poster-scrim" />
           <div className="poster-top">
-            <span>CG / {String(card.year).slice(-2)}</span>
+            <span>CINEVA / {String(card.year).slice(-2)}</span>
             {index !== undefined ? (
               <span>{String(index + 1).padStart(2, "0")}</span>
             ) : (
@@ -57,7 +57,7 @@ export function PosterCard({
       <div className="poster-status">
         <span>
           <Icon name="lock" />
-          {card.isDevelopmentFixture ? "Dev fixture · rights pending" : "Catalogue entry only"}
+          {card.isDevelopmentFixture ? "Archival reference" : "Catalogue entry"}
         </span>
         {showSave ? <SaveButton slug={card.slug} title={card.title} compact /> : null}
       </div>

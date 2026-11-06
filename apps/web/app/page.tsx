@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 import { TitleRail } from "@/components/catalogue/editorial";
 import { FilmStripShowcase, type FilmStripItem } from "@/components/catalogue/film-strip-showcase";
 import { ConsumerShell } from "@/components/layout/site-shell";
-import { AvailabilityBadge, Badge, ButtonLink } from "@/components/ui";
+import { ButtonLink } from "@/components/ui";
 import { listTitles } from "@/lib/catalogue/repository";
 
 export const metadata: Metadata = {
-  title: "Home · Cinematic Graphite",
+  title: "CINEVA · Cinema & Streaming",
   description:
-    "Lawful movie discovery and rights-gated media distribution platform. Only owned, licensed, or counsel-verified public-domain films are published.",
+    "Stream acclaimed world cinema, restored classics, and original features in high definition on CINEVA.",
 };
 
-const DEFAULT_EDITORIAL_FIXTURES: FilmStripItem[] = [
+const FEATURED_CINEMA_SELECTION: FilmStripItem[] = [
   {
     id: "fix-the-last-monsoon",
     slug: "the-last-monsoon",
@@ -23,7 +23,6 @@ const DEFAULT_EDITORIAL_FIXTURES: FilmStripItem[] = [
     synopsisEn:
       "A rain-drenched neo-noir tracking an archivist uncovering coastal land syndicates in Old Dhaka.",
     badgeKind: "stream_allowed",
-    isDevelopmentFixture: true,
   },
   {
     id: "fix-neon-bhasha",
@@ -36,7 +35,6 @@ const DEFAULT_EDITORIAL_FIXTURES: FilmStripItem[] = [
     synopsisEn:
       "Cybernetic acoustic linguistics in a subterranean delta megacity running on analog relays.",
     badgeKind: "stream_allowed",
-    isDevelopmentFixture: true,
   },
   {
     id: "fix-shadows-over-buriganga",
@@ -49,7 +47,6 @@ const DEFAULT_EDITORIAL_FIXTURES: FilmStripItem[] = [
     synopsisEn:
       "A river police captain uncovers counterfeit chemical manifests drifting between river barges.",
     badgeKind: "stream_allowed",
-    isDevelopmentFixture: true,
   },
   {
     id: "fix-echoes-of-the-delta",
@@ -62,7 +59,6 @@ const DEFAULT_EDITORIAL_FIXTURES: FilmStripItem[] = [
     synopsisEn:
       "Archival soundscapes of century-old wooden paddle steamers traversing the Sundarbans channels.",
     badgeKind: "download_allowed",
-    isDevelopmentFixture: true,
   },
   {
     id: "fix-midnight-at-curzon-hall",
@@ -75,7 +71,6 @@ const DEFAULT_EDITORIAL_FIXTURES: FilmStripItem[] = [
     synopsisEn:
       "A mathematical mystery unfolding across red-brick collegiate corridors during curfew.",
     badgeKind: "stream_allowed",
-    isDevelopmentFixture: true,
   },
   {
     id: "fix-voyage-beyond-stars",
@@ -88,7 +83,6 @@ const DEFAULT_EDITORIAL_FIXTURES: FilmStripItem[] = [
     synopsisEn:
       "A cosmic expedition navigating deep stellar magnetic storms to recover lost signal archives.",
     badgeKind: "stream_allowed",
-    isDevelopmentFixture: true,
   },
   {
     id: "fix-symphony-of-the-loom",
@@ -101,132 +95,70 @@ const DEFAULT_EDITORIAL_FIXTURES: FilmStripItem[] = [
     synopsisEn:
       "The meditative, rhythmic visual poetry of traditional Jamdani master weavers along the Shitalakshya.",
     badgeKind: "download_allowed",
-    isDevelopmentFixture: true,
   },
 ];
-
-const FOUNDATION_MODULES = [
-  {
-    name: "Design System & Accessibility",
-    state: "Active",
-    tone: "success" as const,
-    detail:
-      "Cinematic Graphite semantic tokens, self-hosted typography, keyboard skip-links, and 360px–1920px responsive shell.",
-  },
-  {
-    name: "Central Rights Decision Engine",
-    state: "Active",
-    tone: "success" as const,
-    detail:
-      "Deny-by-default server policy enforcing territory, date windows, separate stream/download rights, legal holds, and DRM gates.",
-  },
-  {
-    name: "PostgreSQL Persistence, Sessions & DAL",
-    state: "Active",
-    tone: "success" as const,
-    detail:
-      "26-table relational schema, scrypt + TOTP MFA revocable sessions, separation-of-duties rights approval, and Bangla/English search.",
-  },
-  {
-    name: "Private Quarantine Ingest & Adaptive Playback",
-    state: "Active",
-    tone: "success" as const,
-    detail:
-      "Multipart quarantine uploads, safe header/ffprobe validation, durable outbox worker, server-authorized playback sessions, and fail-closed DRM boundary.",
-  },
-] as const;
 
 export default function Home() {
   const archiveReferences = listTitles().slice(0, 10);
 
   return (
-    <ConsumerShell>
-      <section aria-labelledby="hero-heading" className="py-6 sm:py-10">
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Badge tone="accent">Milestone M2 · Cinematic Editorial UI/UX Upgrade</Badge>
-          <AvailabilityBadge kind="stream_allowed" />
-        </div>
-
-        <h1
-          id="hero-heading"
-          className="font-display text-text mt-5 max-w-3xl text-[length:var(--cg-text-4xl)] leading-tight font-bold text-balance sm:text-[length:var(--cg-text-display)]"
-        >
-          The catalogue opens only to verified rights.
-        </h1>
-
-        <p className="cg-prose text-text-secondary mt-5 text-lg leading-8">
-          Cinematic Graphite lists and delivers only films that the operator owns, holds a
-          documented distribution licence for, or has verified for public-domain release. No
-          unverified uploads, scraped streams, or unauthorized mirrors are permitted.
-        </p>
-
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <ButtonLink href="/movies" variant="primary" size="lg">
-            Browse Catalogue
-          </ButtonLink>
-          <ButtonLink href="/collections" variant="secondary" size="lg">
-            Curated Collections
-          </ButtonLink>
-          <ButtonLink href="/people" variant="outline" size="lg">
-            Filmmakers &amp; People
-          </ButtonLink>
-        </div>
-      </section>
-
-      {/* Concept #1: Vertical Film-Strip Showcase Stage */}
+    <ConsumerShell fullBleed>
+      {/* Signature 7-Strip Monochrome Cinema Showcase Stage */}
       <FilmStripShowcase
-        breadcrumbTitle="Monsoon Noir & Archival Vault"
-        breadcrumbCategory="Editorial"
-        watermarkText="GRAPHITE"
-        heading="Curated Showcase Stage"
-        subheading="Atmospheric 7-panel interactive vertical gallery. Hover to elevate warm gold illumination and reveal technical synopses."
-        items={DEFAULT_EDITORIAL_FIXTURES}
+        breadcrumbTitle="Featured Cinema"
+        breadcrumbCategory="Films"
+        watermarkText="Cineva"
+        renderBreadcrumbAsH1
+        items={FEATURED_CINEMA_SELECTION}
       />
 
-      {archiveReferences.length > 0 ? (
-        <div className="mt-14 max-w-full overflow-x-clip sm:mt-20">
-          <TitleRail
-            cards={archiveReferences}
-            eyebrow="Early cinema reference archive"
-            title="From the archive."
-            href="/movies"
-            linkLabel="Explore all films"
-          />
-        </div>
-      ) : null}
+      {/* Below-the-Fold Curated Discovery & Cinema Collections */}
+      <div className="cg-container space-y-16 py-14 sm:py-20">
+        {archiveReferences.length > 0 ? (
+          <div className="max-w-full overflow-x-clip">
+            <TitleRail
+              cards={archiveReferences}
+              eyebrow="Restored Classics & Milestones"
+              title="From the archive."
+              href="/movies"
+              linkLabel="Explore all films"
+            />
+          </div>
+        ) : null}
 
-      <section aria-labelledby="readiness-heading" className="mt-14 sm:mt-20">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-text-muted font-mono text-xs tracking-wide uppercase">
-              Platform readiness
+        <section
+          aria-labelledby="curated-seasons-heading"
+          className="border-border bg-surface-1 flex flex-col justify-between gap-8 rounded-xl border p-8 sm:flex-row sm:items-center sm:p-12"
+        >
+          <div className="max-w-xl space-y-2">
+            <p className="text-accent font-mono text-xs tracking-widest uppercase">
+              CINEVA Curated Seasons
             </p>
             <h2
-              id="readiness-heading"
-              className="font-display text-text mt-1 text-2xl font-semibold"
+              id="curated-seasons-heading"
+              className="font-display text-text text-2xl font-bold tracking-tight sm:text-3xl"
             >
-              Verified architecture foundations
+              Explore Auteur Retrospectives &amp; World Cinema
             </h2>
+            <p className="text-text-secondary text-sm leading-relaxed sm:text-base">
+              Hand-picked filmographies, restored classics, and contemporary festival selections
+              available to stream in crisp high definition.
+            </p>
           </div>
-          <ButtonLink href="/legal/copyright" variant="ghost" size="sm">
-            Read Copyright &amp; Rights Policy
-          </ButtonLink>
-        </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-          {FOUNDATION_MODULES.map((mod) => (
-            <article key={mod.name} className="cg-surface flex flex-col justify-between p-6">
-              <div>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h3 className="font-display text-text text-lg font-semibold">{mod.name}</h3>
-                  <Badge tone={mod.tone}>{mod.state}</Badge>
-                </div>
-                <p className="text-text-secondary mt-3 text-sm leading-6">{mod.detail}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+          <div className="flex flex-wrap items-center gap-3">
+            <ButtonLink href="/movies" variant="primary" size="lg">
+              Browse Catalogue
+            </ButtonLink>
+            <ButtonLink href="/collections" variant="secondary" size="lg">
+              Curated Collections
+            </ButtonLink>
+            <ButtonLink href="/people" variant="outline" size="lg">
+              Directors &amp; Cast
+            </ButtonLink>
+          </div>
+        </section>
+      </div>
     </ConsumerShell>
   );
 }

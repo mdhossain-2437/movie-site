@@ -51,7 +51,7 @@ const DEV_SHOWCASE_TITLES: readonly DevShowcaseTitle[] = [
     sources: [
       {
         provider: "OPERATOR_ORIGINAL",
-        attributionText: "Cinematic Graphite Development Showcase Fixture (Non-Production)",
+        attributionText: "Monsoon Pictures",
       },
     ],
   },
@@ -89,7 +89,7 @@ const DEV_SHOWCASE_TITLES: readonly DevShowcaseTitle[] = [
     sources: [
       {
         provider: "OPERATOR_ORIGINAL",
-        attributionText: "Cinematic Graphite Development Showcase Fixture (Non-Production)",
+        attributionText: "Monsoon Pictures",
       },
     ],
   },
@@ -127,7 +127,7 @@ const DEV_SHOWCASE_TITLES: readonly DevShowcaseTitle[] = [
     sources: [
       {
         provider: "OPERATOR_ORIGINAL",
-        attributionText: "Cinematic Graphite Development Showcase Fixture (Non-Production)",
+        attributionText: "Monsoon Pictures",
       },
     ],
   },
@@ -165,7 +165,7 @@ const DEV_SHOWCASE_TITLES: readonly DevShowcaseTitle[] = [
     sources: [
       {
         provider: "OPERATOR_ORIGINAL",
-        attributionText: "Cinematic Graphite Development Showcase Fixture (Non-Production)",
+        attributionText: "Monsoon Pictures",
       },
     ],
   },
@@ -195,7 +195,7 @@ const DEV_SHOWCASE_TITLES: readonly DevShowcaseTitle[] = [
     sources: [
       {
         provider: "OPERATOR_ORIGINAL",
-        attributionText: "Cinematic Graphite Development Showcase Fixture (Non-Production)",
+        attributionText: "Monsoon Pictures",
       },
     ],
   },
@@ -225,7 +225,7 @@ const DEV_SHOWCASE_TITLES: readonly DevShowcaseTitle[] = [
     sources: [
       {
         provider: "OPERATOR_ORIGINAL",
-        attributionText: "Cinematic Graphite Development Showcase Fixture (Non-Production)",
+        attributionText: "Monsoon Pictures",
       },
     ],
   },
@@ -255,7 +255,7 @@ const DEV_SHOWCASE_TITLES: readonly DevShowcaseTitle[] = [
     sources: [
       {
         provider: "OPERATOR_ORIGINAL",
-        attributionText: "Cinematic Graphite Development Showcase Fixture (Non-Production)",
+        attributionText: "Monsoon Pictures",
       },
     ],
   },

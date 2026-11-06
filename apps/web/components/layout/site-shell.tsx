@@ -5,31 +5,29 @@ import { DesktopNavLinks, MobileNavLinks, type NavItem } from "./nav-links";
 import { SearchCommandModal } from "./search-command";
 
 export const PRIMARY_NAV_ITEMS: readonly NavItem[] = [
-  { href: "/", label: "Home" },
-  { href: "/movies", label: "Movies" },
+  { href: "/", label: "Featured" },
+  { href: "/movies", label: "Films" },
   { href: "/collections", label: "Collections" },
-  { href: "/people", label: "People" },
-  { href: "/search", label: "Search" },
-  { href: "/watchlist", label: "My List" },
+  { href: "/people", label: "Directors" },
+  { href: "/watchlist", label: "Watchlist" },
 ];
 
 export const MOBILE_NAV_ITEMS: readonly NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/search", label: "Search" },
-  { href: "/watchlist", label: "My List" },
-  { href: "/account", label: "Profile" },
+  { href: "/watchlist", label: "Watchlist" },
+  { href: "/account", label: "Sign In" },
 ];
 
 /**
- * Original minimal film-frame / aperture corner monogram (Design System §2.2).
- * Scales cleanly at 16px, 24px, and hero sizes without literal film-reel clichés.
+ * Original minimal anamorphic frame & projection monogram for CINEVA.
  */
 export function BrandMark() {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      className="text-accent h-6 w-6 shrink-0"
+      className="text-accent h-5 w-5 shrink-0"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
@@ -52,7 +50,7 @@ function DesktopNavFallback({ items }: { items: readonly NavItem[] }) {
         <li key={item.href}>
           <Link
             href={item.href}
-            className="text-text-secondary hover:bg-surface-2 hover:text-text inline-flex min-h-10 items-center rounded-sm px-3.5 py-2 text-sm font-medium"
+            className="text-text-muted hover:text-text inline-flex min-h-10 items-center rounded-sm px-3.5 py-2 text-xs font-medium tracking-wide transition-colors"
           >
             {item.label}
           </Link>
@@ -81,16 +79,15 @@ function MobileNavFallback({ items }: { items: readonly NavItem[] }) {
 
 export function SiteHeader() {
   return (
-    <header className="border-border bg-canvas/95 sticky top-0 z-20 max-w-full overflow-x-clip border-b backdrop-blur-xs">
-      <div className="cg-container flex h-16 max-w-full items-center justify-between gap-2 sm:gap-4">
-        <div className="flex min-w-0 shrink items-center gap-3 sm:gap-6">
+    <header className="bg-canvas/85 sticky top-0 z-20 max-w-full overflow-x-clip backdrop-blur-md">
+      <div className="cg-container flex h-14 max-w-full items-center justify-between gap-2 sm:gap-4">
+        <div className="flex min-w-0 shrink items-center gap-4 sm:gap-8">
           <Link
             href="/"
-            className="font-display text-text inline-flex min-h-11 shrink-0 items-center gap-2 rounded-sm px-1 text-base font-bold tracking-tight sm:text-lg"
+            className="font-display text-text inline-flex min-h-11 shrink-0 items-center gap-2 rounded-sm px-1 text-sm font-black tracking-[0.16em] uppercase sm:text-base"
           >
-            <BrandMark />
-            <span className="truncate">
-              Cinematic <span className="text-accent">Graphite</span>
+            <span className="bg-accent text-on-accent rounded-xs px-2 py-0.5 text-xs font-black tracking-tight">
+              CINEVA
             </span>
           </Link>
 
@@ -101,19 +98,13 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <SearchCommandModal />
           <Link
-            href="/admin"
-            className="border-border bg-surface-1 text-text-secondary hover:bg-surface-2 hover:text-text hidden min-h-10 items-center rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors sm:inline-flex"
-          >
-            Operations
-          </Link>
-          <Link
             href="/account"
-            className="text-text-secondary hover:bg-surface-2 hover:text-text hidden min-h-10 items-center rounded-sm px-3.5 py-1.5 text-sm font-medium transition-colors lg:inline-flex"
+            className="border-border bg-surface-1 text-text-secondary hover:border-border-strong hover:text-text rounded-pill hidden min-h-9 items-center border px-4 py-1.5 text-xs font-medium transition-colors lg:inline-flex"
           >
-            Profile
+            Sign In
           </Link>
         </div>
       </div>
@@ -136,53 +127,62 @@ export function MobileBottomNav() {
 
 export function SiteFooter() {
   return (
-    <footer className="border-border bg-canvas-raised border-t pb-20 md:pb-0">
+    <footer className="border-border/60 bg-canvas-raised border-t pb-24 md:pb-24">
       <div className="cg-container flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-display text-text text-sm font-semibold">
-            Cinematic Graphite · Authorized Media Platform
-          </p>
-          <p className="text-text-muted mt-1 text-xs">
-            Working codename. Only owned, licensed, or counsel-verified public-domain works may be
-            published.
+          <div className="flex items-center gap-2.5">
+            <span className="bg-accent text-on-accent font-display rounded-xs px-2 py-0.5 text-xs font-black tracking-tight">
+              CINEVA
+            </span>
+            <p className="font-display text-text text-sm font-semibold">
+              World Cinema, Restored Classics &amp; Original Features
+            </p>
+          </div>
+          <p className="text-text-muted mt-1.5 text-xs">
+            Curated theatrical streaming and high-definition cinema archive.
           </p>
         </div>
 
         <nav aria-label="Legal and compliance">
-          <ul className="text-text-secondary flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
+          <ul className="text-text-muted flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
             <li>
-              <Link href="/collections" className="hover:text-text">
+              <Link href="/movies" className="hover:text-text transition-colors">
+                Films
+              </Link>
+            </li>
+            <li>
+              <Link href="/collections" className="hover:text-text transition-colors">
                 Collections
               </Link>
             </li>
             <li>
-              <Link href="/people" className="hover:text-text">
-                People
+              <Link href="/people" className="hover:text-text transition-colors">
+                Directors
               </Link>
             </li>
             <li>
-              <Link href="/legal/terms" className="hover:text-text">
+              <Link href="/legal/terms" className="hover:text-text transition-colors">
                 Terms
               </Link>
             </li>
             <li>
-              <Link href="/legal/privacy" className="hover:text-text">
+              <Link href="/legal/privacy" className="hover:text-text transition-colors">
                 Privacy
               </Link>
             </li>
             <li>
-              <Link href="/legal/copyright" className="hover:text-text">
-                Copyright Policy
+              <Link href="/legal/copyright" className="hover:text-text transition-colors">
+                Licensing
               </Link>
             </li>
             <li>
-              <Link href="/legal/takedown" className="hover:text-text">
-                Takedown Process
+              <Link href="/legal/takedown" className="hover:text-text transition-colors">
+                Rights Inquiries
               </Link>
             </li>
             <li>
-              <Link href="/report-content" className="hover:text-text">
-                Report Content
+              <Link href="/report-content" className="hover:text-text transition-colors">
+                Report Issue
               </Link>
             </li>
           </ul>

@@ -30,17 +30,16 @@ const notoBengali = Noto_Sans_Bengali({
 });
 
 export const metadata: Metadata = {
-  // Working codename only; the public brand name requires separate approval.
   title: {
-    default: "Cinematic Graphite",
-    template: "%s · Cinematic Graphite",
+    default: "CINEVA",
+    template: "%s · CINEVA",
   },
-  description: "Lawful movie discovery and authorized media distribution platform.",
+  description: "World cinema, restored classics, and original features in high definition.",
   robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#080A0D",
+  themeColor: "#000000",
   colorScheme: "dark",
 };
 

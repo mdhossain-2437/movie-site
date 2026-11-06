@@ -479,7 +479,7 @@ export async function seedDevShowcase(customDb?: MovieDatabase): Promise<{
           id: `src_${film.slug.replace(/-/g, "_")}`,
           titleId,
           provider: "OPERATOR_ORIGINAL",
-          attributionText: `© ${film.studioName}. Licensed for Cinematic Graphite lawful demonstration.`,
+          attributionText: film.studioName,
           licenseConfirmed: true,
         })
         .onConflictDoNothing();

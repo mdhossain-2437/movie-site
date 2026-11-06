@@ -3,9 +3,9 @@
 @import "../styles/experience.css";
 
 /*
- * Cinematic Graphite → Tailwind bridge.
+ * CINEVA → Tailwind semantic bridge.
  * Source of truth for values: styles/cinematic-graphite.tokens.css
- * (copied unchanged from /cinematic-graphite.tokens.css at the repo root).
+ * (mirrored from /cinematic-graphite.tokens.css at the repo root).
  */
 
 :root {
@@ -17,7 +17,7 @@
 }
 
 @theme inline {
-  /* Reset Tailwind's default palette so only design-system colors are available. */
+  /* Reset Tailwind's default palette so only semantic cinema tokens are available. */
   --color-*: initial;
 
   --color-canvas: var(--cg-bg);
@@ -33,6 +33,12 @@
   --color-accent: var(--cg-accent);
   --color-accent-hover: var(--cg-accent-hover);
   --color-accent-pressed: var(--cg-accent-pressed);
+  --color-on-accent: var(--cg-on-accent);
+  --color-ember-deep: var(--cg-ember-deep);
+  --color-ember-umbrage: var(--cg-ember-umbrage);
+  --color-ember: var(--cg-ember);
+  --color-ember-glow: var(--cg-ember-glow);
+  --color-bronze-glass: var(--cg-bronze-glass);
   --color-success: var(--cg-success);
   --color-warning: var(--cg-warning);
   --color-danger: var(--cg-danger);

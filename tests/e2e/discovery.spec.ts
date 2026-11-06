@@ -5,15 +5,19 @@ test.describe("Cinematic Graphite Hybrid Discovery & Editorial Archive Experienc
     page,
   }) => {
     await page.goto("/");
-    await expect(
-      page.getByRole("heading", { level: 1, name: /catalogue opens only to verified rights/i }),
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("heading", { level: 1, name: /Featured Cinema/i })).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.getByRole("heading", { name: "From the archive." })).toBeVisible({
       timeout: 15_000,
     });
 
-    await page.getByRole("link", { name: "Curated Collections" }).click();
-    await expect(page).toHaveURL(/\/collections$/);
+    const collectionsCta = page.getByRole("link", { name: "Curated Collections" });
+    await collectionsCta.scrollIntoViewIfNeeded();
+    await Promise.all([
+      page.waitForURL(/\/collections$/, { timeout: 15_000 }),
+      collectionsCta.click(),
+    ]);
     await expect(page.getByRole("heading", { level: 1, name: /Collections/i })).toBeVisible({
       timeout: 15_000,
     });

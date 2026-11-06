@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { BrandMark } from "@/components/layout/site-shell";
 import { VideoPlayerShell } from "@/components/player/video-player-shell";
 import { AvailabilityBadge, Badge, ButtonLink, EmptyState, Skeleton } from "@/components/ui";
 import { getDevShowcaseTitleBySlug } from "@/lib/catalogue/dev-showcase";
@@ -11,7 +10,7 @@ import { authorizePlayback } from "@/lib/catalogue/repository";
 import { resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
-  title: "Watch · Cinematic Graphite",
+  title: "Watch · CINEVA",
   robots: { index: false, follow: false },
 };
 
@@ -134,18 +133,17 @@ export default function WatchPage(props: { params: Promise<{ slug: string }> }) 
       >
         Skip to video player
       </a>
-      <header className="border-border bg-canvas-raised border-b">
+      <header className="border-border/60 bg-canvas border-b">
         <div className="cg-container flex h-14 items-center justify-between gap-3">
           <Link
             href="/"
             className="font-display text-text inline-flex min-h-10 items-center gap-2 rounded-sm px-1 text-base font-bold tracking-tight"
           >
-            <BrandMark />
-            <span>
-              Cinematic <span className="text-accent">Graphite</span>
+            <span className="bg-accent text-on-accent rounded-xs px-2 py-0.5 text-xs font-black tracking-tight">
+              CINEVA
             </span>
           </Link>
-          <Badge tone="neutral">Protected Watch Viewport · No-Referrer</Badge>
+          <Badge tone="accent">Theater Mode · HD</Badge>
         </div>
       </header>
 

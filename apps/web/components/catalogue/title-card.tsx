@@ -1,6 +1,6 @@
 import type { PublicTitleSummary } from "@movie/db";
 import Link from "next/link";
-import { AvailabilityBadge, Badge } from "@/components/ui";
+import { AvailabilityBadge } from "@/components/ui";
 
 export function TitleCard({ title }: { title: PublicTitleSummary }) {
   return (
@@ -11,7 +11,6 @@ export function TitleCard({ title }: { title: PublicTitleSummary }) {
             <span className="border-border bg-canvas/85 text-text-secondary rounded-xs border px-2 py-0.5 font-mono text-xs">
               {title.maturityRating}
             </span>
-            {title.isDevelopmentFixture ? <Badge tone="info">Dev Fixture</Badge> : null}
           </div>
 
           <div className="space-y-1">

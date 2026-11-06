@@ -96,9 +96,7 @@ test.describe("Milestones M1–M5 routes, APIs, search command, playback gate & 
     page,
   }) => {
     await page.goto("/");
-    await expect(
-      page.getByRole("heading", { level: 1, name: /catalogue opens only to verified rights/i }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /Featured Cinema/i })).toBeVisible();
 
     const skipLink = page.getByRole("link", { name: "Skip to content" });
     await skipLink.focus();

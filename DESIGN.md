@@ -1,9 +1,9 @@
-# Cinematic Graphite — Design System & Engineering Specification (`DESIGN.md`)
+# CINEVA — Cinema Noir & Solar Amber Design System (`DESIGN.md`)
 
-**Version:** 2.0  
-**Status:** Canonical Design Standard  
+**Version:** 3.0  
+**Status:** Canonical Deploy-Ready Design Standard  
 **Authority:** `AGENTS.md`, `apps/web/app/globals.css`, and `apps/web/styles/cinematic-graphite.tokens.css`  
-**Working Codename:** Cinematic Graphite  
+**Brand Identity:** CINEVA (Platform architecture codename: Cinematic Graphite)  
 
 ---
 
@@ -38,23 +38,26 @@ To maintain an uncompromised cinematic aesthetic, the following patterns are **p
 
 | Token Name | Hex Value | Semantic Usage |
 |---|---|---|
-| `--cg-graphite-950` / `bg-canvas` | `#080A0D` | Obsidian base page background, backdrop canvas |
-| `--cg-graphite-900` / `bg-canvas-raised` | `#0D1116` | Raised canvas, footers, modal scrims |
-| `--cg-graphite-850` / `bg-surface-1` | `#12171E` | Primary cards, floating dock, input backgrounds |
-| `--cg-graphite-800` / `bg-surface-2` | `#181F28` | Elevated surfaces, hover states, secondary controls |
-| `--cg-graphite-750` / `bg-surface-3` | `#222B36` | Active pressed surfaces, popovers |
-| `--cg-graphite-700` / `border-border` | `#2B3542` | Primary hairline border (1px) |
-| `--cg-graphite-600` / `border-border-strong` | `#425063` | Focused and highlighted borders |
-| `--cg-gold-500` / `text-accent` / `border-accent` | `#D8B36A` | Warm gold brand accent, primary CTA highlight |
-| `--cg-gold-400` / `text-accent-hover` | `#E8C77F` | Interactive hover gold glow |
-| `--cg-gold-600` / `text-accent-pressed` | `#B9924D` | Pressed/active gold state |
-| `--cg-ivory-50` / `text-text` | `#F4F6F8` | Primary high-contrast text |
-| `--cg-slate-200` / `text-text-secondary` | `#B2BBC7` | Secondary text, synopses, metadata |
-| `--cg-slate-400` / `text-text-muted` | `#818D9B` | Tertiary text, timestamps, captions |
-| `--cg-green-500` / `text-success` | `#49C69A` | Stream/Download authorized, verified legal states |
-| `--cg-amber-500` / `text-warning` | `#F0B85F` | Pending review, regional warning |
-| `--cg-red-500` / `text-danger` | `#F16B73` | Takedown hold, DRM rejection, critical errors |
-| `--cg-blue-500` / `text-info` | `#73A9F4` | Dev fixture tags, informational callouts |
+| `--cg-graphite-950` / `bg-canvas` | `#000000` | Pitch cinema black base page background, showcase stage |
+| `--cg-graphite-900` / `bg-canvas-raised` | `#090909` | Raised black canvas, footers, modal scrims |
+| `--cg-graphite-850` / `bg-surface-1` | `#141414` | Warm smoke charcoal cards, segmented dock bar, inputs |
+| `--cg-graphite-800` / `bg-surface-2` | `#1E1E1E` | Elevated smoke surfaces, hover states, secondary controls |
+| `--cg-graphite-750` / `bg-surface-3` | `#292929` | Active pressed surfaces, popovers |
+| `--cg-graphite-700` / `border-border` | `#262626` | Primary smoke hairline border (1px) |
+| `--cg-graphite-600` / `border-border-strong` | `#4A4642` | Focused and highlighted warm borders |
+| `--cg-gold-500` / `text-accent` / `bg-accent` | `#F5C518` | Vibrant Cinema Gold brand badge & primary highlight |
+| `--cg-gold-400` / `text-accent-hover` | `#FFD43B` | Interactive hover gold glow |
+| `--cg-gold-600` / `text-accent-pressed` | `#D9A700` | Pressed/active gold state |
+| `--cg-on-gold` / `text-on-accent` | `#0A0A0A` | High-contrast ink on `#F5C518` gold badges |
+| `--cg-ember-600` / `bg-ember` | `#D95B16` | Blazing Solar Amber hero stage core |
+| `--cg-ember-400` / `bg-ember-glow` | `#F29F24` | Golden-hour ochre solar dome rim |
+| `--cg-ivory-50` / `text-text` | `#FFFFFF` | Pure cinema ivory primary headlines & body |
+| `--cg-slate-200` / `text-text-secondary` | `#D8D3CC` | Warm silver secondary text & synopses |
+| `--cg-slate-400` / `text-text-muted` | `#8F8A83` | Warm muted captions, breadcrumbs, timestamps |
+| `--cg-green-500` / `text-success` | `#3DD68C` | Stream/Download authorized, verified states |
+| `--cg-amber-500` / `text-warning` | `#F59E0B` | Pending review, regional warning |
+| `--cg-red-500` / `text-danger` | `#F25F5C` | Takedown hold, DRM rejection, critical errors |
+| `--cg-blue-500` / `text-info` | `#60A5FA` | Informational callouts |
 
 ### 3.2 Typography Hierarchy
 

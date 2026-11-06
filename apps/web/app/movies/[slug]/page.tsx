@@ -25,7 +25,7 @@ import { getTitle } from "@/lib/catalogue/repository";
 import { getCurrentSession, resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
-  title: "Film Detail · Cinematic Graphite",
+  title: "Film Detail · CINEVA",
 };
 
 async function TitleDetailBody({ params }: { params: Promise<{ slug: string }> }) {
@@ -48,14 +48,12 @@ async function TitleDetailBody({ params }: { params: Promise<{ slug: string }> }
     }
 
     return (
-      <div className="cg-container py-10 sm:py-14">
-        <TitleHeroStage
-          title={title}
-          territoryCode={territoryCode}
-          isAuthenticated={Boolean(session)}
-          initialSaved={initialSaved}
-        />
-      </div>
+      <TitleHeroStage
+        title={title}
+        territoryCode={territoryCode}
+        isAuthenticated={Boolean(session)}
+        initialSaved={initialSaved}
+      />
     );
   }
 

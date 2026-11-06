@@ -46,11 +46,9 @@ describe("Cinematic Graphite UI primitives", () => {
     expect(chip).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("renders the honest rights-gated Home page without fake catalogue items", () => {
+  it("renders the CINEVA Featured Cinema showcase Home page", () => {
     render(<Home />);
-    expect(
-      screen.getByRole("heading", { level: 1, name: /catalogue opens only to verified rights/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: /Featured Cinema/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /browse catalogue/i })).toHaveAttribute(
       "href",
       "/movies",
@@ -65,7 +63,7 @@ describe("Cinematic Graphite UI primitives", () => {
         runtimeMinutes={95}
       />,
     );
-    const authorizeBtn = screen.getByRole("button", { name: /authorize & load stream/i });
+    const authorizeBtn = screen.getByRole("button", { name: /watch film/i });
     expect(authorizeBtn).toBeInTheDocument();
     const videoEl = screen.getByLabelText("Video player for Meghna Chronicle");
     expect(videoEl).toHaveAttribute("preload", "none");

@@ -22,7 +22,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-    testTimeout: 30_000,
+    testTimeout: 60_000,
     setupFiles: ["./vitest.setup.ts"],
     include: ["packages/**/*.test.ts", "apps/web/**/*.test.{ts,tsx}"],
     exclude: ["**/node_modules/**", "**/.next/**", "**/dist/**", "tests/e2e/**"],

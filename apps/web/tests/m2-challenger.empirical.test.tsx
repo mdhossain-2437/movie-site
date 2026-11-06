@@ -219,8 +219,8 @@ describe("Empirical Challenger: Milestone 2 UI, Search Navigation & QoE Telemetr
         );
       }).not.toThrow();
 
-      expect(screen.getByText("Server-Authorized Stream")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Authorize & Load Stream" })).toBeInTheDocument();
+      expect(screen.getByText("CINEVA · High-Definition Feature")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Watch Film" })).toBeInTheDocument();
       expect(
         screen.getByText(/Signed URLs enforce short-lived access control, not DRM/i),
       ).toBeInTheDocument();
@@ -263,7 +263,7 @@ describe("Empirical Challenger: Milestone 2 UI, Search Navigation & QoE Telemetr
       );
 
       // Trigger authorization attempt which fails with network error
-      const authButton = screen.getByRole("button", { name: "Authorize & Load Stream" });
+      const authButton = screen.getByRole("button", { name: "Watch Film" });
       fireEvent.click(authButton);
 
       // Verify component transitions to ERROR state safely without crashing

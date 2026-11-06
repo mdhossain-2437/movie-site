@@ -9,8 +9,8 @@ import { listTitles } from "@/lib/catalogue/repository";
 import { getCurrentSession, resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
-  title: "My List · Cinematic Graphite",
-  description: "Save authorized films to your personal watchlist.",
+  title: "Watchlist · CINEVA",
+  description: "Save films to your personal watchlist on CINEVA.",
 };
 
 async function WatchlistContent() {
