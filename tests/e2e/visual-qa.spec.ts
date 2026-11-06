@@ -257,8 +257,9 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
     const watchTitle = page.getByRole("heading", { level: 1, name: /The Last Monsoon/i });
     await expect(watchTitle).toBeVisible();
 
-    const videoShell = page.locator("section[aria-label*='player'], section[aria-label*='Player']");
+    const videoShell = page.locator("div[data-player-state]");
     await expect(videoShell).toBeVisible();
+    await expect(page.getByRole("button", { name: /Authorize & Load Stream/i })).toBeVisible();
 
     // Zero horizontal overflow invariant
     const hasOverflow = await page.evaluate(() => {
