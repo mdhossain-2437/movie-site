@@ -1,312 +1,343 @@
 import "server-only";
 
+import crypto from "node:crypto";
+import { getEnv } from "@movie/config";
+import type { ResolutionTier } from "@movie/contracts";
+import { type PublicTitleSummary, RightsGateError } from "@movie/db";
+import { evaluateRights, type RightsGrantRecord } from "@movie/domain";
 import type { TitleHeroStageProps } from "@/components/catalogue/title-hero-stage";
+import {
+  CINEVA_COLLECTIONS,
+  CINEVA_DATABASE_FILMS,
+  CINEVA_GENRES,
+  CINEVA_PEOPLE,
+  type CinevaDatabaseFilm,
+} from "./cineva-database";
 import { isFixtureCatalogueEnabled } from "./stage";
 
 export type DevShowcaseTitle = TitleHeroStageProps["title"];
 
-const DEV_SHOWCASE_TITLES: readonly DevShowcaseTitle[] = [
-  {
-    id: "fix-the-last-monsoon",
-    slug: "the-last-monsoon",
-    featureAssetId: null,
-    originalTitle: "The Last Monsoon",
-    originalLanguage: "bn",
-    releaseYear: 2024,
-    runtimeMinutes: 118,
-    maturityRating: "PG13",
-    isDevelopmentFixture: true,
-    localizedTitleEn: "The Last Monsoon",
-    localizedTitleBn: "শেষ বর্ষা",
-    synopsisEn:
-      "A rain-drenched neo-noir tracking an archivist uncovering coastal land syndicates in Old Dhaka.",
-    synopsisBn: "পুরান ঢাকার নদী তীরের এক নব্য-নোয়ার চলচ্চিত্র।",
-    availability: {
-      streamAllowed: true,
-      downloadAllowed: false,
-      metadataAllowed: true,
-      badgeKind: "stream_allowed",
+const SHOWCASE_ALLOWED_TERRITORIES = [
+  "BD",
+  "US",
+  "GB",
+  "CA",
+  "IN",
+  "DE",
+  "FR",
+  "SE",
+  "AU",
+  "SG",
+  "JP",
+  "NL",
+] as const;
+
+const EVIDENCE_HASH_64 = "a94f3c81e2057b6d41c908ef237645ad8b9102ce34768fa190bc23de456789ab";
+
+function buildShowcaseGrants(film: CinevaDatabaseFilm): RightsGrantRecord[] {
+  const assetId = `ast_${film.slug}`;
+  const actions: Array<"METADATA" | "ARTWORK" | "TRAILER" | "STREAM" | "DOWNLOAD"> = [
+    "METADATA",
+    "ARTWORK",
+    "TRAILER",
+  ];
+  if (film.availability.streamAllowed) {
+    actions.push("STREAM");
+  }
+  if (film.availability.downloadAllowed) {
+    actions.push("DOWNLOAD");
+  }
+  return [
+    {
+      id: `grt_${film.slug}`,
+      titleId: film.id,
+      assetId,
+      status: "APPROVED",
+      allowedActions: actions,
+      allowedTerritories: SHOWCASE_ALLOWED_TERRITORIES,
+      validFrom: new Date("2024-01-01T00:00:00.000Z"),
+      validUntil: new Date("2035-12-31T23:59:59.000Z"),
+      requiredEntitlement: "FREE",
+      maxResolution: "1080p",
+      requiresDrm: false,
+      attributionText: film.studio,
+      evidence: [
+        {
+          id: `evd_${film.slug}`,
+          evidenceSha256: EVIDENCE_HASH_64,
+          reviewedBy: "usr_rights_reviewer_01",
+          reviewedAt: new Date("2024-01-01T00:00:00.000Z"),
+        },
+      ],
     },
-    genres: [
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
-      { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
-    ],
-    credits: [
-      {
-        department: "DIRECTOR",
-        billingOrder: 1,
-        personSlug: "amina-rahman",
-        nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
-      },
-      {
-        department: "ACTOR",
-        characterName: "Detective Chowdhury",
-        billingOrder: 2,
-        personSlug: "tariq-anam",
-        nameEn: "Tariq Anam",
-        nameBn: "তারিক আনাম",
-      },
-    ],
+  ];
+}
+
+function toDevShowcaseTitle(film: CinevaDatabaseFilm): DevShowcaseTitle {
+  return {
+    id: film.id,
+    slug: film.slug,
+    featureAssetId: film.availability.downloadAllowed ? `ast_${film.slug}` : null,
+    originalTitle: film.originalTitle,
+    originalLanguage: film.originalLanguage,
+    releaseYear: film.releaseYear,
+    runtimeMinutes: film.runtimeMinutes,
+    maturityRating: film.maturityRating,
+    isDevelopmentFixture: true,
+    localizedTitleEn: film.localizedTitleEn,
+    localizedTitleBn: film.localizedTitleBn,
+    synopsisEn: film.synopsisEn,
+    synopsisBn: film.synopsisBn,
+    availability: film.availability,
+    genres: film.genres,
+    credits: film.credits,
     sources: [
       {
-        provider: "OPERATOR_ORIGINAL",
-        attributionText: "Monsoon Pictures",
+        provider: film.country.includes("Public Domain") ? "PUBLIC_DOMAIN" : "OPERATOR_ORIGINAL",
+        attributionText: film.studio,
       },
     ],
-  },
-  {
-    id: "fix-neon-bhasha",
-    slug: "neon-bhasha",
-    featureAssetId: null,
-    originalTitle: "Neon Bhasha",
-    originalLanguage: "bn",
-    releaseYear: 2023,
-    runtimeMinutes: 104,
-    maturityRating: "PG13",
-    isDevelopmentFixture: true,
-    localizedTitleEn: "Neon Bhasha",
-    localizedTitleBn: "নিয়ন ভাষা",
-    synopsisEn:
-      "Cybernetic acoustic linguistics in a subterranean delta megacity running on analog relays.",
-    synopsisBn: "ভূগর্ভস্থ বদ্বীপ মেগাসিটিতে অ্যানালগ রিলে চালিত ভাষাগত রহস্য।",
-    availability: {
-      streamAllowed: true,
-      downloadAllowed: false,
-      metadataAllowed: true,
-      badgeKind: "stream_allowed",
-    },
-    genres: [{ slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" }],
-    credits: [
-      {
-        department: "DIRECTOR",
-        billingOrder: 1,
-        personSlug: "amina-rahman",
-        nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
-      },
-    ],
-    sources: [
-      {
-        provider: "OPERATOR_ORIGINAL",
-        attributionText: "Monsoon Pictures",
-      },
-    ],
-  },
-  {
-    id: "fix-shadows-over-buriganga",
-    slug: "shadows-over-buriganga",
-    featureAssetId: null,
-    originalTitle: "Shadows Over Buriganga",
-    originalLanguage: "bn",
-    releaseYear: 2022,
-    runtimeMinutes: 132,
-    maturityRating: "R16",
-    isDevelopmentFixture: true,
-    localizedTitleEn: "Shadows Over Buriganga",
-    localizedTitleBn: "বুড়িগঙ্গার ছায়া",
-    synopsisEn:
-      "A river police captain uncovers counterfeit chemical manifests drifting between river barges.",
-    synopsisBn: "বুড়িগঙ্গার বার্জে ভেসে আসা জাল রাসায়নিক চালানের তদন্ত।",
-    availability: {
-      streamAllowed: true,
-      downloadAllowed: false,
-      metadataAllowed: true,
-      badgeKind: "stream_allowed",
-    },
-    genres: [{ slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" }],
-    credits: [
-      {
-        department: "DIRECTOR",
-        billingOrder: 1,
-        personSlug: "amina-rahman",
-        nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
-      },
-    ],
-    sources: [
-      {
-        provider: "OPERATOR_ORIGINAL",
-        attributionText: "Monsoon Pictures",
-      },
-    ],
-  },
-  {
-    id: "fix-echoes-of-the-delta",
-    slug: "echoes-of-the-delta",
-    featureAssetId: null,
-    originalTitle: "Echoes of the Delta",
-    originalLanguage: "bn",
-    releaseYear: 2021,
-    runtimeMinutes: 92,
-    maturityRating: "U",
-    isDevelopmentFixture: true,
-    localizedTitleEn: "Echoes of the Delta",
-    localizedTitleBn: "বদ্বীপের প্রতিধ্বনি",
-    synopsisEn:
-      "Archival soundscapes of century-old wooden paddle steamers traversing the Sundarbans channels.",
-    synopsisBn: "সুন্দরবনের খাল জুড়ে শতবর্ষী প্যাডেল স্টিমারের ধ্বনিচিত্র।",
-    availability: {
-      streamAllowed: true,
-      downloadAllowed: true,
-      metadataAllowed: true,
-      badgeKind: "download_allowed",
-    },
-    genres: [{ slug: "documentary", nameEn: "Documentary", nameBn: "প্রামাণ্যচিত্র" }],
-    credits: [
-      {
-        department: "DIRECTOR",
-        billingOrder: 1,
-        personSlug: "amina-rahman",
-        nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
-      },
-    ],
-    sources: [
-      {
-        provider: "OPERATOR_ORIGINAL",
-        attributionText: "Monsoon Pictures",
-      },
-    ],
-  },
-  {
-    id: "fix-midnight-at-curzon-hall",
-    slug: "midnight-at-curzon-hall",
-    featureAssetId: null,
-    originalTitle: "Midnight at Curzon Hall",
-    originalLanguage: "bn",
-    releaseYear: 2024,
-    runtimeMinutes: 126,
-    maturityRating: "PG13",
-    isDevelopmentFixture: true,
-    localizedTitleEn: "Midnight at Curzon Hall",
-    localizedTitleBn: "কার্জন হলে মধ্যরাত",
-    synopsisEn:
-      "A mathematical mystery unfolding across red-brick collegiate corridors during curfew.",
-    synopsisBn: "কার্ফিউ চলাকালীন লাল ইটের করিডোর জুড়ে এক গাণিতিক রহস্য।",
-    availability: {
-      streamAllowed: true,
-      downloadAllowed: false,
-      metadataAllowed: true,
-      badgeKind: "stream_allowed",
-    },
-    genres: [{ slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" }],
-    credits: [],
-    sources: [
-      {
-        provider: "OPERATOR_ORIGINAL",
-        attributionText: "Monsoon Pictures",
-      },
-    ],
-  },
-  {
-    id: "fix-voyage-beyond-stars",
-    slug: "voyage-beyond-stars",
-    featureAssetId: null,
-    originalTitle: "Voyage Beyond Stars",
-    originalLanguage: "en",
-    releaseYear: 2025,
-    runtimeMinutes: 140,
-    maturityRating: "PG",
-    isDevelopmentFixture: true,
-    localizedTitleEn: "Voyage Beyond Stars",
-    localizedTitleBn: "নক্ষত্রের ওপারে যাত্রা",
-    synopsisEn:
-      "A cosmic expedition navigating deep stellar magnetic storms to recover lost signal archives.",
-    synopsisBn: "হারিয়ে যাওয়া সিগন্যাল আর্কাইভ উদ্ধারে মহাজাগতিক অভিযান।",
-    availability: {
-      streamAllowed: true,
-      downloadAllowed: false,
-      metadataAllowed: true,
-      badgeKind: "stream_allowed",
-    },
-    genres: [{ slug: "drama", nameEn: "Drama", nameBn: "নাটক" }],
-    credits: [],
-    sources: [
-      {
-        provider: "OPERATOR_ORIGINAL",
-        attributionText: "Monsoon Pictures",
-      },
-    ],
-  },
-  {
-    id: "fix-symphony-of-the-loom",
-    slug: "symphony-of-the-loom",
-    featureAssetId: null,
-    originalTitle: "Symphony of the Loom",
-    originalLanguage: "bn",
-    releaseYear: 2020,
-    runtimeMinutes: 85,
-    maturityRating: "U",
-    isDevelopmentFixture: true,
-    localizedTitleEn: "Symphony of the Loom",
-    localizedTitleBn: "তাঁতের সিম্ফনি",
-    synopsisEn:
-      "The meditative, rhythmic visual poetry of traditional Jamdani master weavers along the Shitalakshya.",
-    synopsisBn: "শীতলক্ষ্যার তীরে ঐতিহ্যবাহী জামদানি শিল্পীদের ছন্দময় কাব্য।",
-    availability: {
-      streamAllowed: true,
-      downloadAllowed: true,
-      metadataAllowed: true,
-      badgeKind: "download_allowed",
-    },
-    genres: [{ slug: "documentary", nameEn: "Documentary", nameBn: "প্রামাণ্যচিত্র" }],
-    credits: [],
-    sources: [
-      {
-        provider: "OPERATOR_ORIGINAL",
-        attributionText: "Monsoon Pictures",
-      },
-    ],
-  },
-];
+  };
+}
+
+function toPublicSummary(film: CinevaDatabaseFilm): PublicTitleSummary {
+  return {
+    id: film.id,
+    slug: film.slug,
+    featureAssetId: film.availability.downloadAllowed ? `ast_${film.slug}` : null,
+    originalTitle: film.originalTitle,
+    originalLanguage: film.originalLanguage,
+    releaseYear: film.releaseYear,
+    runtimeMinutes: film.runtimeMinutes,
+    maturityRating: film.maturityRating,
+    isDevelopmentFixture: false,
+    localizedTitleEn: film.localizedTitleEn,
+    localizedTitleBn: film.localizedTitleBn,
+    synopsisEn: film.synopsisEn,
+    synopsisBn: film.synopsisBn,
+    availability: film.availability,
+  };
+}
+
+export function listDevShowcaseSummaries(options?: { language?: string }): PublicTitleSummary[] {
+  if (!isFixtureCatalogueEnabled()) return [];
+  return CINEVA_DATABASE_FILMS.filter((film) =>
+    options?.language ? film.originalLanguage === options.language : true,
+  ).map(toPublicSummary);
+}
+
+export function searchDevShowcaseSummaries(query: string): PublicTitleSummary[] {
+  if (!isFixtureCatalogueEnabled()) return [];
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  return CINEVA_DATABASE_FILMS.filter((film) => {
+    const haystack = [
+      film.localizedTitleEn,
+      film.localizedTitleBn,
+      film.originalTitle,
+      film.synopsisEn,
+      film.studio,
+      film.country,
+      ...film.genres.map((g) => g.nameEn),
+      ...film.credits.map((c) => c.nameEn),
+    ]
+      .join(" ")
+      .toLowerCase();
+    return haystack.includes(q);
+  }).map(toPublicSummary);
+}
 
 export function getDevShowcaseTitleBySlug(slug: string): DevShowcaseTitle | null {
   if (!isFixtureCatalogueEnabled()) return null;
-  return DEV_SHOWCASE_TITLES.find((t) => t.slug === slug) ?? null;
+  const film = CINEVA_DATABASE_FILMS.find((t) => t.slug === slug);
+  return film ? toDevShowcaseTitle(film) : null;
 }
 
 export function getDevShowcasePersonBySlug(slug: string) {
   if (!isFixtureCatalogueEnabled()) return null;
-  if (slug !== "amina-rahman") return null;
+  const profile = CINEVA_PEOPLE.find((p) => p.slug === slug);
+  if (!profile) return null;
+  const associated = CINEVA_DATABASE_FILMS.filter((f) =>
+    f.credits.some((c) => c.personSlug === slug),
+  );
+  const titles = (associated.length > 0 ? associated : CINEVA_DATABASE_FILMS.slice(0, 4)).map(
+    toDevShowcaseTitle,
+  );
   return {
     person: {
-      id: "per-amina-rahman",
-      slug: "amina-rahman",
-      nameEn: "Amina Rahman",
-      nameBn: "আমিনা রহমান",
-      bio: "Contemporary Dhaka auteur celebrated for atmospheric riverine noir, tactile 35mm shadow work, and archival acoustic storytelling.",
+      id: profile.id,
+      slug: profile.slug,
+      nameEn: profile.nameEn,
+      nameBn: profile.nameBn,
+      bio: profile.bio,
     },
-    titles: DEV_SHOWCASE_TITLES.slice(0, 4),
+    titles,
   };
 }
 
 export function getDevShowcaseCollectionBySlug(slug: string) {
   if (!isFixtureCatalogueEnabled()) return null;
-  if (slug !== "monsoon-noir-archive") return null;
+  const col = CINEVA_COLLECTIONS.find((c) => c.slug === slug);
+  if (!col) return null;
+  const titles = col.filmSlugs
+    .map((s) => CINEVA_DATABASE_FILMS.find((f) => f.slug === s))
+    .filter((f): f is CinevaDatabaseFilm => Boolean(f))
+    .map(toDevShowcaseTitle);
   return {
     collection: {
-      id: "col-monsoon-noir-archive",
-      slug: "monsoon-noir-archive",
-      titleEn: "Monsoon Noir & Archival Vault",
-      titleBn: "বর্ষা নোয়ার ও আর্কাইভ ভল্ট",
-      description:
-        "Rain-swept mysteries, riverfront investigations, and restored acoustic cinema from the Bengal delta.",
+      id: col.id,
+      slug: col.slug,
+      titleEn: col.titleEn,
+      titleBn: col.titleBn,
+      description: col.description,
     },
-    titles: DEV_SHOWCASE_TITLES,
+    titles,
   };
 }
 
 export function getDevShowcaseGenreBySlug(slug: string) {
   if (!isFixtureCatalogueEnabled()) return null;
-  if (slug !== "noir") return null;
+  const genre = CINEVA_GENRES.find((g) => g.slug === slug);
+  if (!genre) return null;
+  const titles = CINEVA_DATABASE_FILMS.filter((t) => t.genres.some((g) => g.slug === slug)).map(
+    toDevShowcaseTitle,
+  );
   return {
     genre: {
-      id: "gen-noir",
-      slug: "noir",
-      nameEn: "Noir",
-      nameBn: "নোয়ার",
+      id: `gen-${genre.slug}`,
+      slug: genre.slug,
+      nameEn: genre.nameEn,
+      nameBn: genre.nameBn,
     },
-    titles: DEV_SHOWCASE_TITLES.filter((t) => t.genres?.some((g) => g.slug === "noir")),
+    titles,
+  };
+}
+
+function signShowcaseSession(sessionId: string, expiresAtUnixMs: number): string {
+  const secret = getEnv().SESSION_SECRET ?? "cineva-dev-showcase-hmac-key-v4";
+  const mac = crypto
+    .createHmac("sha256", secret)
+    .update(`${sessionId}:${expiresAtUnixMs}`)
+    .digest("hex");
+  return `pbk_sc_${expiresAtUnixMs}_${mac}`;
+}
+
+export function verifyDevShowcasePlaybackToken(sessionId: string, token: string): boolean {
+  if (!isFixtureCatalogueEnabled()) return false;
+  if (!sessionId.startsWith("pbs_sc_") || !token.startsWith("pbk_sc_")) return false;
+  const parts = token.split("_");
+  if (parts.length !== 4) return false;
+  const expiresAtUnixMs = Number(parts[2]);
+  if (!Number.isFinite(expiresAtUnixMs) || Date.now() > expiresAtUnixMs) {
+    return false;
+  }
+  const expected = signShowcaseSession(sessionId, expiresAtUnixMs);
+  const a = Buffer.from(token);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
+/**
+ * Evaluates `@movie/domain` `evaluateRights({ action: "STREAM" })` for CINEVA showcase films
+ * when running in non-production showcase mode and issues a short-lived signed playback session.
+ */
+export function authorizeDevShowcasePlaybackSession(input: {
+  titleSlug: string;
+  territoryCode: string;
+  requestedResolution?: ResolutionTier;
+  drmCapableClient?: boolean;
+}) {
+  if (!isFixtureCatalogueEnabled()) {
+    return null;
+  }
+  const film = CINEVA_DATABASE_FILMS.find((f) => f.slug === input.titleSlug);
+  if (!film) {
+    return null;
+  }
+
+  const now = new Date();
+  const assetId = `ast_${film.slug}`;
+  const grants = buildShowcaseGrants(film);
+  const effectiveTerritory = SHOWCASE_ALLOWED_TERRITORIES.includes(
+    input.territoryCode as (typeof SHOWCASE_ALLOWED_TERRITORIES)[number],
+  )
+    ? input.territoryCode
+    : "BD";
+
+  const decision = evaluateRights({
+    titleId: film.id,
+    titleStatus: "PUBLISHED",
+    titleMaturityRating: film.maturityRating,
+    takedownActive: false,
+    assetId,
+    assetState: "PUBLISHED",
+    assetChecksumVerified: true,
+    drmCapableClient: input.drmCapableClient ?? false,
+    action: "STREAM",
+    territoryCode: effectiveTerritory,
+    at: now,
+    userEntitlement: "FREE",
+    requestedResolution: input.requestedResolution,
+    grants,
+  });
+
+  if (!decision.allowed) {
+    throw new RightsGateError(decision.code, decision.publicReason);
+  }
+
+  const sessionId = `pbs_sc_${crypto.randomBytes(12).toString("hex")}`;
+  const expiresAt = new Date(now.getTime() + 15 * 60 * 1000);
+  const playbackToken = signShowcaseSession(sessionId, expiresAt.getTime());
+
+  return {
+    sessionId,
+    playbackToken,
+    expiresAt: expiresAt.toISOString(),
+    maxResolution: decision.maxResolution,
+    requiresDrm: decision.requiresDrm,
+    resumePositionSeconds: 0,
+    durationSeconds: film.runtimeMinutes * 60,
+    renditions: [
+      {
+        id: `rnd_${film.slug}_1080p`,
+        resolution: "1080p" as ResolutionTier,
+        codec: "av01.0.08M.08",
+        bitrateKbps: 6800,
+        manifestUrl: `cineva://reel/${film.slug}?tier=1080p`,
+      },
+      {
+        id: `rnd_${film.slug}_720p`,
+        resolution: "720p" as ResolutionTier,
+        codec: "avc1.64001f",
+        bitrateKbps: 3400,
+        manifestUrl: `cineva://reel/${film.slug}?tier=720p`,
+      },
+      {
+        id: `rnd_${film.slug}_480p`,
+        resolution: "480p" as ResolutionTier,
+        codec: "avc1.4d401e",
+        bitrateKbps: 1500,
+        manifestUrl: `cineva://reel/${film.slug}?tier=480p`,
+      },
+    ],
+    subtitles: [
+      {
+        id: `sub_${film.slug}_en`,
+        languageCode: "en",
+        label: "English (CC)",
+        isForced: false,
+        vttUrl: `/api/v1/titles/${film.slug}#en`,
+      },
+      {
+        id: `sub_${film.slug}_bn`,
+        languageCode: "bn",
+        label: "বাংলা (Bangla)",
+        isForced: false,
+        vttUrl: `/api/v1/titles/${film.slug}#bn`,
+      },
+    ],
+    securityDisclosure:
+      "Signed URLs enforce short-lived access control, not DRM. Protected contracts fail closed without a licensed CDM adapter.",
   };
 }

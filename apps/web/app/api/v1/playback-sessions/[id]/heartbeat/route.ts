@@ -2,7 +2,9 @@ import { assertSameOriginRequest } from "@movie/auth";
 import { getEnv } from "@movie/config";
 import { ResolutionTierSchema } from "@movie/contracts";
 import { getDatabase, recordPlaybackHeartbeat } from "@movie/db";
+import { AuthorizationError } from "@movie/domain";
 import { z } from "zod";
+import { verifyDevShowcasePlaybackToken } from "@/lib/catalogue/dev-showcase";
 import { extractRequestId, jsonNoStore, toProblemResponse } from "@/lib/server/api-helpers";
 
 const HeartbeatBodySchema = z.object({
@@ -25,6 +27,25 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     assertSameOriginRequest(request, getEnv().APP_URL);
     const { id } = await context.params;
     const body = HeartbeatBodySchema.parse(await request.json());
+
+    if (id.startsWith("pbs_sc_")) {
+      if (!verifyDevShowcasePlaybackToken(id, body.playbackToken)) {
+        throw new AuthorizationError(
+          "UNAUTHENTICATED",
+          "Invalid or expired playback session token",
+        );
+      }
+      return jsonNoStore(
+        {
+          sessionId: id,
+          positionSeconds: body.positionSeconds,
+          status: "ACTIVE",
+        },
+        200,
+        requestId,
+      );
+    }
+
     const db = await getDatabase();
 
     const updated = await recordPlaybackHeartbeat(db, {

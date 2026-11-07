@@ -374,13 +374,70 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
     expect(fs.statSync(screenshotPath).size).toBeGreaterThan(0);
   });
 
-  test("6. asserts all 5 captured screenshot files exist and have size > 0", async () => {
+  test("6. verifies live streaming playback on /watch/neon-bhasha and captures qa-watch-playing-desktop.png", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/watch/neon-bhasha?t=12", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
+
+    const watchTitle = page.getByRole("heading", { level: 1, name: /Neon Bhasha/i });
+    await expect(watchTitle).toBeVisible();
+
+    await page.getByRole("button", { name: /Watch Film/i }).click();
+
+    const playingShell = page.locator("div[data-player-state='PLAYING']");
+    await expect(playingShell).toBeVisible({ timeout: 10000 });
+
+    const canvasReel = page.getByTestId("cinema-canvas-reel");
+    await expect(canvasReel).toBeVisible();
+
+    const screenshotPath = path.join(BRAIN_ARTIFACT_DIR, "qa-watch-playing-desktop.png");
+    await page.screenshot({ path: screenshotPath, fullPage: false });
+    expect(fs.existsSync(screenshotPath)).toBe(true);
+    expect(fs.statSync(screenshotPath).size).toBeGreaterThan(0);
+  });
+
+  test("7. verifies interactive Movie Database Explorer on /movies and captures qa-movies-database-desktop.png", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/movies", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
+
+    const explorer = page.getByTestId("movie-database-explorer");
+    await expect(explorer).toBeVisible();
+    await expect(page.getByText(/Showing 12 of 12 Titles/i)).toBeVisible();
+
+    // Verify Tech Ledger toggle works cleanly without horizontal document overflow
+    await page.getByRole("button", { name: "Tech Ledger" }).click();
+    await expect(page.getByRole("columnheader", { name: /Technical Master/i })).toBeVisible();
+
+    const hasLedgerOverflow = await page.evaluate(() => {
+      const doc = document.documentElement;
+      const body = document.body;
+      return doc.scrollWidth > doc.clientWidth || (body && body.scrollWidth > doc.clientWidth);
+    });
+    expect(hasLedgerOverflow, "Tech Ledger view must have zero document overflow").toBe(false);
+
+    // Return to Poster Grid for visual capture
+    await page.getByRole("button", { name: "Poster Grid" }).click();
+
+    const screenshotPath = path.join(BRAIN_ARTIFACT_DIR, "qa-movies-database-desktop.png");
+    await page.screenshot({ path: screenshotPath, fullPage: false });
+    expect(fs.existsSync(screenshotPath)).toBe(true);
+    expect(fs.statSync(screenshotPath).size).toBeGreaterThan(0);
+  });
+
+  test("8. asserts all 7 captured screenshot files exist and have size > 0", async () => {
     const requiredScreenshots = [
       "qa-home-showcase-desktop.png",
       "qa-movie-detail-hero-desktop.png",
       "qa-director-showcase-desktop.png",
       "qa-mobile-detail-hero.png",
       "qa-watch-player-desktop.png",
+      "qa-watch-playing-desktop.png",
+      "qa-movies-database-desktop.png",
     ];
 
     for (const filename of requiredScreenshots) {

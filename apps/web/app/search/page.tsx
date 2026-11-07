@@ -1,16 +1,28 @@
-import { getDatabase, searchPublishedTitles } from "@movie/db";
+import { getDatabase, searchPublishedTitles, type PublicTitleSummary } from "@movie/db";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { TitleCard } from "@/components/catalogue/title-card";
 import { ConsumerShell } from "@/components/layout/site-shell";
 import { Badge, Button, ButtonLink, ContentRowSkeleton, EmptyState } from "@/components/ui";
+import { listDevShowcaseSummaries, searchDevShowcaseSummaries } from "@/lib/catalogue/dev-showcase";
 import { resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
-  title: "Search · CINEVA",
-  description: "Search films, cast, directors, and Bangla or English titles on CINEVA.",
+  title: "Search Film Database · CINEVA",
+  description: "Search films, cast, directors, genres, and Bangla or English titles on CINEVA.",
 };
+
+const QUICK_SEARCH_CHIPS = [
+  "The Last Monsoon",
+  "বর্ষা",
+  "Amina Rahman",
+  "Noir",
+  "Sci-Fi",
+  "Curzon Hall",
+  "1921",
+] as const;
 
 function normalizeQuery(raw: string | string[] | undefined): string {
   const first = Array.isArray(raw) ? raw[0] : raw;
@@ -19,6 +31,21 @@ function normalizeQuery(raw: string | string[] | undefined): string {
     .replace(/[\u0000-\u001F\u007F]/g, "")
     .trim()
     .slice(0, 120);
+}
+
+function mergeSearchMatches(
+  dbMatches: PublicTitleSummary[],
+  showcaseMatches: PublicTitleSummary[],
+): PublicTitleSummary[] {
+  const seen = new Set<string>();
+  const merged: PublicTitleSummary[] = [];
+  for (const item of [...dbMatches, ...showcaseMatches]) {
+    if (!seen.has(item.slug)) {
+      seen.add(item.slug);
+      merged.push(item);
+    }
+  }
+  return merged;
 }
 
 async function SearchResultsSection({
@@ -31,29 +58,69 @@ async function SearchResultsSection({
   const query = normalizeQuery(resolved.q);
 
   if (!query) {
+    const featured = listDevShowcaseSummaries().slice(0, 4);
     return (
-      <EmptyState
-        eyebrow="Search ready"
-        title="Enter a title, filmmaker, or Bangla/English keyword"
-        description="Queries search published titles across English and Bangla localized metadata, synopses, and credited filmmakers. Drafts and titles under legal hold are never indexed."
-        actions={
-          <ButtonLink href="/movies" variant="secondary">
-            Browse Movies Directory
-          </ButtonLink>
-        }
-      />
+      <div className="space-y-10">
+        <div className="border-border bg-surface-1 space-y-4 rounded-xl border p-5 sm:p-6">
+          <p className="text-accent font-mono text-xs font-semibold tracking-widest uppercase">
+            Instant Database Queries
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {QUICK_SEARCH_CHIPS.map((term) => (
+              <Link
+                key={term}
+                href={`/search?q=${encodeURIComponent(term)}`}
+                className="border-border bg-surface-2 text-text-secondary hover:border-accent hover:text-text rounded-pill inline-flex min-h-11 min-w-11 items-center justify-center border px-4 py-1.5 text-xs font-medium transition-colors motion-reduce:transition-none md:min-h-9"
+              >
+                {term}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {featured.length > 0 ? (
+          <section aria-labelledby="trending-search-heading" className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 id="trending-search-heading" className="font-display text-text text-xl font-bold">
+                Most Searched on CINEVA
+              </h2>
+              <ButtonLink href="/movies" variant="outline" size="sm">
+                Full Film Database
+              </ButtonLink>
+            </div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {featured.map((item) => (
+                <TitleCard key={item.id} title={item} />
+              ))}
+            </div>
+          </section>
+        ) : (
+          <EmptyState
+            eyebrow="Search ready"
+            title="Enter a title, filmmaker, or Bangla/English keyword"
+            description="Queries search published titles across English and Bangla localized metadata, synopses, and credited filmmakers."
+            actions={
+              <ButtonLink href="/movies" variant="secondary">
+                Browse Movies Directory
+              </ButtonLink>
+            }
+          />
+        )}
+      </div>
     );
   }
 
   const territoryCode = await resolveViewerTerritory();
   const db = await getDatabase();
-  const matches = await searchPublishedTitles(db, query, { territoryCode, limit: 24 });
+  const dbMatches = await searchPublishedTitles(db, query, { territoryCode, limit: 24 });
+  const showcaseMatches = searchDevShowcaseSummaries(query);
+  const matches = mergeSearchMatches(dbMatches, showcaseMatches);
 
   return (
     <div aria-live="polite" className="space-y-5">
       <div className="flex flex-wrap items-center gap-2">
-        <Badge tone="info">Query: &ldquo;{query}&rdquo;</Badge>
-        <Badge tone="neutral">{matches.length} published matches</Badge>
+        <Badge tone="accent">Query: &ldquo;{query}&rdquo;</Badge>
+        <Badge tone="neutral">{matches.length} database matches</Badge>
       </div>
 
       {matches.length === 0 ? (
@@ -89,10 +156,11 @@ export default function SearchPage(props: {
   return (
     <ConsumerShell>
       <header className="mb-8 space-y-3">
-        <Badge tone="neutral">Discovery</Badge>
-        <h1 className="font-display text-text text-3xl font-bold sm:text-4xl">Search Catalogue</h1>
+        <Badge tone="accent">CINEVA Search Index</Badge>
+        <h1 className="font-display text-text text-3xl font-bold sm:text-5xl">Search Catalogue</h1>
         <p className="cg-prose text-text-secondary text-base leading-7">
-          Find authorized films by English title, Bangla title, director, or cast member.
+          Find authorized films by English title, বাংলা শিরোনাম, director, cast member, genre, or
+          release year.
         </p>
       </header>
 
@@ -111,7 +179,7 @@ export default function SearchPage(props: {
           name="q"
           type="search"
           maxLength={120}
-          placeholder="Search English or বাংলা titles, directors, cast…"
+          placeholder="Search English or বাংলা titles, directors, cast, genres…"
           className="border-border-strong bg-surface-2 text-text placeholder:text-text-muted min-h-11 flex-1 rounded-sm border px-4 py-2.5 text-base"
         />
         <Button type="submit" variant="primary" size="md">

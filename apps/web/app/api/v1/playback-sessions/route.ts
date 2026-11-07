@@ -1,8 +1,10 @@
 import { assertSameOriginRequest } from "@movie/auth";
 import { getEnv } from "@movie/config";
 import { ResolutionTierSchema } from "@movie/contracts";
-import { authorizePlaybackSession, getDatabase } from "@movie/db";
+import { authorizePlaybackSession, getDatabase, NotFoundError } from "@movie/db";
+import { StorageIntegrityError } from "@movie/storage";
 import { z } from "zod";
+import { authorizeDevShowcasePlaybackSession } from "@/lib/catalogue/dev-showcase";
 import {
   extractRequestId,
   getCurrentSession,
@@ -36,20 +38,40 @@ export async function POST(request: Request) {
       env.DRM_ADAPTER_CONFIGURED &&
       (env.VIDEO_PROVIDER === "mux" || env.VIDEO_PROVIDER === "aws-mediaconvert");
 
-    const authorized = await authorizePlaybackSession(
-      db,
-      storage,
-      { actor: session?.actor ?? null, requestId },
-      {
-        titleSlug: body.titleSlug,
-        territoryCode,
-        requestedResolution: body.requestedResolution,
-        drmCapableClient: body.drmCapableClient ?? false,
-        drmLicenseAdapterConfigured: isMultiDrmProvider,
-      },
-    );
+    try {
+      const authorized = await authorizePlaybackSession(
+        db,
+        storage,
+        { actor: session?.actor ?? null, requestId },
+        {
+          titleSlug: body.titleSlug,
+          territoryCode,
+          requestedResolution: body.requestedResolution,
+          drmCapableClient: body.drmCapableClient ?? false,
+          drmLicenseAdapterConfigured: isMultiDrmProvider,
+        },
+      );
+      return jsonNoStore(authorized, 201, requestId);
+    } catch (innerError) {
+      const isShowcaseFallbackEligible =
+        innerError instanceof NotFoundError ||
+        (innerError instanceof StorageIntegrityError &&
+          innerError.code === "OBJECT_NOT_FOUND" &&
+          env.OBJECT_STORAGE_PROVIDER === "memory");
 
-    return jsonNoStore(authorized, 201, requestId);
+      if (isShowcaseFallbackEligible) {
+        const showcaseSession = authorizeDevShowcasePlaybackSession({
+          titleSlug: body.titleSlug,
+          territoryCode,
+          requestedResolution: body.requestedResolution,
+          drmCapableClient: body.drmCapableClient ?? false,
+        });
+        if (showcaseSession) {
+          return jsonNoStore(showcaseSession, 201, requestId);
+        }
+      }
+      throw innerError;
+    }
   } catch (error) {
     return toProblemResponse(error, requestId);
   }

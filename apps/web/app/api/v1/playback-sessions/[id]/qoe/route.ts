@@ -3,6 +3,7 @@ import { getEnv } from "@movie/config";
 import { PlaybackQoeEventInputSchema } from "@movie/contracts";
 import { getDatabase, recordPlaybackQoeEvent } from "@movie/db";
 import { AuthorizationError } from "@movie/domain";
+import { verifyDevShowcasePlaybackToken } from "@/lib/catalogue/dev-showcase";
 import { extractRequestId, jsonNoStore, toProblemResponse } from "@/lib/server/api-helpers";
 
 // Strict secret and PII rejection regex (Blueprint §89.2, §91.1)
@@ -34,6 +35,26 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
     assertNoForbiddenSecrets(rawJson);
     const body = PlaybackQoeEventInputSchema.parse(rawJson);
+
+    if (id.startsWith("pbs_sc_")) {
+      if (!verifyDevShowcasePlaybackToken(id, body.playbackToken)) {
+        throw new AuthorizationError(
+          "UNAUTHENTICATED",
+          "Invalid or expired playback session token",
+        );
+      }
+      return jsonNoStore(
+        {
+          success: true,
+          eventId: `qoe_sc_${Date.now()}`,
+          status: "RECORDED",
+          occurredAt: new Date().toISOString(),
+        },
+        200,
+        requestId,
+      );
+    }
+
     const db = await getDatabase();
 
     const result = await recordPlaybackQoeEvent(db, {
