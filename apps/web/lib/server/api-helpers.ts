@@ -9,6 +9,7 @@ import { createLogger, createRequestId } from "@movie/observability";
 import { cookies, headers } from "next/headers";
 import { connection } from "next/server";
 import { z } from "zod";
+import { TmdbAdapterError } from "@/lib/metadata/tmdb-client";
 
 const logger = createLogger({ service: "@movie/web:api" });
 
@@ -127,6 +128,24 @@ export function toProblemResponse(error: unknown, requestId: string): Response {
     });
     return new Response(JSON.stringify(problem), {
       status: 422,
+      headers: {
+        "Content-Type": "application/problem+json",
+        "Cache-Control": "no-store",
+        "x-request-id": requestId,
+      },
+    });
+  }
+
+  if (error instanceof TmdbAdapterError) {
+    const problem = createProblemDetails({
+      status: error.status,
+      code: error.code,
+      title: error.status === 404 ? "TMDB resource not found" : "TMDB metadata adapter error",
+      detail: error.message,
+      requestId,
+    });
+    return new Response(JSON.stringify(problem), {
+      status: error.status,
       headers: {
         "Content-Type": "application/problem+json",
         "Cache-Control": "no-store",

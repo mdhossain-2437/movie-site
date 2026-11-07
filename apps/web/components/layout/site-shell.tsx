@@ -8,6 +8,7 @@ export const PRIMARY_NAV_ITEMS: readonly NavItem[] = [
   { href: "/", label: "Featured" },
   { href: "/movies", label: "Films" },
   { href: "/series", label: "Series" },
+  { href: "/tmdb", label: "TMDB Live" },
   { href: "/studios", label: "Studios" },
   { href: "/collections", label: "Collections" },
   { href: "/people", label: "Directors & Cast" },
@@ -52,7 +53,7 @@ function DesktopNavFallback({ items }: { items: readonly NavItem[] }) {
         <li key={item.href}>
           <Link
             href={item.href}
-            className="text-text-muted hover:text-text inline-flex min-h-10 items-center rounded-sm px-3.5 py-2 text-xs font-medium tracking-wide transition-colors"
+            className="text-text-muted hover:text-text inline-flex min-h-10 items-center rounded-sm px-2.5 py-2 text-xs font-medium tracking-wide whitespace-nowrap transition-colors xl:px-3.5"
           >
             {item.label}
           </Link>

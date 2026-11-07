@@ -18,16 +18,21 @@ export const metadata: Metadata = {
 export default function StudiosDirectoryPage() {
   return (
     <ConsumerShell>
-      <header className="mb-10 space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge tone="accent">Production Houses &amp; Universe Hubs</Badge>
-          <Badge tone="neutral">{CINEVA_STUDIOS.length} Verified Studio Banners</Badge>
+      <header className="mb-10 flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone="accent">Production Houses &amp; Universe Hubs</Badge>
+            <Badge tone="neutral">{CINEVA_STUDIOS.length} Verified Studio Banners</Badge>
+          </div>
+          <h1 className="font-display text-text text-3xl font-bold sm:text-5xl">Studios</h1>
+          <p className="cg-prose text-text-secondary text-base leading-7">
+            Explore every major CINEVA studio division—from interconnected heroic cosmic sagas and
+            graphic-noir vigilante banners to 65mm large-format tentpoles and 4K archival vaults.
+          </p>
         </div>
-        <h1 className="font-display text-text text-3xl font-bold sm:text-5xl">Studios</h1>
-        <p className="cg-prose text-text-secondary text-base leading-7">
-          Explore every major CINEVA studio division—from interconnected heroic cosmic sagas and
-          graphic-noir vigilante banners to 65mm large-format tentpoles and 4K archival vaults.
-        </p>
+        <ButtonLink href="/tmdb?mode=discover&studio=marvel" variant="secondary" size="sm">
+          Live TMDB Studios (Marvel · DC · Sony · Fox) →
+        </ButtonLink>
       </header>
 
       {/* Special Categories Quick Strip */}

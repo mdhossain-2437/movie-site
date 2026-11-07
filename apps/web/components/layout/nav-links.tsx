@@ -19,7 +19,7 @@ export function DesktopNavLinks({ items }: { items: readonly NavItem[] }) {
             <Link
               href={item.href}
               aria-current={isActive ? "page" : undefined}
-              className={`inline-flex min-h-10 items-center rounded-sm px-3.5 py-2 text-sm font-medium transition-colors duration-[var(--cg-motion-fast)] ${
+              className={`inline-flex min-h-10 items-center rounded-sm px-2.5 py-2 text-xs font-medium whitespace-nowrap transition-colors duration-[var(--cg-motion-fast)] xl:px-3.5 xl:text-sm ${
                 isActive
                   ? "bg-surface-2 text-accent"
                   : "text-text-secondary hover:bg-surface-2 hover:text-text"

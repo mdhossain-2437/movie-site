@@ -4,9 +4,12 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { TitleCard } from "@/components/catalogue/title-card";
+import { TmdbTitleCard } from "@/components/catalogue/tmdb-title-card";
 import { ConsumerShell } from "@/components/layout/site-shell";
 import { Badge, Button, ButtonLink, ContentRowSkeleton, EmptyState } from "@/components/ui";
 import { listDevShowcaseSummaries, searchDevShowcaseSummaries } from "@/lib/catalogue/dev-showcase";
+import { discoverTmdbWorks, getTmdbRuntimeStatus } from "@/lib/metadata/tmdb-client";
+import { TMDB_OFFICIAL_ATTRIBUTION, type TmdbCatalogItem } from "@/lib/metadata/tmdb-types";
 import { resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
@@ -116,36 +119,91 @@ async function SearchResultsSection({
   const showcaseMatches = searchDevShowcaseSummaries(query);
   const matches = mergeSearchMatches(dbMatches, showcaseMatches);
 
+  let tmdbMatches: TmdbCatalogItem[] = [];
+  if (getTmdbRuntimeStatus().configured) {
+    try {
+      const tmdbRes = await discoverTmdbWorks({
+        mode: "search",
+        query,
+        limit: 8,
+      });
+      tmdbMatches = tmdbRes.items;
+    } catch {
+      tmdbMatches = [];
+    }
+  }
+
   return (
-    <div aria-live="polite" className="space-y-5">
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge tone="accent">Query: &ldquo;{query}&rdquo;</Badge>
-        <Badge tone="neutral">{matches.length} database matches</Badge>
+    <div aria-live="polite" className="space-y-10">
+      <div className="space-y-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge tone="accent">Query: &ldquo;{query}&rdquo;</Badge>
+          <Badge tone="neutral">{matches.length} rights-approved vault matches</Badge>
+          {tmdbMatches.length > 0 ? (
+            <Badge tone="neutral">{tmdbMatches.length} live TMDB global matches</Badge>
+          ) : null}
+        </div>
+
+        {matches.length === 0 ? (
+          <EmptyState
+            eyebrow="No matching published films"
+            title={`No rights-approved results for “${query}”`}
+            description="No published catalogue entry matched your search query. Verify spelling or browse the Movies directory."
+            actions={
+              <>
+                <ButtonLink href="/search" variant="secondary">
+                  Clear Search
+                </ButtonLink>
+                <ButtonLink href="/movies" variant="outline">
+                  Browse Movies
+                </ButtonLink>
+              </>
+            }
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {matches.map((item) => (
+              <TitleCard key={item.id} title={item} />
+            ))}
+          </div>
+        )}
       </div>
 
-      {matches.length === 0 ? (
-        <EmptyState
-          eyebrow="No matching published films"
-          title={`No rights-approved results for “${query}”`}
-          description="No published catalogue entry matched your search query. Verify spelling or browse the Movies directory."
-          actions={
-            <>
-              <ButtonLink href="/search" variant="secondary">
-                Clear Search
-              </ButtonLink>
-              <ButtonLink href="/movies" variant="outline">
-                Browse Movies
-              </ButtonLink>
-            </>
-          }
-        />
-      ) : (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {matches.map((item) => (
-            <TitleCard key={item.id} title={item} />
-          ))}
-        </div>
-      )}
+      {tmdbMatches.length > 0 ? (
+        <section
+          aria-labelledby="tmdb-search-matches-heading"
+          className="border-border space-y-5 border-t pt-8"
+        >
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="space-y-1">
+              <p className="text-accent font-mono text-xs font-semibold tracking-widest uppercase">
+                Live TMDB Global Metadata Index
+              </p>
+              <h2
+                id="tmdb-search-matches-heading"
+                className="font-display text-text text-2xl font-bold"
+              >
+                Global Film &amp; Series Matches for &ldquo;{query}&rdquo;
+              </h2>
+            </div>
+            <ButtonLink
+              href={`/tmdb?mode=search&q=${encodeURIComponent(query)}`}
+              variant="secondary"
+              size="sm"
+            >
+              Open Full TMDB Search →
+            </ButtonLink>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {tmdbMatches.map((item) => (
+              <TmdbTitleCard key={`${item.mediaKind}-${item.tmdbId}`} item={item} />
+            ))}
+          </div>
+
+          <p className="text-text-muted font-mono text-[11px]">{TMDB_OFFICIAL_ATTRIBUTION}</p>
+        </section>
+      ) : null}
     </div>
   );
 }

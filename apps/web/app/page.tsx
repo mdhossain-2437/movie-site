@@ -4,6 +4,7 @@ import { KeyArt } from "@/components/art/key-art";
 import { TitleRail } from "@/components/catalogue/editorial";
 import { FilmStripShowcase, type FilmStripItem } from "@/components/catalogue/film-strip-showcase";
 import { PersonalizedRecommendationsRail } from "@/components/catalogue/personalized-recommendations-rail";
+import { TmdbHomeTrendingRail } from "@/components/catalogue/tmdb-home-trending-rail";
 import { ConsumerShell } from "@/components/layout/site-shell";
 import { AvailabilityBadge, Badge, ButtonLink } from "@/components/ui";
 import {
@@ -71,6 +72,9 @@ export default function Home() {
       <div className="cg-container max-w-full space-y-20 overflow-x-clip py-14 sm:py-20">
         {/* 1. Netflix-Class Personalized Similarity Graph Recommendation Engine */}
         <PersonalizedRecommendationsRail />
+
+        {/* 1B. Live TMDB v3 Global Box Office, Franchises & TV Series Index */}
+        <TmdbHomeTrendingRail />
 
         {/* 2. Top Rated Hall of Fame (Bayesian Weighted Rating WR) */}
         <section aria-labelledby="top-ten-heading" className="space-y-6">

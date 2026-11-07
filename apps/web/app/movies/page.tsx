@@ -130,16 +130,21 @@ export default function MoviesPage(props: {
 }) {
   return (
     <ConsumerShell>
-      <header className="mb-8 space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge tone="accent">CINEVA Film &amp; Series Database</Badge>
-          <Badge tone="neutral">Faceted Director · Cast · Studio · Universe Engine</Badge>
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone="accent">CINEVA Film &amp; Series Database</Badge>
+            <Badge tone="neutral">Faceted Director · Cast · Studio · Universe Engine</Badge>
+          </div>
+          <h1 className="font-display text-text text-3xl font-bold sm:text-5xl">Movies</h1>
+          <p className="cg-prose text-text-secondary text-base leading-7">
+            Filter across feature films and original series by director, principal cast, studio
+            banner, special universe, or genre—and sort by Bayesian Weighted Top Rated score.
+          </p>
         </div>
-        <h1 className="font-display text-text text-3xl font-bold sm:text-5xl">Movies</h1>
-        <p className="cg-prose text-text-secondary text-base leading-7">
-          Filter across feature films and original series by director, principal cast, studio
-          banner, special universe, or genre—and sort by Bayesian Weighted Top Rated score.
-        </p>
+        <ButtonLink href="/tmdb?kind=MOVIE" variant="secondary" size="sm">
+          Explore Live TMDB Global Movies →
+        </ButtonLink>
       </header>
 
       <Suspense fallback={<ContentRowSkeleton count={4} />}>

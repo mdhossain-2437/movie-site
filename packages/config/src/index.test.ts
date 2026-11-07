@@ -62,5 +62,15 @@ describe("@movie/config", () => {
         { isCommercialDeployment: true },
       ),
     ).not.toThrow();
+
+    expect(() =>
+      assertTmdbCommercialUseAllowed(
+        {
+          TMDB_READ_ACCESS_TOKEN: "test_bearer_token",
+          TMDB_COMMERCIAL_LICENSE_CONFIRMED: false,
+        },
+        { isCommercialDeployment: false },
+      ),
+    ).not.toThrow();
   });
 });

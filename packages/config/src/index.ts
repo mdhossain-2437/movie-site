@@ -41,6 +41,7 @@ export const EnvSchema = z
     DRM_ADAPTER_CONFIGURED: BooleanFlagSchema.default(false),
 
     TMDB_API_KEY: z.string().min(1).optional(),
+    TMDB_READ_ACCESS_TOKEN: z.string().min(1).optional(),
     TMDB_COMMERCIAL_LICENSE_CONFIRMED: BooleanFlagSchema.default(false),
 
     UPLOAD_MAX_BYTES: z.coerce.number().int().positive().default(53_687_091_200),
@@ -107,11 +108,15 @@ export function parseEnv(raw: Record<string, string | undefined>): AppEnv {
 }
 
 export function assertTmdbCommercialUseAllowed(
-  env: Pick<AppEnv, "TMDB_API_KEY" | "TMDB_COMMERCIAL_LICENSE_CONFIRMED">,
+  env: {
+    TMDB_API_KEY?: string | undefined;
+    TMDB_READ_ACCESS_TOKEN?: string | undefined;
+    TMDB_COMMERCIAL_LICENSE_CONFIRMED: boolean;
+  },
   options: { isCommercialDeployment: boolean },
 ): void {
-  if (!env.TMDB_API_KEY) {
-    throw new Error("TMDB_API_KEY is not configured");
+  if (!env.TMDB_API_KEY && !env.TMDB_READ_ACCESS_TOKEN) {
+    throw new Error("TMDB_READ_ACCESS_TOKEN or TMDB_API_KEY is not configured");
   }
   if (options.isCommercialDeployment && !env.TMDB_COMMERCIAL_LICENSE_CONFIRMED) {
     throw new Error(

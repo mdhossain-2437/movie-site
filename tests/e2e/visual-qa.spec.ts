@@ -524,7 +524,42 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
     ).toBeVisible();
   });
 
-  test("9. asserts all 9 captured screenshot files exist and have size > 0", async () => {
+  test("9. verifies /tmdb Live Global Index, SSRF image guard & captures qa-tmdb-global-desktop.png", async ({
+    page,
+    request,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+
+    // Verify SSRF / invalid size & SVG rejection on /api/v1/tmdb/image
+    const badSizeRes = await request.get("/api/v1/tmdb/image/original/test.jpg");
+    expect(badSizeRes.status()).toBe(400);
+    const badSvgRes = await request.get("/api/v1/tmdb/image/w500/evil.svg");
+    expect(badSvgRes.status()).toBe(400);
+
+    const discoverApi = await request.get("/api/v1/tmdb/discover?mode=trending&limit=8");
+    expect(discoverApi.status()).toBe(200);
+    const discoverJson = await discoverApi.json();
+    expect(typeof discoverJson.configured).toBe("boolean");
+
+    await page.goto("/tmdb", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("heading", { level: 1, name: /TMDB Global Index/i })).toBeVisible();
+
+    if (discoverJson.configured) {
+      await expect(page.getByTestId("tmdb-live-explorer")).toBeVisible();
+      expect(discoverJson.items.length).toBeGreaterThan(0);
+    }
+
+    const hasOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    );
+    expect(hasOverflow, "/tmdb must have zero horizontal overflow").toBe(false);
+
+    const tmdbScreenshot = path.join(BRAIN_ARTIFACT_DIR, "qa-tmdb-global-desktop.png");
+    await page.screenshot({ path: tmdbScreenshot, fullPage: false });
+  });
+
+  test("10. asserts all 10 captured screenshot files exist and have size > 0", async () => {
     const requiredScreenshots = [
       "qa-home-showcase-desktop.png",
       "qa-movie-detail-hero-desktop.png",
@@ -535,6 +570,7 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
       "qa-movies-database-desktop.png",
       "qa-series-hub-desktop.png",
       "qa-studios-hub-desktop.png",
+      "qa-tmdb-global-desktop.png",
     ];
 
     for (const filename of requiredScreenshots) {

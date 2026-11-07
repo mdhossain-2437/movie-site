@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { KeyArt } from "@/components/art/key-art";
 import { Badge } from "@/components/ui";
 import {
@@ -9,6 +9,30 @@ import {
   getCinevaPersonalizedRecommendations,
 } from "@/lib/catalogue/cineva-database";
 import { readRecentSeedSlugs } from "@/lib/catalogue/recent-seeds";
+
+const EMPTY_SEEDS: readonly string[] = [];
+let cachedSeedKey = "";
+let cachedSeedArray: readonly string[] = EMPTY_SEEDS;
+
+function subscribeStorage(callback: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
+
+function getClientSeedSnapshot(): readonly string[] {
+  const next = readRecentSeedSlugs();
+  const key = next.join(",");
+  if (key !== cachedSeedKey) {
+    cachedSeedKey = key;
+    cachedSeedArray = next;
+  }
+  return cachedSeedArray;
+}
+
+function getServerSeedSnapshot(): readonly string[] {
+  return EMPTY_SEEDS;
+}
 
 const CURATED_TASTE_PROFILES = [
   {
@@ -36,11 +60,11 @@ const CURATED_TASTE_PROFILES = [
 export function PersonalizedRecommendationsRail() {
   const [activeProfile, setActiveProfile] =
     useState<(typeof CURATED_TASTE_PROFILES)[number]["id"]>("history");
-  const [historySeeds, setHistorySeeds] = useState<string[]>([]);
-
-  useEffect(() => {
-    setHistorySeeds(readRecentSeedSlugs());
-  }, []);
+  const historySeeds = useSyncExternalStore(
+    subscribeStorage,
+    getClientSeedSnapshot,
+    getServerSeedSnapshot,
+  );
 
   const effectiveSeeds = useMemo(() => {
     if (activeProfile === "history" && historySeeds.length > 0) {

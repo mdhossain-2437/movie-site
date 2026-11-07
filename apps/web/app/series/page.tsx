@@ -85,16 +85,21 @@ export default function SeriesPage(props: {
 }) {
   return (
     <ConsumerShell>
-      <header className="mb-8 space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge tone="accent">CINEVA Episodic Originals</Badge>
-          <Badge tone="neutral">Multi-Season Guides · Direct Episode Stream</Badge>
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone="accent">CINEVA Episodic Originals</Badge>
+            <Badge tone="neutral">Multi-Season Guides · Direct Episode Stream</Badge>
+          </div>
+          <h1 className="font-display text-text text-3xl font-bold sm:text-5xl">Series</h1>
+          <p className="cg-prose text-text-secondary text-base leading-7">
+            Multi-season crime sagas, heroic multiverse spin-offs, cold-case river mysteries, and 4K
+            delta docuseries—filterable by showrunner, cast, studio banner, and genre.
+          </p>
         </div>
-        <h1 className="font-display text-text text-3xl font-bold sm:text-5xl">Series</h1>
-        <p className="cg-prose text-text-secondary text-base leading-7">
-          Multi-season crime sagas, heroic multiverse spin-offs, cold-case river mysteries, and 4K
-          delta docuseries—filterable by showrunner, cast, studio banner, and genre.
-        </p>
+        <ButtonLink href="/tmdb?kind=SERIES" variant="secondary" size="sm">
+          Explore Live TMDB TV Series →
+        </ButtonLink>
       </header>
 
       <Suspense fallback={<ContentRowSkeleton count={4} />}>
