@@ -1,4 +1,4 @@
-import type { MaturityRating, TitleStatus } from "@movie/contracts";
+import type { MaturityRating, TitleKind, TitleStatus } from "@movie/contracts";
 import {
   boolean,
   index,
@@ -16,7 +16,7 @@ export const titles = pgTable(
   {
     id: text("id").primaryKey(),
     slug: text("slug").notNull(),
-    kind: text("kind").$type<"MOVIE">().notNull().default("MOVIE"),
+    kind: text("kind").$type<TitleKind>().notNull().default("MOVIE"),
     status: text("status").$type<TitleStatus>().notNull().default("DRAFT"),
     originalTitle: text("original_title").notNull(),
     originalLanguage: text("original_language").notNull().default("en"),

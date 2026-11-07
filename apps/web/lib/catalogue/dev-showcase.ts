@@ -2,7 +2,7 @@ import "server-only";
 
 import crypto from "node:crypto";
 import { getEnv } from "@movie/config";
-import type { ResolutionTier } from "@movie/contracts";
+import type { CatalogueSort, MaturityRating, ResolutionTier, TitleKind } from "@movie/contracts";
 import { type PublicTitleSummary, RightsGateError } from "@movie/db";
 import { evaluateRights, type RightsGrantRecord } from "@movie/domain";
 import type { TitleHeroStageProps } from "@/components/catalogue/title-hero-stage";
@@ -11,7 +11,11 @@ import {
   CINEVA_DATABASE_FILMS,
   CINEVA_GENRES,
   CINEVA_PEOPLE,
+  CINEVA_SPECIAL_CATEGORIES,
+  CINEVA_STUDIOS,
   type CinevaDatabaseFilm,
+  getCinevaEpisode,
+  queryCinevaCatalogue,
 } from "./cineva-database";
 import { isFixtureCatalogueEnabled } from "./stage";
 
@@ -73,10 +77,11 @@ function buildShowcaseGrants(film: CinevaDatabaseFilm): RightsGrantRecord[] {
   ];
 }
 
-function toDevShowcaseTitle(film: CinevaDatabaseFilm): DevShowcaseTitle {
+export function toDevShowcaseTitle(film: CinevaDatabaseFilm): DevShowcaseTitle {
   return {
     id: film.id,
     slug: film.slug,
+    kind: film.kind,
     featureAssetId: film.availability.downloadAllowed ? `ast_${film.slug}` : null,
     originalTitle: film.originalTitle,
     originalLanguage: film.originalLanguage,
@@ -100,10 +105,15 @@ function toDevShowcaseTitle(film: CinevaDatabaseFilm): DevShowcaseTitle {
   };
 }
 
-function toPublicSummary(film: CinevaDatabaseFilm): PublicTitleSummary {
+export function toPublicSummary(film: CinevaDatabaseFilm): PublicTitleSummary {
+  const matchingCollections = CINEVA_COLLECTIONS.filter((c) => c.filmSlugs.includes(film.slug)).map(
+    (c) => c.slug,
+  );
+
   return {
     id: film.id,
     slug: film.slug,
+    kind: film.kind,
     featureAssetId: film.availability.downloadAllowed ? `ast_${film.slug}` : null,
     originalTitle: film.originalTitle,
     originalLanguage: film.originalLanguage,
@@ -115,36 +125,52 @@ function toPublicSummary(film: CinevaDatabaseFilm): PublicTitleSummary {
     localizedTitleBn: film.localizedTitleBn,
     synopsisEn: film.synopsisEn,
     synopsisBn: film.synopsisBn,
+    genreSlugs: film.genres.map((g) => g.slug),
+    directorSlugs: film.credits.filter((c) => c.department === "DIRECTOR").map((c) => c.personSlug),
+    castSlugs: film.credits.filter((c) => c.department === "ACTOR").map((c) => c.personSlug),
+    collectionSlugs: matchingCollections,
+    studioName: film.studio,
+    studioSlug: film.studioSlug,
     availability: film.availability,
   };
 }
 
-export function listDevShowcaseSummaries(options?: { language?: string }): PublicTitleSummary[] {
+export interface ShowcaseQueryOptions {
+  kind?: TitleKind;
+  language?: string;
+  genreSlug?: string;
+  directorSlug?: string;
+  castSlug?: string;
+  categorySlug?: string;
+  studioSlug?: string;
+  maturityRating?: MaturityRating;
+  access?: "all" | "stream" | "download";
+  sort?: CatalogueSort;
+  query?: string;
+}
+
+export function listDevShowcaseSummaries(options?: ShowcaseQueryOptions): PublicTitleSummary[] {
   if (!isFixtureCatalogueEnabled()) return [];
-  return CINEVA_DATABASE_FILMS.filter((film) =>
-    options?.language ? film.originalLanguage === options.language : true,
-  ).map(toPublicSummary);
+  return queryCinevaCatalogue({
+    kind: options?.kind ?? "ALL",
+    language: options?.language,
+    genre: options?.genreSlug,
+    director: options?.directorSlug,
+    cast: options?.castSlug,
+    category: options?.categorySlug,
+    studio: options?.studioSlug,
+    maturityRating: options?.maturityRating,
+    access: options?.access,
+    sort: options?.sort,
+    query: options?.query,
+  }).map(toPublicSummary);
 }
 
 export function searchDevShowcaseSummaries(query: string): PublicTitleSummary[] {
   if (!isFixtureCatalogueEnabled()) return [];
-  const q = query.trim().toLowerCase();
+  const q = query.trim();
   if (!q) return [];
-  return CINEVA_DATABASE_FILMS.filter((film) => {
-    const haystack = [
-      film.localizedTitleEn,
-      film.localizedTitleBn,
-      film.originalTitle,
-      film.synopsisEn,
-      film.studio,
-      film.country,
-      ...film.genres.map((g) => g.nameEn),
-      ...film.credits.map((c) => c.nameEn),
-    ]
-      .join(" ")
-      .toLowerCase();
-    return haystack.includes(q);
-  }).map(toPublicSummary);
+  return queryCinevaCatalogue({ query: q }).map(toPublicSummary);
 }
 
 export function getDevShowcaseTitleBySlug(slug: string): DevShowcaseTitle | null {
@@ -213,6 +239,31 @@ export function getDevShowcaseGenreBySlug(slug: string) {
   };
 }
 
+export function getDevShowcaseStudioBySlug(slug: string) {
+  if (!isFixtureCatalogueEnabled()) return null;
+  const studio = CINEVA_STUDIOS.find((s) => s.slug === slug);
+  if (!studio) return null;
+  const titles = queryCinevaCatalogue({ studio: slug, sort: "top_rated" }).map(toDevShowcaseTitle);
+  return {
+    studio,
+    titles,
+  };
+}
+
+export function getDevShowcaseCategoryBySlug(slug: string) {
+  if (!isFixtureCatalogueEnabled()) return null;
+  const category = CINEVA_SPECIAL_CATEGORIES.find((c) => c.slug === slug);
+  if (!category) return null;
+  const titles = queryCinevaCatalogue({
+    category: slug,
+    sort: slug === "top-rated-hall" ? "top_rated" : "featured",
+  }).map(toDevShowcaseTitle);
+  return {
+    category,
+    titles,
+  };
+}
+
 function signShowcaseSession(sessionId: string, expiresAtUnixMs: number): string {
   const secret = getEnv().SESSION_SECRET ?? "cineva-dev-showcase-hmac-key-v4";
   const mac = crypto
@@ -239,7 +290,7 @@ export function verifyDevShowcasePlaybackToken(sessionId: string, token: string)
 }
 
 /**
- * Evaluates `@movie/domain` `evaluateRights({ action: "STREAM" })` for CINEVA showcase films
+ * Evaluates `@movie/domain` `evaluateRights({ action: "STREAM" })` for CINEVA showcase films & series
  * when running in non-production showcase mode and issues a short-lived signed playback session.
  */
 export function authorizeDevShowcasePlaybackSession(input: {
@@ -247,6 +298,8 @@ export function authorizeDevShowcasePlaybackSession(input: {
   territoryCode: string;
   requestedResolution?: ResolutionTier;
   drmCapableClient?: boolean;
+  seasonNumber?: number;
+  episodeNumber?: number;
 }) {
   if (!isFixtureCatalogueEnabled()) {
     return null;
@@ -286,6 +339,13 @@ export function authorizeDevShowcasePlaybackSession(input: {
     throw new RightsGateError(decision.code, decision.publicReason);
   }
 
+  const activeEpisode =
+    film.kind === "SERIES" ? getCinevaEpisode(film, input.seasonNumber, input.episodeNumber) : null;
+  const effectiveMinutes = activeEpisode?.runtimeMinutes ?? film.runtimeMinutes;
+  const episodeQuery = activeEpisode
+    ? `&s=${activeEpisode.seasonNumber}&e=${activeEpisode.episodeNumber}`
+    : "";
+
   const sessionId = `pbs_sc_${crypto.randomBytes(12).toString("hex")}`;
   const expiresAt = new Date(now.getTime() + 15 * 60 * 1000);
   const playbackToken = signShowcaseSession(sessionId, expiresAt.getTime());
@@ -297,28 +357,28 @@ export function authorizeDevShowcasePlaybackSession(input: {
     maxResolution: decision.maxResolution,
     requiresDrm: decision.requiresDrm,
     resumePositionSeconds: 0,
-    durationSeconds: film.runtimeMinutes * 60,
+    durationSeconds: effectiveMinutes * 60,
     renditions: [
       {
         id: `rnd_${film.slug}_1080p`,
         resolution: "1080p" as ResolutionTier,
         codec: "av01.0.08M.08",
         bitrateKbps: 6800,
-        manifestUrl: `cineva://reel/${film.slug}?tier=1080p`,
+        manifestUrl: `cineva://reel/${film.slug}?tier=1080p${episodeQuery}`,
       },
       {
         id: `rnd_${film.slug}_720p`,
         resolution: "720p" as ResolutionTier,
         codec: "avc1.64001f",
         bitrateKbps: 3400,
-        manifestUrl: `cineva://reel/${film.slug}?tier=720p`,
+        manifestUrl: `cineva://reel/${film.slug}?tier=720p${episodeQuery}`,
       },
       {
         id: `rnd_${film.slug}_480p`,
         resolution: "480p" as ResolutionTier,
         codec: "avc1.4d401e",
         bitrateKbps: 1500,
-        manifestUrl: `cineva://reel/${film.slug}?tier=480p`,
+        manifestUrl: `cineva://reel/${film.slug}?tier=480p${episodeQuery}`,
       },
     ],
     subtitles: [

@@ -1,18 +1,25 @@
 "use client";
 
+import type { TitleKind } from "@movie/contracts";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { KeyArt } from "@/components/art/key-art";
 import { AuthorizedDownloadButton } from "@/components/catalogue/download-button";
 import { WatchlistToggleButton } from "@/components/catalogue/watchlist-toggle";
 import { AvailabilityBadge, Badge, ButtonLink } from "@/components/ui";
-import { CINEVA_DATABASE_FILMS, getCinevaFilmBySlug } from "@/lib/catalogue/cineva-database";
+import {
+  getCinevaFilmBySlug,
+  getCinevaSimilarTitles,
+  getCinevaTopRatedMap,
+} from "@/lib/catalogue/cineva-database";
+import { pushRecentSeedSlug } from "@/lib/catalogue/recent-seeds";
 import type { ArtSpec } from "@/lib/catalogue/types";
 
 export interface TitleHeroStageProps {
   title: {
     id: string;
     slug: string;
+    kind?: TitleKind;
     featureAssetId: string | null;
     originalTitle: string;
     originalLanguage: string;
@@ -251,6 +258,13 @@ export function TitleHeroStage({
   initialSaved,
 }: TitleHeroStageProps) {
   const filmRecord = useMemo(() => getCinevaFilmBySlug(title.slug), [title.slug]);
+  const topRanking = useMemo(() => getCinevaTopRatedMap().get(title.slug) ?? null, [title.slug]);
+  const isSeries = (filmRecord?.kind ?? title.kind) === "SERIES";
+  const [selectedSeason, setSelectedSeason] = useState<number>(1);
+
+  useEffect(() => {
+    pushRecentSeedSlug(title.slug);
+  }, [title.slug]);
 
   const director = useMemo(
     () =>
@@ -281,12 +295,17 @@ export function TitleHeroStage({
     [filmRecord, title.originalLanguage, territoryCode],
   );
 
-  const relatedFilms = useMemo(
-    () => CINEVA_DATABASE_FILMS.filter((f) => f.slug !== title.slug).slice(0, 4),
-    [title.slug],
+  const similarMatches = useMemo(() => getCinevaSimilarTitles(title.slug, 4), [title.slug]);
+  const activeSeasonObj = useMemo(
+    () =>
+      filmRecord?.seasons?.find((s) => s.seasonNumber === selectedSeason) ??
+      filmRecord?.seasons?.[0] ??
+      null,
+    [filmRecord, selectedSeason],
   );
 
   const breadcrumbCategory = director ? director.nameEn : (title.genres?.[0]?.nameEn ?? "Films");
+  const primaryWatchHref = isSeries ? `/watch/${title.slug}?s=1&e=1` : `/watch/${title.slug}`;
 
   return (
     <article className="w-full">
@@ -408,7 +427,7 @@ export function TitleHeroStage({
         <div className="relative z-10 my-8 flex flex-col items-center justify-center text-center sm:my-10 lg:pr-20">
           {title.availability.streamAllowed ? (
             <Link
-              href={`/watch/${title.slug}`}
+              href={primaryWatchHref}
               className="group border-text/40 bg-bronze-glass hover:border-text/80 focus-visible:outline-accent relative flex h-22 w-22 items-center justify-center rounded-full border shadow-[0_18px_54px_rgba(229,9,20,0.42)] backdrop-blur-md transition-transform duration-300 hover:scale-105 focus:scale-105 motion-reduce:transform-none motion-reduce:transition-none sm:h-26 sm:w-26"
               aria-label={`Play stream for ${title.localizedTitleEn}`}
             >
@@ -526,15 +545,26 @@ export function TitleHeroStage({
 
             <dt className="text-text/85 font-medium">Studio:</dt>
             <dd>
-              <span className="border-text/75 text-text rounded-pill inline-block max-w-[240px] truncate border px-4 py-1 font-medium">
-                {studioSource}
-              </span>
+              {filmRecord?.studioSlug ? (
+                <Link
+                  href={`/studios/${filmRecord.studioSlug}`}
+                  className="border-text/75 text-text hover:border-accent hover:bg-canvas/45 rounded-pill inline-block max-w-[240px] truncate border px-4 py-1 font-medium transition-colors motion-reduce:transition-none"
+                >
+                  {studioSource}
+                </Link>
+              ) : (
+                <span className="border-text/75 text-text rounded-pill inline-block max-w-[240px] truncate border px-4 py-1 font-medium">
+                  {studioSource}
+                </span>
+              )}
             </dd>
 
             <dt className="text-text/85 font-medium">Time:</dt>
             <dd>
               <span className="border-text/75 text-text rounded-pill inline-block border px-4 py-1 font-medium">
-                {formatRuntime(title.runtimeMinutes)}
+                {isSeries
+                  ? `${filmRecord?.seasons?.length ?? 1} Seasons · ${title.runtimeMinutes}m/ep`
+                  : formatRuntime(title.runtimeMinutes)}
               </span>
             </dd>
 
@@ -566,8 +596,17 @@ export function TitleHeroStage({
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone="accent">
-                {filmRecord ? `${filmRecord.cinevaScore}% CINEVA Index` : "CINEVA Selection"}
+                {topRanking
+                  ? `#${topRanking.topRank} Top Rated · WR ${topRanking.bayesianScore.toFixed(2)}`
+                  : filmRecord
+                    ? `${filmRecord.cinevaScore}% CINEVA Index`
+                    : "CINEVA Selection"}
               </Badge>
+              {isSeries ? (
+                <Badge tone="info">
+                  Original Series · {filmRecord?.seasons?.length ?? 1} Seasons
+                </Badge>
+              ) : null}
               {filmRecord ? (
                 <>
                   <Badge tone="neutral">{filmRecord.aspectRatio}</Badge>
@@ -586,8 +625,8 @@ export function TitleHeroStage({
 
           <div className="flex flex-wrap items-center gap-3">
             {title.availability.streamAllowed ? (
-              <ButtonLink href={`/watch/${title.slug}`} variant="primary" size="md">
-                Watch Now
+              <ButtonLink href={primaryWatchHref} variant="primary" size="md">
+                {isSeries ? "Play S1:E1" : "Watch Now"}
               </ButtonLink>
             ) : null}
 
@@ -605,6 +644,94 @@ export function TitleHeroStage({
             />
           </div>
         </section>
+
+        {/* Interactive Seasons & Episodes Guide (for SERIES) */}
+        {isSeries && filmRecord?.seasons && filmRecord.seasons.length > 0 ? (
+          <section
+            id="episodes"
+            aria-labelledby="episodes-heading"
+            data-testid="series-episodes-guide"
+            className="space-y-5"
+          >
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="text-accent font-mono text-xs tracking-widest uppercase">
+                  Episodic Master Guide
+                </p>
+                <h2 id="episodes-heading" className="font-display text-text text-2xl font-bold">
+                  Seasons &amp; Episodes
+                </h2>
+              </div>
+
+              <div
+                role="group"
+                aria-label="Select season"
+                className="flex flex-wrap items-center gap-2"
+              >
+                {filmRecord.seasons.map((season) => {
+                  const active = activeSeasonObj?.seasonNumber === season.seasonNumber;
+                  return (
+                    <button
+                      key={season.seasonNumber}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setSelectedSeason(season.seasonNumber)}
+                      className={`rounded-pill inline-flex min-h-11 min-w-11 items-center justify-center border px-4 py-1.5 font-mono text-xs font-semibold transition-colors motion-reduce:transition-none md:min-h-9 ${
+                        active
+                          ? "border-accent bg-accent text-on-accent"
+                          : "border-border bg-surface-1 text-text-secondary hover:border-border-strong hover:text-text"
+                      }`}
+                    >
+                      {season.titleEn}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {activeSeasonObj ? (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                {activeSeasonObj.episodes.map((ep) => (
+                  <Link
+                    key={`s${ep.seasonNumber}-e${ep.episodeNumber}`}
+                    href={`/watch/${title.slug}?s=${ep.seasonNumber}&e=${ep.episodeNumber}`}
+                    className="group border-border bg-surface-1 hover:border-accent flex flex-col justify-between rounded-xl border p-5 transition-colors motion-reduce:transition-none"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="border-accent/45 bg-accent/10 text-accent rounded-xs border px-2 py-0.5 font-mono text-[11px] font-bold">
+                          S{ep.seasonNumber}:E{ep.episodeNumber}
+                        </span>
+                        <span className="text-text-muted font-mono text-xs">
+                          {ep.runtimeMinutes}m
+                        </span>
+                      </div>
+                      <h3 className="font-display text-text group-hover:text-accent text-lg font-bold transition-colors motion-reduce:transition-none">
+                        {ep.titleEn}
+                      </h3>
+                      <p className="text-text-secondary text-xs" lang="bn">
+                        {ep.titleBn}
+                      </p>
+                      <p className="text-text-secondary pt-1 text-xs leading-relaxed">
+                        {ep.synopsisEn}
+                      </p>
+                    </div>
+                    <span className="text-accent mt-4 inline-flex items-center gap-1.5 font-mono text-xs font-semibold">
+                      <svg
+                        aria-hidden="true"
+                        className="h-3.5 w-3.5 fill-current"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                      <span>Play Episode {ep.episodeNumber} →</span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ) : null}
 
         {/* Interactive Scene Chapters (Netflix / Criterion Scene Index) */}
         {filmRecord && title.availability.streamAllowed ? (
@@ -701,9 +828,26 @@ export function TitleHeroStage({
                       </p>
                     ) : null}
                   </div>
-                  {c.characterName ? (
-                    <p className="text-text-muted mt-3 font-mono text-xs">as {c.characterName}</p>
-                  ) : null}
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    {c.characterName ? (
+                      <p className="text-text-muted font-mono text-xs">as {c.characterName}</p>
+                    ) : (
+                      <span />
+                    )}
+                    {c.department.toUpperCase() === "DIRECTOR" ||
+                    c.department.toUpperCase() === "ACTOR" ? (
+                      <Link
+                        href={
+                          c.department.toUpperCase() === "DIRECTOR"
+                            ? `/movies?director=${c.personSlug}`
+                            : `/movies?cast=${c.personSlug}`
+                        }
+                        className="text-accent hover:text-text font-mono text-[11px] font-semibold"
+                      >
+                        Filter Works →
+                      </Link>
+                    ) : null}
+                  </div>
                 </div>
               ))}
             </div>
@@ -821,13 +965,17 @@ export function TitleHeroStage({
           </section>
         ) : null}
 
-        {/* More Like This Recommendations */}
-        {relatedFilms.length > 0 ? (
-          <section aria-labelledby="more-like-this-heading" className="space-y-4">
-            <div className="flex items-center justify-between">
+        {/* More Like This — Mathematical Similarity Graph Recommendations */}
+        {similarMatches.length > 0 ? (
+          <section
+            aria-labelledby="more-like-this-heading"
+            data-testid="more-like-this-section"
+            className="space-y-4"
+          >
+            <div className="flex flex-wrap items-end justify-between gap-2">
               <div>
                 <p className="text-accent font-mono text-xs tracking-widest uppercase">
-                  Curated Adjacencies
+                  IDF Cosine + Director / Cast / Universe Graph
                 </p>
                 <h2
                   id="more-like-this-heading"
@@ -837,11 +985,11 @@ export function TitleHeroStage({
                 </h2>
               </div>
               <Link href="/movies" className="text-accent hover:text-text text-xs font-semibold">
-                Explore All Films →
+                Explore All Titles →
               </Link>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {relatedFilms.map((rec) => (
+              {similarMatches.map(({ film: rec, match }) => (
                 <Link
                   key={rec.slug}
                   href={`/movies/${rec.slug}`}
@@ -854,19 +1002,34 @@ export function TitleHeroStage({
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
                     />
                     <div className="art-grain" />
-                    <span className="bg-accent text-on-accent absolute top-2.5 left-2.5 rounded-xs px-2 py-0.5 font-mono text-[10px] font-bold">
-                      {rec.cinevaScore}%
+                    <span className="border-success/50 bg-canvas/90 text-success absolute top-2.5 left-2.5 rounded-xs border px-2 py-0.5 font-mono text-[10px] font-bold">
+                      {match.matchPercentage}% Match
+                    </span>
+                    <span className="border-border-strong bg-canvas/90 text-text absolute top-2.5 right-2.5 rounded-xs border px-2 py-0.5 font-mono text-[10px] font-semibold">
+                      {rec.kind === "SERIES"
+                        ? `Series · ${rec.seasons?.length ?? 1}S`
+                        : `${rec.runtimeMinutes}m`}
                     </span>
                   </div>
                   <div className="flex flex-1 flex-col justify-between p-4">
                     <div>
                       <p className="text-text-muted font-mono text-[11px]">
-                        {rec.releaseYear} · {rec.runtimeMinutes}m · {rec.maturityRating}
+                        {rec.releaseYear} · {rec.studio} · WR {match.bayesianScore.toFixed(2)}
                       </p>
                       <h3 className="font-display text-text group-hover:text-accent mt-1 text-base font-semibold">
                         {rec.localizedTitleEn}
                       </h3>
-                      <p className="text-text-secondary mt-1 line-clamp-2 text-xs leading-relaxed">
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {match.reasons.slice(0, 2).map((reason) => (
+                          <span
+                            key={reason}
+                            className="border-accent/35 bg-accent/10 text-text-secondary rounded-xs border px-1.5 py-0.5 font-mono text-[10px]"
+                          >
+                            {reason}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-text-secondary mt-2 line-clamp-2 text-xs leading-relaxed">
                         {rec.synopsisEn}
                       </p>
                     </div>

@@ -148,6 +148,21 @@ export const PlaybackQoeEventInputSchema = z.object({
 });
 export type PlaybackQoeEventInput = z.infer<typeof PlaybackQoeEventInputSchema>;
 
+export const TitleKindSchema = z.enum(["MOVIE", "SERIES"]);
+export type TitleKind = z.infer<typeof TitleKindSchema>;
+
+export const CatalogueSortSchema = z.enum([
+  "featured",
+  "top_rated",
+  "trending",
+  "newest",
+  "classic",
+  "runtime_desc",
+  "runtime_asc",
+  "title_asc",
+]);
+export type CatalogueSort = z.infer<typeof CatalogueSortSchema>;
+
 export const MaturityRatingSchema = z.enum(["U", "PG", "PG13", "R16", "R18", "UNRATED"]);
 export type MaturityRating = z.infer<typeof MaturityRatingSchema>;
 

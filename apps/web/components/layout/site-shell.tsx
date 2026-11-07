@@ -7,8 +7,10 @@ import { SearchCommandModal } from "./search-command";
 export const PRIMARY_NAV_ITEMS: readonly NavItem[] = [
   { href: "/", label: "Featured" },
   { href: "/movies", label: "Films" },
+  { href: "/series", label: "Series" },
+  { href: "/studios", label: "Studios" },
   { href: "/collections", label: "Collections" },
-  { href: "/people", label: "Directors" },
+  { href: "/people", label: "Directors & Cast" },
   { href: "/watchlist", label: "Watchlist" },
 ];
 
@@ -148,6 +150,16 @@ export function SiteFooter() {
             <li>
               <Link href="/movies" className="hover:text-text transition-colors">
                 Films
+              </Link>
+            </li>
+            <li>
+              <Link href="/series" className="hover:text-text transition-colors">
+                Series
+              </Link>
+            </li>
+            <li>
+              <Link href="/studios" className="hover:text-text transition-colors">
+                Studios
               </Link>
             </li>
             <li>

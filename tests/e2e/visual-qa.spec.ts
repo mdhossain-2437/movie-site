@@ -398,8 +398,9 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
     expect(fs.statSync(screenshotPath).size).toBeGreaterThan(0);
   });
 
-  test("7. verifies interactive Movie Database Explorer on /movies and captures qa-movies-database-desktop.png", async ({
+  test("7. verifies multi-dimensional Movie & Series Explorer on /movies and captures qa-movies-database-desktop.png", async ({
     page,
+    request,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/movies", { waitUntil: "domcontentloaded" });
@@ -407,11 +408,33 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
 
     const explorer = page.getByTestId("movie-database-explorer");
     await expect(explorer).toBeVisible();
-    await expect(page.getByText(/Showing 12 of 12 Titles/i)).toBeVisible();
+    await expect(page.getByText(/Showing 20 of 20 Titles/i)).toBeVisible();
+
+    // Verify Format filter: Series (6)
+    await page.getByRole("button", { name: /Series \(6\)/i }).click();
+    await expect(page.getByText(/Showing 6 of 20 Titles/i)).toBeVisible();
+    await page.getByRole("button", { name: /All \(20\)/i }).click();
+
+    // Verify Director + Cast + Studio + Universe + Sort filters
+    await page.locator("#movie-db-director").selectOption("amina-rahman");
+    await expect(page.getByText(/Director: amina-rahman/i)).toBeVisible();
+    await page.locator("#movie-db-cast").selectOption("tariq-anam");
+    await expect(page.getByText(/Cast: tariq-anam/i)).toBeVisible();
+    await page.getByRole("button", { name: /Reset Database Filters/i }).click();
+    await expect(page.getByText(/Showing 20 of 20 Titles/i)).toBeVisible();
+
+    // Verify Special Category filter (Heroic Multiverse) & Studio filter
+    await page.getByRole("button", { name: /Heroic Multiverse/i }).click();
+    await expect(
+      page.getByRole("heading", { name: "Iron Eclipse: Vanguard Protocol" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: /All Universes/i }).click();
+
+    await page.locator("#movie-db-sort").selectOption("top_rated");
 
     // Verify Tech Ledger toggle works cleanly without horizontal document overflow
     await page.getByRole("button", { name: "Tech Ledger" }).click();
-    await expect(page.getByRole("columnheader", { name: /Technical Master/i })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: /Bayesian WR/i })).toBeVisible();
 
     const hasLedgerOverflow = await page.evaluate(() => {
       const doc = document.documentElement;
@@ -423,13 +446,85 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
     // Return to Poster Grid for visual capture
     await page.getByRole("button", { name: "Poster Grid" }).click();
 
+    // Verify Backend Faceted Titles API & Netflix-class Recommendation Engine API
+    const apiFaceted = await request.get(
+      "/api/v1/titles?director=amina-rahman&genre=noir&sort=top_rated",
+    );
+    expect(apiFaceted.status()).toBe(200);
+    const apiFacetedJson = await apiFaceted.json();
+    expect(apiFacetedJson.count).toBeGreaterThanOrEqual(3);
+
+    const apiRecItem = await request.get("/api/v1/recommendations?slug=the-last-monsoon&limit=4");
+    expect(apiRecItem.status()).toBe(200);
+    const apiRecJson = await apiRecItem.json();
+    expect(apiRecJson.algorithm).toBe("idf-cosine-graph-bayesian-v1");
+    expect(apiRecJson.mode).toBe("item_similarity");
+    expect(apiRecJson.items.length).toBe(4);
+    expect(apiRecJson.items[0].matchPercentage).toBeGreaterThanOrEqual(60);
+    expect(apiRecJson.items[0].reasons.length).toBeGreaterThan(0);
+
+    const apiRecSeeds = await request.get(
+      "/api/v1/recommendations?seeds=iron-eclipse,the-obsidian-watchman&limit=4",
+    );
+    expect(apiRecSeeds.status()).toBe(200);
+    const apiRecSeedsJson = await apiRecSeeds.json();
+    expect(apiRecSeedsJson.mode).toBe("personalized_seeds");
+    expect(apiRecSeedsJson.items[0].reasons[0]).toMatch(/Because you watched/i);
+
     const screenshotPath = path.join(BRAIN_ARTIFACT_DIR, "qa-movies-database-desktop.png");
     await page.screenshot({ path: screenshotPath, fullPage: false });
     expect(fs.existsSync(screenshotPath)).toBe(true);
     expect(fs.statSync(screenshotPath).size).toBeGreaterThan(0);
   });
 
-  test("8. asserts all 7 captured screenshot files exist and have size > 0", async () => {
+  test("8. verifies /series hub, Series Episode Guide, Episode Streaming & /studios hub", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+
+    // /series hub
+    await page.goto("/series", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("heading", { level: 1, name: "Series" })).toBeVisible();
+    await expect(page.getByText(/Showing 6 of 6 Titles/i)).toBeVisible();
+
+    const seriesScreenshot = path.join(BRAIN_ARTIFACT_DIR, "qa-series-hub-desktop.png");
+    await page.screenshot({ path: seriesScreenshot, fullPage: false });
+
+    // Series detail Seasons & Episodes guide (/movies/syndicate-of-ash)
+    await page.goto("/movies/syndicate-of-ash", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
+    const episodesGuide = page.getByTestId("series-episodes-guide");
+    await expect(episodesGuide).toBeVisible();
+    await expect(episodesGuide.getByRole("heading", { name: "Berth Nine" })).toBeVisible();
+    await episodesGuide.getByRole("button", { name: /Season 2/i }).click();
+    await expect(episodesGuide.getByRole("heading", { name: "The Watchtower Pact" })).toBeVisible();
+
+    // Episode streaming (/watch/syndicate-of-ash?s=1&e=1) -> Next Episode S1:E2
+    await page.goto("/watch/syndicate-of-ash?s=1&e=1", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: /Syndicate of Ash · S1:E1/i }),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: /Next: S1:E2/i })).toBeVisible();
+
+    // /studios hub & /studios/vanguard-mythic-studios
+    await page.goto("/studios", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("heading", { level: 1, name: "Studios" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Vanguard Mythic Studios" })).toBeVisible();
+
+    const studiosScreenshot = path.join(BRAIN_ARTIFACT_DIR, "qa-studios-hub-desktop.png");
+    await page.screenshot({ path: studiosScreenshot, fullPage: false });
+
+    await page.goto("/studios/vanguard-mythic-studios", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: /Vanguard Mythic Studios/i }),
+    ).toBeVisible();
+  });
+
+  test("9. asserts all 9 captured screenshot files exist and have size > 0", async () => {
     const requiredScreenshots = [
       "qa-home-showcase-desktop.png",
       "qa-movie-detail-hero-desktop.png",
@@ -438,6 +533,8 @@ test.describe("Cinematic Graphite Closed-Loop Visual QA & Screenshot Suite", () 
       "qa-watch-player-desktop.png",
       "qa-watch-playing-desktop.png",
       "qa-movies-database-desktop.png",
+      "qa-series-hub-desktop.png",
+      "qa-studios-hub-desktop.png",
     ];
 
     for (const filename of requiredScreenshots) {

@@ -21,6 +21,8 @@ const AuthorizePlaybackBodySchema = z.object({
     .max(120),
   requestedResolution: ResolutionTierSchema.optional(),
   drmCapableClient: z.boolean().optional(),
+  seasonNumber: z.number().int().min(1).max(50).optional(),
+  episodeNumber: z.number().int().min(1).max(200).optional(),
 });
 
 export async function POST(request: Request) {
@@ -65,6 +67,8 @@ export async function POST(request: Request) {
           territoryCode,
           requestedResolution: body.requestedResolution,
           drmCapableClient: body.drmCapableClient ?? false,
+          seasonNumber: body.seasonNumber,
+          episodeNumber: body.episodeNumber,
         });
         if (showcaseSession) {
           return jsonNoStore(showcaseSession, 201, requestId);

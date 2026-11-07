@@ -238,6 +238,37 @@ describe("@movie/db centralized DAL, rights gate, separation of duties & IDOR de
       });
       expect(directorMatches).toHaveLength(1);
 
+      // 10b. Multi-dimensional DAL filtering by directorSlug, castSlug, kind, and studioSlug.
+      expect(
+        await listPublishedTitles(handle.db, {
+          territoryCode: "BD",
+          directorSlug: "kamal-choudhury-fixture",
+          kind: "MOVIE",
+          at: now,
+        }),
+      ).toHaveLength(1);
+      expect(
+        await listPublishedTitles(handle.db, {
+          territoryCode: "BD",
+          directorSlug: "unknown-director",
+          at: now,
+        }),
+      ).toHaveLength(0);
+      expect(
+        await listPublishedTitles(handle.db, {
+          territoryCode: "BD",
+          kind: "SERIES",
+          at: now,
+        }),
+      ).toHaveLength(0);
+      expect(
+        await listPublishedTitles(handle.db, {
+          territoryCode: "BD",
+          castSlug: "kamal-choudhury-fixture",
+          at: now,
+        }),
+      ).toHaveLength(0);
+
       // 11. IDOR Negative Test: Viewer B cannot view or delete Viewer A's watchlist items.
       await addWatchlistItem(handle.db, { actor: viewerA, requestId: "req_11" }, draft.id);
       expect(

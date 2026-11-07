@@ -4,6 +4,7 @@ import type { ResolutionTier } from "@movie/contracts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge, Button, ButtonLink, Spinner } from "@/components/ui";
 import { getCinevaFilmBySlug } from "@/lib/catalogue/cineva-database";
+import { pushRecentSeedSlug } from "@/lib/catalogue/recent-seeds";
 import { CinemaCanvasReel } from "./cinema-canvas-reel";
 
 export type PlayerLifecycleState =
@@ -87,11 +88,15 @@ export function VideoPlayerShell({
   localizedTitle,
   runtimeMinutes,
   initialStartSeconds = 0,
+  seasonNumber,
+  episodeNumber,
 }: {
   titleSlug: string;
   localizedTitle: string;
   runtimeMinutes: number;
   initialStartSeconds?: number;
+  seasonNumber?: number;
+  episodeNumber?: number;
 }) {
   const filmRecord = useMemo(() => getCinevaFilmBySlug(titleSlug), [titleSlug]);
 
@@ -280,6 +285,8 @@ export function VideoPlayerShell({
         body: JSON.stringify({
           titleSlug,
           drmCapableClient: drmCapable,
+          seasonNumber,
+          episodeNumber,
         }),
       });
 
@@ -299,6 +306,7 @@ export function VideoPlayerShell({
         return;
       }
 
+      pushRecentSeedSlug(titleSlug);
       setSessionData(payload);
       setDuration(payload.durationSeconds || runtimeMinutes * 60);
       setCurrentTime(initialStartSeconds || payload.resumePositionSeconds || 0);
@@ -323,7 +331,7 @@ export function VideoPlayerShell({
         detail: "Network connection interrupted while requesting playback authorization.",
       });
     }
-  }, [emitQoeEvent, initialStartSeconds, runtimeMinutes, titleSlug]);
+  }, [emitQoeEvent, episodeNumber, initialStartSeconds, runtimeMinutes, seasonNumber, titleSlug]);
 
   const togglePlayPause = useCallback(() => {
     if (playerState === "IDLE") {

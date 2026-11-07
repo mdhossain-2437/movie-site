@@ -1,3 +1,4 @@
+import { CatalogueSortSchema, TitleKindSchema } from "@movie/contracts";
 import { getDatabase, listPublishedTitles, type PublicTitleSummary } from "@movie/db";
 import type { Metadata } from "next";
 import { Suspense } from "react";
@@ -10,9 +11,9 @@ import { listTitles } from "@/lib/catalogue/repository";
 import { resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
-  title: "Movies & Film Database · CINEVA",
+  title: "Movies & Catalogue Explorer · CINEVA",
   description:
-    "Explore the CINEVA film database: stream 1080p anamorphic features, inspect technical camera sheets, filter by genre or language, and browse restored cinema.",
+    "Explore the CINEVA film & series database: filter by director, principal cast, studio banner, universe category, genre, or language, and sort by Bayesian Top Rated.",
 };
 
 function mergeTitleSummaries(
@@ -30,24 +31,31 @@ function mergeTitleSummaries(
   return merged;
 }
 
+function firstParam(val: string | string[] | undefined): string | undefined {
+  return Array.isArray(val) ? val[0] : val;
+}
+
 async function MoviesDirectoryResults({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const resolved = await searchParams;
-  const rawLang = Array.isArray(resolved.lang) ? resolved.lang[0] : resolved.lang;
+  const rawLang = firstParam(resolved.lang);
   const activeLang = rawLang === "bn" || rawLang === "en" ? rawLang : undefined;
-  const rawGenre = Array.isArray(resolved.genre) ? resolved.genre[0] : resolved.genre;
+  const rawKind = firstParam(resolved.kind);
+  const parsedKind = TitleKindSchema.safeParse(rawKind);
+  const initialKind = parsedKind.success ? parsedKind.data : "ALL";
+  const rawSort = firstParam(resolved.sort);
+  const parsedSort = CatalogueSortSchema.safeParse(rawSort);
 
   const territoryCode = await resolveViewerTerritory();
   const db = await getDatabase();
   const dbItems = await listPublishedTitles(db, {
     territoryCode,
-    language: activeLang,
-    limit: 48,
+    limit: 60,
   });
-  const showcaseItems = listDevShowcaseSummaries({ language: activeLang });
+  const showcaseItems = listDevShowcaseSummaries();
   const items = mergeTitleSummaries(dbItems, showcaseItems);
 
   const archiveCards = listTitles();
@@ -74,8 +82,16 @@ async function MoviesDirectoryResults({
         <MovieDatabaseExplorer
           items={items}
           territoryCode={territoryCode}
+          basePath="/movies"
           activeLang={activeLang}
-          initialGenre={rawGenre}
+          initialKind={initialKind}
+          initialGenre={firstParam(resolved.genre)}
+          initialDirector={firstParam(resolved.director)}
+          initialCast={firstParam(resolved.cast)}
+          initialCategory={firstParam(resolved.category)}
+          initialStudio={firstParam(resolved.studio)}
+          initialSort={parsedSort.success ? parsedSort.data : undefined}
+          initialQuery={firstParam(resolved.q)}
         />
       )}
 
@@ -116,13 +132,13 @@ export default function MoviesPage(props: {
     <ConsumerShell>
       <header className="mb-8 space-y-3">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge tone="accent">CINEVA Film Database</Badge>
-          <Badge tone="neutral">2.39:1 Anamorphic · Dual Subtitles</Badge>
+          <Badge tone="accent">CINEVA Film &amp; Series Database</Badge>
+          <Badge tone="neutral">Faceted Director · Cast · Studio · Universe Engine</Badge>
         </div>
         <h1 className="font-display text-text text-3xl font-bold sm:text-5xl">Movies</h1>
         <p className="cg-prose text-text-secondary text-base leading-7">
-          Stream authorized feature cinema in high definition or switch to the technical ledger to
-          inspect aspect ratios, negative stock, sound mixes, directors, and territorial rights.
+          Filter across feature films and original series by director, principal cast, studio
+          banner, special universe, or genre—and sort by Bayesian Weighted Top Rated score.
         </p>
       </header>
 
