@@ -11,6 +11,7 @@ import { drizzle as drizzlePglite, type PgliteDatabase } from "drizzle-orm/pglit
 import { migrate as migratePglite } from "drizzle-orm/pglite/migrator";
 import pg from "pg";
 import * as schema from "./schema/index.ts";
+import { EMBEDDED_MIGRATION_SQL } from "./embedded-migrations.ts";
 
 export type MovieDatabase = PgDatabase<PgQueryResultHKT, typeof schema>;
 
@@ -63,16 +64,32 @@ function resolveDefaultPgliteDir(): string {
 
 const MIGRATIONS_FOLDER = resolveMigrationsFolder();
 
+async function applyPgliteMigrations(
+  pglite: PGlite,
+  db: PgliteDatabase<typeof schema>,
+): Promise<void> {
+  const journalPath = path.join(MIGRATIONS_FOLDER, "meta", "_journal.json");
+  if (fs.existsSync(journalPath)) {
+    try {
+      await migratePglite(db, { migrationsFolder: MIGRATIONS_FOLDER });
+      return;
+    } catch {
+      // Fall through to embedded DDL if filesystem migration fails in serverless bundle
+    }
+  }
+  await pglite.exec(EMBEDDED_MIGRATION_SQL);
+}
+
 export async function createTestDatabase(): Promise<ManagedDatabaseHandle> {
   const pglite = new PGlite();
   const db: PgliteDatabase<typeof schema> = drizzlePglite(pglite, { schema });
-  await migratePglite(db, { migrationsFolder: MIGRATIONS_FOLDER });
+  await applyPgliteMigrations(pglite, db);
 
   return {
     db: db as unknown as MovieDatabase,
     driver: "pglite",
     migrate: async () => {
-      await migratePglite(db, { migrationsFolder: MIGRATIONS_FOLDER });
+      await applyPgliteMigrations(pglite, db);
     },
     close: async () => {
       await pglite.close();
@@ -130,7 +147,7 @@ export function createDatabaseHandle(databaseUrl?: string): ManagedDatabaseHandl
     db: db as unknown as MovieDatabase,
     driver: "pglite",
     migrate: async () => {
-      await migratePglite(db, { migrationsFolder: MIGRATIONS_FOLDER });
+      await applyPgliteMigrations(pglite, db);
     },
     close: async () => {
       await pglite.close();

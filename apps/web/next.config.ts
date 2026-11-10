@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   cacheComponents: true,
   partialPrefetching: true,
+  outputFileTracingRoot: path.resolve(import.meta.dirname, "../.."),
+  outputFileTracingIncludes: {
+    "/**": ["../../packages/db/migrations/**/*"],
+  },
   serverExternalPackages: ["@electric-sql/pglite", "pg"],
   turbopack: {
     root: path.resolve(import.meta.dirname, "../.."),
