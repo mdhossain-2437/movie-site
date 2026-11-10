@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PGlite } from "@electric-sql/pglite";
@@ -47,6 +48,9 @@ function resolveMigrationsFolder(): string {
 }
 
 function resolveDefaultPgliteDir(): string {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join(os.tmpdir(), "pglite");
+  }
   const cwd = process.cwd();
   const normalized = cwd.replace(/\\/g, "/");
   const repoRoot = normalized.endsWith("/apps/web")
@@ -104,9 +108,18 @@ export function createDatabaseHandle(databaseUrl?: string): ManagedDatabaseHandl
   if (!isTestEnv) {
     if (resolvedUrl?.startsWith("pglite://")) {
       dataDir = resolvedUrl.slice("pglite://".length);
+      try {
+        fs.mkdirSync(dataDir, { recursive: true });
+      } catch {
+        dataDir = undefined;
+      }
     } else {
-      dataDir = resolveDefaultPgliteDir();
-      fs.mkdirSync(dataDir, { recursive: true });
+      try {
+        dataDir = resolveDefaultPgliteDir();
+        fs.mkdirSync(dataDir, { recursive: true });
+      } catch {
+        dataDir = undefined;
+      }
     }
   }
 
