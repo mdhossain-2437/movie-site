@@ -99,7 +99,7 @@ export default function AccountPage() {
             Local Viewing Preferences
           </h2>
           <p className="text-text-secondary text-sm">
-            Customize motion sensitivity and Bangla poster labels on this browser.
+            Customize motion sensitivity and viewing settings on this browser.
           </p>
         </div>
         <DevicePreferences />

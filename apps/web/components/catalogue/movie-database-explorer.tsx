@@ -60,7 +60,6 @@ export interface MovieDatabaseExplorerProps {
 
 const LANGUAGE_OPTIONS = [
   { label: "All Languages", value: "all" },
-  { label: "Bangla (বাংলা)", value: "bn" },
   { label: "English", value: "en" },
 ] as const;
 
@@ -245,7 +244,6 @@ export function MovieDatabaseExplorer({
       }
       const haystack = [
         entry.summary.localizedTitleEn,
-        entry.summary.localizedTitleBn ?? "",
         entry.summary.originalTitle,
         entry.summary.synopsisEn,
         entry.director,
@@ -390,7 +388,7 @@ export function MovieDatabaseExplorer({
             Active Territory Gate
           </p>
           <p className="text-text-secondary pt-1 font-mono text-sm font-semibold">
-            {territoryCode} · EN / বাংলা CC
+            {territoryCode} · EN Subtitles / CC
           </p>
         </div>
       </div>
@@ -494,7 +492,7 @@ export function MovieDatabaseExplorer({
                 setSearchQuery(e.target.value);
                 syncUrlParams({ q: e.target.value });
               }}
-              placeholder="Filter by title, বাংলা নাম, director, actor, studio, or location…"
+              placeholder="Filter by title, director, actor, studio, or location…"
               className="border-border-strong bg-surface-2 text-text placeholder:text-text-muted focus:border-accent min-h-11 w-full rounded-md border px-4 py-2.5 text-sm transition-colors motion-reduce:transition-none"
             />
           </div>
@@ -744,9 +742,6 @@ export function MovieDatabaseExplorer({
                 }`}
               >
                 <span>{genre.nameEn}</span>
-                <span className="opacity-75" lang="bn">
-                  · {genre.nameBn}
-                </span>
               </button>
             );
           })}
@@ -847,9 +842,6 @@ export function MovieDatabaseExplorer({
                         {entry.kind === "SERIES" ? `SERIES · ${entry.seasonCount}S` : "MOVIE"}
                       </span>
                     </div>
-                    <span className="text-text-secondary text-xs" lang="bn">
-                      {entry.summary.localizedTitleBn}
-                    </span>
                   </td>
                   <td className="text-text-secondary px-4 py-3.5 font-mono text-xs">
                     {entry.summary.releaseYear}

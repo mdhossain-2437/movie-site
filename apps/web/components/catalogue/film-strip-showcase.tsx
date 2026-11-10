@@ -169,7 +169,7 @@ export function FilmStripShowcase({
           <li>
             <Link
               href="/"
-              className="hover:text-text-secondary transition-colors motion-reduce:transition-none"
+              className="hover:text-text-secondary inline-flex min-h-11 items-center px-1.5 py-0.5 transition-colors motion-reduce:transition-none sm:min-h-6"
             >
               Main
             </Link>
@@ -180,7 +180,7 @@ export function FilmStripShowcase({
           <li>
             <Link
               href="/movies"
-              className="hover:text-text-secondary transition-colors motion-reduce:transition-none"
+              className="hover:text-text-secondary inline-flex min-h-11 items-center px-1.5 py-0.5 transition-colors motion-reduce:transition-none sm:min-h-6"
             >
               {breadcrumbCategory}
             </Link>
@@ -244,14 +244,6 @@ export function FilmStripShowcase({
                       <h3 className="font-display text-text text-xs leading-snug font-bold sm:text-sm">
                         {item.titleEn}
                       </h3>
-                      {item.titleBn ? (
-                        <p
-                          className="text-text-secondary font-display mt-0.5 text-[11px]"
-                          lang="bn"
-                        >
-                          {item.titleBn}
-                        </p>
-                      ) : null}
                       {item.synopsisEn ? (
                         <p className="text-text-secondary mt-1.5 line-clamp-3 text-[11px] leading-relaxed">
                           {item.synopsisEn}

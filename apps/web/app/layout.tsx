@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Inter, Manrope, Noto_Sans_Bengali } from "next/font/google";
+import { Geist_Mono, Inter, Manrope } from "next/font/google";
 import { ExperienceProviders } from "@/components/experience/providers";
 import "./globals.css";
 
@@ -23,12 +23,6 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-const notoBengali = Noto_Sans_Bengali({
-  variable: "--font-bengali",
-  subsets: ["bengali"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: {
     default: "CINEVA",
@@ -45,10 +39,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${manrope.variable} ${inter.variable} ${geistMono.variable} ${notoBengali.variable}`}
-    >
+    <html lang="en" className={`${manrope.variable} ${inter.variable} ${geistMono.variable}`}>
       <body className="bg-canvas text-text flex min-h-dvh max-w-full flex-col overflow-x-clip font-sans antialiased">
         <a
           href="#main"

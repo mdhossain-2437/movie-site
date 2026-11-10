@@ -5,7 +5,6 @@ import type { CinevaDatabaseFilm } from "@/lib/catalogue/cineva-database";
 
 export interface CinemaCanvasReelProps {
   title: string;
-  titleBn?: string;
   preset: CinevaDatabaseFilm["visualPreset"];
   currentTime: number;
   playing: boolean;
@@ -16,7 +15,6 @@ export interface CinemaCanvasReelProps {
 
 export function CinemaCanvasReel({
   title,
-  titleBn,
   preset,
   currentTime,
   playing,
@@ -321,12 +319,6 @@ export function CinemaCanvasReel({
         ctx.fillStyle = `rgba(254, 249, 239, ${alpha})`;
         ctx.font = "600 38px sans-serif";
         ctx.fillText(title.toUpperCase(), w / 2, h * 0.52);
-
-        if (titleBn) {
-          ctx.fillStyle = `rgba(254, 249, 239, ${alpha * 0.78})`;
-          ctx.font = "500 18px sans-serif";
-          ctx.fillText(titleBn, w / 2, h * 0.59);
-        }
         ctx.restore();
       } else if (activeChapterTitle) {
         // Subtle top-left chapter watermark stamp
@@ -356,7 +348,7 @@ export function CinemaCanvasReel({
         window.cancelAnimationFrame(rafId);
       }
     };
-  }, [activeChapterTitle, playing, preset, title, titleBn]);
+  }, [activeChapterTitle, playing, preset, title]);
 
   return (
     <canvas

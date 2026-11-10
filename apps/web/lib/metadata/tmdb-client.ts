@@ -13,6 +13,7 @@ import {
   type TmdbCatalogItem,
   type TmdbCreditSummary,
   type TmdbEpisodeItem,
+  type TmdbGalleryArtwork,
   type TmdbImageSize,
   type TmdbMediaKind,
   type TmdbPersonDetail,
@@ -179,6 +180,7 @@ async function tmdbGetJson<T>(
   const auth = resolveTmdbAuthHeadersAndParams();
   const url = new URL(endpointPath, TMDB_API_ORIGIN);
   url.searchParams.set("include_adult", "false");
+  url.searchParams.set("language", "en-US");
   for (const [k, v] of Object.entries(params)) {
     if (v !== undefined && v !== "") {
       url.searchParams.set(k, String(v));
@@ -421,8 +423,7 @@ export async function discoverTmdbWorks(options: DiscoverTmdbOptions = {}): Prom
           ? "popularity.desc"
           : requestedSort;
 
-    const minVotes =
-      requestedSort === "vote_average.desc" ? (options.language === "bn" ? 15 : 350) : undefined;
+    const minVotes = requestedSort === "vote_average.desc" ? 350 : undefined;
 
     // Note: TMDB /discover/tv supports `with_companies` and `with_genres`, while `with_people` is movie-specific
     const params: Record<string, string | number | undefined> = {
@@ -547,15 +548,33 @@ export async function searchTmdbPeople(query: string): Promise<TmdbPersonHit[]> 
   }));
 }
 
+interface RawTmdbImageEntry {
+  file_path?: string | null;
+  width?: number;
+  height?: number;
+  aspect_ratio?: number;
+  vote_average?: number;
+  vote_count?: number;
+  iso_639_1?: string | null;
+}
+
 interface RawTmdbDetailResponse extends RawTmdbListEntry {
   tagline?: string | null;
   status?: string;
   runtime?: number | null;
+  budget?: number | null;
+  revenue?: number | null;
   episode_run_time?: number[];
   number_of_seasons?: number | null;
   number_of_episodes?: number | null;
-  production_companies?: Array<{ id: number; name: string; origin_country?: string }>;
+  production_companies?: Array<{
+    id: number;
+    name: string;
+    origin_country?: string;
+    logo_path?: string | null;
+  }>;
   production_countries?: Array<{ iso_3166_1: string; name: string }>;
+  spoken_languages?: Array<{ iso_639_1?: string; name?: string; english_name?: string }>;
   created_by?: Array<{ id: number; name: string; profile_path?: string | null }>;
   seasons?: Array<{
     season_number: number;
@@ -579,6 +598,26 @@ interface RawTmdbDetailResponse extends RawTmdbListEntry {
       department?: string;
       profile_path?: string | null;
     }>;
+  };
+  images?: {
+    posters?: RawTmdbImageEntry[];
+    backdrops?: RawTmdbImageEntry[];
+  };
+  release_dates?: {
+    results?: Array<{
+      iso_3166_1?: string;
+      release_dates?: Array<{ certification?: string; type?: number }>;
+    }>;
+  };
+  content_ratings?: {
+    results?: Array<{
+      iso_3166_1?: string;
+      rating?: string;
+    }>;
+  };
+  external_ids?: {
+    imdb_id?: string | null;
+    wikidata_id?: string | null;
   };
   recommendations?: { results?: RawTmdbListEntry[] };
   similar?: { results?: RawTmdbListEntry[] };
@@ -629,7 +668,9 @@ export async function fetchTmdbWorkDetail(
 
   const raw = await tmdbGetJson<RawTmdbDetailResponse>(`/3/${mediaKind}/${safeId}`, {
     language: "en-US",
-    append_to_response: "credits,recommendations,similar",
+    append_to_response:
+      "credits,images,release_dates,content_ratings,external_ids,recommendations,similar",
+    include_image_language: "en,null",
   });
 
   const base = normalizeCatalogItem(raw, mediaKind);
@@ -638,6 +679,7 @@ export async function fetchTmdbWorkDetail(
   }
 
   const directorsMap = new Map<number, TmdbCreditSummary>();
+  const writersMap = new Map<number, TmdbCreditSummary>();
   if (mediaKind === "tv") {
     for (const creator of raw.created_by ?? []) {
       directorsMap.set(creator.id, {
@@ -660,8 +702,87 @@ export async function fetchTmdbWorkDetail(
           profileUrl: toSameOriginTmdbImagePath(member.profile_path, "w185"),
         });
       }
+    } else if (
+      member.department === "Writing" ||
+      member.job === "Writer" ||
+      member.job === "Screenplay" ||
+      member.job === "Story"
+    ) {
+      if (!writersMap.has(member.id)) {
+        writersMap.set(member.id, {
+          personId: member.id,
+          name: member.name,
+          department: "WRITER",
+          roleLabel: member.job || "Screenplay",
+          profileUrl: toSameOriginTmdbImagePath(member.profile_path, "w185"),
+        });
+      }
     }
   }
+
+  let certification: string | null = null;
+  if (mediaKind === "movie" && Array.isArray(raw.release_dates?.results)) {
+    const usEntry = raw.release_dates.results.find((r) => r.iso_3166_1 === "US");
+    const usCert = usEntry?.release_dates?.find(
+      (d) => typeof d.certification === "string" && d.certification.trim().length > 0,
+    );
+    certification = usCert?.certification?.trim() ?? null;
+    if (!certification) {
+      for (const rel of raw.release_dates.results) {
+        const alt = rel.release_dates?.find(
+          (d) => typeof d.certification === "string" && d.certification.trim().length > 0,
+        );
+        if (alt?.certification) {
+          certification = alt.certification.trim();
+          break;
+        }
+      }
+    }
+  } else if (mediaKind === "tv" && Array.isArray(raw.content_ratings?.results)) {
+    const usRating = raw.content_ratings.results.find((r) => r.iso_3166_1 === "US");
+    certification = usRating?.rating?.trim() || null;
+    if (!certification) {
+      const alt = raw.content_ratings.results.find(
+        (r) => typeof r.rating === "string" && r.rating.trim().length > 0,
+      );
+      certification = alt?.rating?.trim() || null;
+    }
+  }
+
+  const budget = typeof raw.budget === "number" && raw.budget > 0 ? raw.budget : null;
+  const revenue = typeof raw.revenue === "number" && raw.revenue > 0 ? raw.revenue : null;
+  const formattedBudget = budget ? `$${budget.toLocaleString("en-US")}` : null;
+  const formattedRevenue = revenue ? `$${revenue.toLocaleString("en-US")}` : null;
+
+  const posters: TmdbGalleryArtwork[] = (raw.images?.posters ?? [])
+    .filter((p) => Boolean(p.file_path) && (!p.iso_639_1 || p.iso_639_1 === "en"))
+    .sort((a, b) => (b.vote_count ?? 0) - (a.vote_count ?? 0))
+    .slice(0, 12)
+    .map((p) => ({
+      url: toSameOriginTmdbImagePath(p.file_path, "w500") ?? "",
+      width: p.width ?? 500,
+      height: p.height ?? 750,
+      aspectRatio: Number((p.aspect_ratio ?? 0.667).toFixed(3)),
+      voteAverage: Number((p.vote_average ?? 0).toFixed(1)),
+      voteCount: p.vote_count ?? 0,
+      language: p.iso_639_1 ?? null,
+    }))
+    .filter((p) => p.url.length > 0);
+
+  const backdrops: TmdbGalleryArtwork[] = (raw.images?.backdrops ?? [])
+    .filter((b) => Boolean(b.file_path))
+    .sort((a, b) => (b.vote_count ?? 0) - (a.vote_count ?? 0))
+    .slice(0, 8)
+    .map((b) => ({
+      url: toSameOriginTmdbImagePath(b.file_path, "w1280") ?? "",
+      width: b.width ?? 1280,
+      height: b.height ?? 720,
+      aspectRatio: Number((b.aspect_ratio ?? 1.778).toFixed(3)),
+      voteAverage: Number((b.vote_average ?? 0).toFixed(1)),
+      voteCount: b.vote_count ?? 0,
+      language: b.iso_639_1 ?? null,
+    }))
+    .filter((b) => b.url.length > 0);
 
   const cast: TmdbCreditSummary[] = (raw.credits?.cast ?? []).slice(0, 12).map((actor) => ({
     personId: actor.id,
@@ -741,20 +862,85 @@ export async function fetchTmdbWorkDetail(
     tagline: raw.tagline?.trim() || null,
     statusLabel: raw.status ?? "Released",
     runtimeMinutes,
+    certification,
     seasonCount: mediaKind === "tv" ? (raw.number_of_seasons ?? seasons.length) : null,
     episodeCount: mediaKind === "tv" ? (raw.number_of_episodes ?? null) : null,
-    studios: (raw.production_companies ?? []).slice(0, 5).map((c) => ({
+    budget,
+    revenue,
+    formattedBudget,
+    formattedRevenue,
+    studios: (raw.production_companies ?? []).slice(0, 6).map((c) => ({
       id: c.id,
       name: c.name,
       originCountry: c.origin_country ?? "",
+      logoUrl: toSameOriginTmdbImagePath(c.logo_path, "w185"),
     })),
-    countries: (raw.production_countries ?? []).map((c) => c.name).slice(0, 3),
+    spokenLanguages: (raw.spoken_languages ?? []).map((l) => ({
+      iso_639_1: l.iso_639_1 ?? "en",
+      name: l.name ?? l.english_name ?? "English",
+      englishName: l.english_name ?? l.name ?? "English",
+    })),
+    countries: (raw.production_countries ?? []).map((c) => c.name).slice(0, 4),
     directors: [...directorsMap.values()].slice(0, 4),
+    writers: [...writersMap.values()].slice(0, 6),
     cast,
+    posters,
+    backdrops,
+    externalIds: {
+      imdbId: raw.external_ids?.imdb_id?.trim() || null,
+      wikidataId: raw.external_ids?.wikidata_id?.trim() || null,
+    },
     seasons,
     initialSeasonEpisodes,
     recommendations,
   };
+}
+
+export async function resolveTmdbWorkDetailSafely(options: {
+  slug?: string;
+  title?: string;
+  year?: number;
+  kind?: "MOVIE" | "SERIES" | string;
+}): Promise<TmdbWorkDetail | null> {
+  try {
+    const status = getTmdbRuntimeStatus();
+    if (!status.configured) return null;
+
+    const mediaKind: TmdbMediaKind = options.kind === "SERIES" ? "tv" : "movie";
+    const trailingIdMatch = options.slug ? /-(\d{2,9})$/.exec(options.slug) : null;
+    if (trailingIdMatch?.[1]) {
+      const numericId = Number.parseInt(trailingIdMatch[1], 10);
+      if (Number.isFinite(numericId) && numericId > 0) {
+        return await fetchTmdbWorkDetail(mediaKind, numericId);
+      }
+    }
+
+    const query = options.title?.trim() ?? "";
+    if (!query) return null;
+
+    const searchRes = await discoverTmdbWorks({
+      mode: "search",
+      kind: options.kind === "SERIES" ? "SERIES" : "MOVIE",
+      query,
+      limit: 5,
+    });
+    if (searchRes.items.length === 0) return null;
+
+    const normalizedTarget = query.toLowerCase();
+    const matched = searchRes.items.find((item) => {
+      const sameTitle =
+        item.title.toLowerCase() === normalizedTarget ||
+        item.originalTitle.toLowerCase() === normalizedTarget;
+      const closeYear =
+        !options.year || !item.releaseYear || Math.abs(item.releaseYear - options.year) <= 1;
+      return sameTitle && closeYear;
+    });
+    if (!matched) return null;
+
+    return await fetchTmdbWorkDetail(matched.mediaKind, matched.tmdbId);
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchTmdbPersonDetail(personId: number): Promise<TmdbPersonDetail> {

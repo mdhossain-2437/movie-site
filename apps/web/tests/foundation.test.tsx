@@ -41,8 +41,8 @@ describe("Cinematic Graphite UI primitives", () => {
   });
 
   it("exposes aria-pressed state on FilterChip", () => {
-    render(<FilterChip selected>Bangla</FilterChip>);
-    const chip = screen.getByRole("button", { name: "Bangla" });
+    render(<FilterChip selected>Noir</FilterChip>);
+    const chip = screen.getByRole("button", { name: "Noir" });
     expect(chip).toHaveAttribute("aria-pressed", "true");
   });
 

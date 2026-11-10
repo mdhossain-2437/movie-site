@@ -56,7 +56,6 @@ describe("Concept #1: FilmStripShowcase Stage", () => {
       id: "f-1",
       slug: "the-last-monsoon",
       titleEn: "The Last Monsoon",
-      titleBn: "শেষ বর্ষা",
       releaseYear: 2024,
       runtimeMinutes: 118,
       maturityRating: "PG13",
@@ -67,7 +66,6 @@ describe("Concept #1: FilmStripShowcase Stage", () => {
       id: "f-2",
       slug: "neon-bhasha",
       titleEn: "Neon Bhasha",
-      titleBn: "নিয়ন ভাষা",
       releaseYear: 2023,
       runtimeMinutes: 104,
       maturityRating: "PG13",
@@ -103,7 +101,6 @@ describe("Concept #1: FilmStripShowcase Stage", () => {
     expect(links.length).toBe(2);
     expect(links[0]).toHaveAttribute("href", "/movies/the-last-monsoon");
     expect(screen.getAllByText("The Last Monsoon").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("শেষ বর্ষা").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders subtle lower backdrop watermark display typography", () => {
@@ -126,10 +123,8 @@ describe("Concept #2: TitleHeroStage Component", () => {
     maturityRating: "PG13",
     isDevelopmentFixture: true,
     localizedTitleEn: "The Last Monsoon",
-    localizedTitleBn: "শেষ বর্ষা",
     synopsisEn:
       "A rain-drenched neo-noir tracking an archivist uncovering coastal land syndicates in Old Dhaka.",
-    synopsisBn: "পুরান ঢাকার নদী তীরের এক নব্য-নোয়ার চলচ্চিত্র।",
     availability: {
       streamAllowed: true,
       downloadAllowed: true,
@@ -137,24 +132,22 @@ describe("Concept #2: TitleHeroStage Component", () => {
       badgeKind: "stream_allowed" as const,
     },
     genres: [
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
-      { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
+      { slug: "noir", nameEn: "Noir" },
+      { slug: "drama", nameEn: "Drama" },
     ],
     credits: [
       {
-        department: "DIRECTOR",
+        department: "DIRECTOR" as const,
         billingOrder: 1,
         personSlug: "amina-rahman",
         nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
       },
       {
-        department: "ACTOR",
+        department: "ACTOR" as const,
         characterName: "Detective Chowdhury",
         billingOrder: 2,
         personSlug: "tariq-anam",
         nameEn: "Tariq Anam",
-        nameBn: "তারিক আনাম",
       },
     ],
     sources: [
@@ -165,7 +158,7 @@ describe("Concept #2: TitleHeroStage Component", () => {
     ],
   };
 
-  it("renders giant editorial title hierarchy and localized Bengali title", () => {
+  it("renders giant editorial title hierarchy", () => {
     render(
       <TitleHeroStage
         title={mockTitle}
@@ -175,7 +168,6 @@ describe("Concept #2: TitleHeroStage Component", () => {
       />,
     );
     expect(screen.getByRole("heading", { level: 1, name: "The Last Monsoon" })).toBeInTheDocument();
-    expect(screen.getByText("শেষ বর্ষা")).toBeInTheDocument();
   });
 
   it("renders circular translucent Play CTA linking to /watch/[slug]", () => {

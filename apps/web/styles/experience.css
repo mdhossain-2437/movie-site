@@ -1,7 +1,7 @@
 /* Cinematic Graphite / editorial experience. UI colours are semantic tokens; artwork owns its palette. */
 :root {
   --cg-page-gutter: clamp(1.25rem, 4.2vw, 5.5rem);
-  --cg-font-body: var(--font-inter), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
+  --cg-font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --cg-dock-clearance: 7rem;
 }
 html {
@@ -40,10 +40,6 @@ select {
 img,
 svg {
   vertical-align: middle;
-}
-:lang(bn) {
-  font-family: var(--font-bengali), sans-serif;
-  line-height: 1.6;
 }
 [id] {
   scroll-margin-block: 2rem var(--cg-dock-clearance);
@@ -693,21 +689,6 @@ main:focus {
   font: 600 clamp(1.1rem, 2vw, 1.8rem)/1.08 var(--cg-font-display);
   letter-spacing: -0.045em;
   text-wrap: balance;
-}
-.poster-title-bn {
-  display: none;
-  position: absolute;
-  bottom: 0.65rem;
-  left: 1rem;
-  right: 1rem;
-  color: var(--cg-text-secondary);
-  font-size: 0.6875rem;
-}
-[data-bangla="show"] .poster-title {
-  bottom: 2.1rem;
-}
-[data-bangla="show"] .poster-title-bn {
-  display: block;
 }
 .poster-caption {
   padding-top: 0.9rem;
@@ -1965,11 +1946,6 @@ dialog::backdrop {
 .detail-title-long {
   font-size: clamp(3.5rem, 6.4vw, 7.5rem);
 }
-.detail-title-bn {
-  font-size: 0.75rem;
-  color: var(--cg-text-secondary);
-  margin-top: 1rem;
-}
 .detail-intro > p:first-child {
   font-size: 0.6875rem;
   line-height: 1.85;
@@ -2146,34 +2122,6 @@ dialog::backdrop {
   line-height: 1.9;
   color: var(--cg-text-secondary);
   max-width: 45rem;
-}
-.synopsis-text:lang(bn) {
-  font-size: 1.1rem;
-}
-.language-toggle {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  margin-bottom: 1rem;
-}
-.language-toggle > button {
-  border-radius: 99px;
-  border: 1px solid transparent;
-  padding: 0.3rem 0.75rem;
-  min-height: 34px;
-  font-size: 0.6875rem;
-  color: var(--cg-text-muted);
-}
-.language-toggle > button[aria-pressed="true"] {
-  border-color: var(--cg-border);
-  color: var(--cg-text);
-  background: var(--cg-surface-1);
-}
-.translation-note {
-  display: block;
-  font: 0.6875rem var(--cg-font-mono);
-  color: var(--cg-text-muted);
-  margin-top: 1rem;
 }
 .story-section > .metadata-chips {
   margin-block: 1.5rem 2.5rem;
@@ -2564,11 +2512,6 @@ dialog::backdrop {
 .person-bio-section h2 > span {
   color: var(--cg-accent);
 }
-.person-bangla {
-  color: var(--cg-text-muted);
-  font-size: 0.85rem;
-  margin-bottom: 1.5rem;
-}
 .person-bio-section > div > .action-button {
   margin-top: 1rem;
 }
@@ -2649,11 +2592,6 @@ dialog::backdrop {
 }
 .collection-hero-copy h1 > span {
   color: var(--cg-accent);
-}
-.collection-hero-bangla {
-  font-size: 0.9rem;
-  color: var(--cg-text-muted);
-  margin-block: 1rem 1.5rem;
 }
 .collection-essay {
   max-width: 31rem;
@@ -4459,9 +4397,28 @@ dialog::backdrop {
   .poster-status > span {
     font-size: 0.6875rem;
   }
+  .poster-status {
+    min-height: 44px;
+  }
   .poster-status .save-button {
-    width: 28px;
-    height: 32px;
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .metadata-chips > a {
+    min-height: 44px;
+    padding: 0.5rem 0.9rem;
+  }
+  .credit-link {
+    min-height: 44px;
+  }
+  .breadcrumbs a {
+    min-height: 44px;
+    padding-inline: 0.25rem;
   }
   .director-section,
   .collections-section {
@@ -4523,8 +4480,10 @@ dialog::backdrop {
   }
   .collection-tile-arrow {
     top: -3rem;
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
   .collection-tile-top {
     gap: 0.5rem;
@@ -4669,7 +4628,7 @@ dialog::backdrop {
   .filter-chip {
     font-size: 0.6875rem;
     padding-inline: 0.65rem;
-    min-height: 36px;
+    min-height: 44px;
   }
   .browse-toolbar {
     flex-wrap: wrap;
@@ -4686,7 +4645,10 @@ dialog::backdrop {
     display: none;
   }
   .view-toggle a {
-    width: 30px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
   .film-index-head,
   .film-index-row {
@@ -4729,9 +4691,6 @@ dialog::backdrop {
   }
   .detail-title-long {
     font-size: 12vw;
-  }
-  .detail-title-bn {
-    font-size: 0.6875rem;
   }
   .detail-intro {
     margin-top: 2rem;
@@ -4779,8 +4738,10 @@ dialog::backdrop {
     flex-direction: row;
   }
   .detail-action-rail .icon-button {
-    width: 34px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
   .detail-hero-bottom {
     padding-top: 3rem;
@@ -5028,8 +4989,10 @@ dialog::backdrop {
     gap: 0.5rem;
   }
   .collection-film-actions .icon-button {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
   .search-form {
     gap: 0.8rem;
@@ -5050,8 +5013,10 @@ dialog::backdrop {
     font-size: 1rem;
   }
   .search-submit {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
   .search-hint {
     font-size: 0.6875rem;

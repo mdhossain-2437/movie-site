@@ -42,7 +42,7 @@ function pendingRightsRequest(titleId: string): RightsGrantRecord {
 interface TitleSeed {
   slug: string;
   title: string;
-  titleBn: string;
+  titleBn?: string | null;
   originalTitle: string;
   originalLanguage: string;
   soundFormat: string;
@@ -87,7 +87,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "nosferatu",
     title: "Nosferatu: A Symphony of Horror",
-    titleBn: "নসফেরাতু",
     originalTitle: "Nosferatu, eine Symphonie des Grauens",
     originalLanguage: "German",
     soundFormat: "Silent · German intertitles",
@@ -98,8 +97,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
     genres: ["Horror", "Expressionism"],
     synopsis:
       "An estate agent travels to the Carpathian mountains to close a sale with the reclusive Count Orlok — and carries something far worse back to his home town of Wisborg. Murnau’s unauthorised take on Dracula turns shadow, plague and empty streets into pure dread.",
-    synopsisBn:
-      "এক তরুণ এস্টেট এজেন্ট রহস্যময় কাউন্ট অরলকের কাছে বাড়ি বিক্রির কাজে কার্পেথিয়ান পাহাড়ে যায়, আর ফিরে আসে এক ভয়ংকর অভিশাপ সঙ্গে নিয়ে। ছায়া, মহামারি আর জনশূন্য রাস্তায় গড়া মুরনাউয়ের এক অবিস্মরণীয় আতঙ্ক।",
     credits: [
       director("f-w-murnau"),
       writer({ person: "henrik-galeen" }),
@@ -122,7 +119,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "the-last-laugh",
     title: "The Last Laugh",
-    titleBn: "শেষ হাসি",
     originalTitle: "Der letzte Mann",
     originalLanguage: "German",
     soundFormat: "Silent · almost no intertitles",
@@ -153,7 +149,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "faust",
     title: "Faust",
-    titleBn: "ফাউস্ট",
     originalTitle: "Faust – Eine deutsche Volkssage",
     originalLanguage: "German",
     soundFormat: "Silent · German intertitles",
@@ -185,7 +180,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "sunrise",
     title: "Sunrise: A Song of Two Humans",
-    titleBn: "সূর্যোদয়: দুই মানুষের গান",
     originalTitle: "Sunrise: A Song of Two Humans",
     originalLanguage: "English",
     soundFormat: "Silent · English intertitles · synchronised score",
@@ -196,8 +190,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
     genres: ["Drama", "Romance"],
     synopsis:
       "Tempted by a woman from the city, a farmer plots against his wife — then, adrift together in the bustling metropolis, the couple rediscovers why they fell in love. Murnau’s first American film is a luminous fable of temptation and forgiveness.",
-    synopsisBn:
-      "শহরের এক নারীর প্রলোভনে পড়ে এক কৃষক নিজের স্ত্রীর বিরুদ্ধে ভয়ংকর ষড়যন্ত্র করে — তারপর ব্যস্ত মহানগরে একসঙ্গে হারিয়ে গিয়ে দুজনে আবার খুঁজে পায় ভালোবাসার মানে। প্রলোভন আর ক্ষমার এক আলোকিত উপকথা।",
     credits: [
       director("f-w-murnau"),
       writer({ person: "carl-mayer" }),
@@ -219,7 +211,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "city-girl",
     title: "City Girl",
-    titleBn: "সিটি গার্ল",
     originalTitle: "City Girl",
     originalLanguage: "English",
     soundFormat: "Silent · English intertitles",
@@ -249,7 +240,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "dr-mabuse-the-gambler",
     title: "Dr. Mabuse the Gambler",
-    titleBn: "জুয়াড়ি ডক্টর মাবুসে",
     originalTitle: "Dr. Mabuse, der Spieler",
     originalLanguage: "German",
     soundFormat: "Silent · German intertitles",
@@ -282,7 +272,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "die-nibelungen-siegfried",
     title: "Die Nibelungen: Siegfried",
-    titleBn: "নিবেলুঙেন: জিগফ্রিড",
     originalTitle: "Die Nibelungen: Siegfried",
     originalLanguage: "German",
     soundFormat: "Silent · German intertitles",
@@ -314,7 +303,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "metropolis",
     title: "Metropolis",
-    titleBn: "মেট্রোপলিস",
     originalTitle: "Metropolis",
     originalLanguage: "German",
     soundFormat: "Silent · German intertitles",
@@ -325,8 +313,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
     genres: ["Science fiction", "Expressionism"],
     synopsis:
       "In a vertical city of gleaming towers, the son of its ruler descends to the machine halls below and falls for Maria, who preaches hope to the workers — until an inventor builds her mechanical double. Lang’s vision of the future has shaped science fiction for a century.",
-    synopsisBn:
-      "আকাশছোঁয়া মিনারের এক নগরে শাসকের ছেলে নেমে যায় যন্ত্রঘরের গভীরে, আর ভালোবেসে ফেলে শ্রমিকদের আশার কথা শোনানো মারিয়াকে — যতক্ষণ না এক উদ্ভাবক তৈরি করে তার যান্ত্রিক প্রতিরূপ। এক শতাব্দী ধরে কল্পবিজ্ঞানকে রূপ দিয়ে আসা ল্যাংয়ের ভবিষ্যৎ-দর্শন।",
     credits: [
       director("fritz-lang"),
       writer({ person: "thea-von-harbou" }),
@@ -349,7 +335,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "spies",
     title: "Spies",
-    titleBn: "গুপ্তচর",
     originalTitle: "Spione",
     originalLanguage: "German",
     soundFormat: "Silent · German intertitles",
@@ -381,7 +366,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "woman-in-the-moon",
     title: "Woman in the Moon",
-    titleBn: "চাঁদের নারী",
     originalTitle: "Frau im Mond",
     originalLanguage: "German",
     soundFormat: "Silent · German intertitles",
@@ -414,7 +398,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "a-trip-to-the-moon",
     title: "A Trip to the Moon",
-    titleBn: "চাঁদে অভিযান",
     originalTitle: "Le Voyage dans la Lune",
     originalLanguage: "French",
     soundFormat: "Silent",
@@ -425,8 +408,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
     genres: ["Fantasy", "Science fiction"],
     synopsis:
       "A congress of astronomers fires a capsule from a giant cannon straight into the eye of the Man in the Moon, then tangles with the lunar Selenites before tumbling home. Méliès’s stage illusions made it one of the most celebrated films of cinema’s first decade.",
-    synopsisBn:
-      "জ্যোতির্বিদদের একটি দল বিশাল কামান থেকে ক্যাপসুল ছুড়ে সোজা চাঁদের চোখে গিয়ে নামে, তারপর চাঁদের বাসিন্দা সেলেনাইটদের সঙ্গে লড়াই করে ফিরে আসে পৃথিবীতে। মেলিয়েসের মঞ্চজাদুতে ভরা চলচ্চিত্রের প্রথম দশকের সবচেয়ে আলোচিত ছবিগুলোর একটি।",
     credits: [
       director("georges-melies"),
       writer({ person: "georges-melies" }),
@@ -447,7 +428,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "the-kingdom-of-the-fairies",
     title: "The Kingdom of the Fairies",
-    titleBn: "পরিদের রাজ্য",
     originalTitle: "Le Royaume des fées",
     originalLanguage: "French",
     soundFormat: "Silent",
@@ -474,7 +454,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "the-impossible-voyage",
     title: "The Impossible Voyage",
-    titleBn: "অসম্ভব যাত্রা",
     originalTitle: "Le Voyage à travers l’impossible",
     originalLanguage: "French",
     soundFormat: "Silent",
@@ -501,7 +480,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "strike",
     title: "Strike",
-    titleBn: "ধর্মঘট",
     originalTitle: "Stachka",
     originalLanguage: "Russian",
     soundFormat: "Silent · Russian intertitles",
@@ -528,7 +506,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "battleship-potemkin",
     title: "Battleship Potemkin",
-    titleBn: "ব্যাটলশিপ পোটেমকিন",
     originalTitle: "Bronenosets Potyomkin",
     originalLanguage: "Russian",
     soundFormat: "Silent · Russian intertitles",
@@ -539,8 +516,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
     genres: ["Drama", "Historical"],
     synopsis:
       "Served maggot-ridden meat, the sailors of the battleship Potemkin rise against their officers in 1905, and the people of Odessa rally to them on the harbour steps. Its massacre sequence remains one of the most studied passages in film history.",
-    synopsisBn:
-      "পোকাধরা মাংস খেতে বাধ্য করায় ১৯০৫ সালে যুদ্ধজাহাজ পোটেমকিনের নাবিকেরা অফিসারদের বিরুদ্ধে বিদ্রোহ করে, আর ওডেসার মানুষ বন্দরের সিঁড়িতে তাদের পাশে এসে দাঁড়ায়। সেই সিঁড়ির দৃশ্য আজও চলচ্চিত্র ইতিহাসের সবচেয়ে আলোচিত অধ্যায়গুলোর একটি।",
     credits: [
       director("sergei-eisenstein"),
       writer({ name: "Nina Agadzhanova" }),
@@ -562,7 +537,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "october",
     title: "October: Ten Days That Shook the World",
-    titleBn: "অক্টোবর",
     originalTitle: "Oktyabr",
     originalLanguage: "Russian",
     soundFormat: "Silent · Russian intertitles",
@@ -593,7 +567,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "sherlock-jr",
     title: "Sherlock Jr.",
-    titleBn: "শার্লক জুনিয়র",
     originalTitle: "Sherlock Jr.",
     originalLanguage: "English",
     soundFormat: "Silent · English intertitles",
@@ -624,7 +597,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "the-general",
     title: "The General",
-    titleBn: "দ্য জেনারেল",
     originalTitle: "The General",
     originalLanguage: "English",
     soundFormat: "Silent · English intertitles",
@@ -655,7 +627,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "the-cabinet-of-dr-caligari",
     title: "The Cabinet of Dr. Caligari",
-    titleBn: "ডক্টর ক্যালিগারির কেবিনেট",
     originalTitle: "Das Cabinet des Dr. Caligari",
     originalLanguage: "German",
     soundFormat: "Silent · German intertitles",
@@ -689,7 +660,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "man-with-a-movie-camera",
     title: "Man with a Movie Camera",
-    titleBn: "ক্যামেরা হাতে মানুষ",
     originalTitle: "Chelovek s kino-apparatom",
     originalLanguage: "Ukrainian / Russian",
     soundFormat: "Silent · no intertitles",
@@ -715,7 +685,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "the-adventures-of-prince-achmed",
     title: "The Adventures of Prince Achmed",
-    titleBn: "রাজপুত্র আহমেদের অভিযান",
     originalTitle: "Die Abenteuer des Prinzen Achmed",
     originalLanguage: "German",
     soundFormat: "Silent · German intertitles",
@@ -742,7 +711,6 @@ export const FIXTURE_TITLES: readonly CatalogueTitle[] = [
   defineTitle({
     slug: "nanook-of-the-north",
     title: "Nanook of the North",
-    titleBn: "উত্তরের নানুক",
     originalTitle: "Nanook of the North",
     originalLanguage: "English",
     soundFormat: "Silent · English intertitles",
@@ -771,7 +739,6 @@ export const FIXTURE_PEOPLE: readonly CataloguePerson[] = [
   {
     slug: "f-w-murnau",
     name: "F. W. Murnau",
-    nameBn: "এফ. ডব্লিউ. মুরনাউ",
     displayName: "Murnau",
     born: 1888,
     died: 1931,
@@ -781,7 +748,6 @@ export const FIXTURE_PEOPLE: readonly CataloguePerson[] = [
   {
     slug: "fritz-lang",
     name: "Fritz Lang",
-    nameBn: "ফ্রিৎস ল্যাং",
     displayName: "Lang",
     born: 1890,
     died: 1976,
@@ -791,7 +757,6 @@ export const FIXTURE_PEOPLE: readonly CataloguePerson[] = [
   {
     slug: "georges-melies",
     name: "Georges Méliès",
-    nameBn: "জর্জ মেলিয়েস",
     displayName: "Méliès",
     born: 1861,
     died: 1938,
@@ -801,7 +766,6 @@ export const FIXTURE_PEOPLE: readonly CataloguePerson[] = [
   {
     slug: "sergei-eisenstein",
     name: "Sergei Eisenstein",
-    nameBn: "সের্গেই আইজেনস্টাইন",
     displayName: "Eisenstein",
     born: 1898,
     died: 1948,
@@ -821,7 +785,6 @@ export const FIXTURE_PEOPLE: readonly CataloguePerson[] = [
   {
     slug: "buster-keaton",
     name: "Buster Keaton",
-    nameBn: "বাস্টার কিটন",
     displayName: "Keaton",
     born: 1895,
     died: 1966,
@@ -841,7 +804,6 @@ export const FIXTURE_PEOPLE: readonly CataloguePerson[] = [
   {
     slug: "robert-wiene",
     name: "Robert Wiene",
-    nameBn: "রবার্ট ভিনে",
     displayName: "Wiene",
     born: 1873,
     died: 1938,
@@ -851,7 +813,6 @@ export const FIXTURE_PEOPLE: readonly CataloguePerson[] = [
   {
     slug: "dziga-vertov",
     name: "Dziga Vertov",
-    nameBn: "জিগা ভের্তভ",
     displayName: "Vertov",
     born: 1896,
     died: 1954,
@@ -871,7 +832,6 @@ export const FIXTURE_PEOPLE: readonly CataloguePerson[] = [
   {
     slug: "lotte-reiniger",
     name: "Lotte Reiniger",
-    nameBn: "লটে রাইনিগার",
     displayName: "Reiniger",
     born: 1899,
     died: 1981,
@@ -881,7 +841,6 @@ export const FIXTURE_PEOPLE: readonly CataloguePerson[] = [
   {
     slug: "robert-j-flaherty",
     name: "Robert J. Flaherty",
-    nameBn: "রবার্ট জে. ফ্ল্যাহার্টি",
     displayName: "Flaherty",
     born: 1884,
     died: 1951,
@@ -1004,7 +963,6 @@ export const FIXTURE_COLLECTIONS: readonly CatalogueCollection[] = [
   {
     slug: "german-expressionism",
     title: "German Expressionism",
-    titleBn: "জার্মান অভিব্যক্তিবাদ",
     description:
       "Painted shadows, tilted rooftops and haunted faces: Weimar Germany’s studios turned inner turmoil into architecture. Six films that taught cinema how to dream darkly.",
     items: [
@@ -1019,7 +977,6 @@ export const FIXTURE_COLLECTIONS: readonly CatalogueCollection[] = [
   {
     slug: "soviet-montage",
     title: "Soviet Montage",
-    titleBn: "সোভিয়েত মন্তাজ",
     description:
       "After 1917, a generation of filmmakers argued that meaning lives in the cut between two images. Four films that turned editing into a revolution.",
     items: ["strike", "battleship-potemkin", "october", "man-with-a-movie-camera"],
@@ -1027,7 +984,6 @@ export const FIXTURE_COLLECTIONS: readonly CatalogueCollection[] = [
   {
     slug: "voyages-extraordinaires",
     title: "Voyages Extraordinaires",
-    titleBn: "অসাধারণ অভিযান",
     description:
       "Cannons aimed at the Moon, trains that leap into the Sun, flying horses and rockets with countdowns. Cinema’s first fantasists, from Méliès to Reiniger and Lang.",
     items: [
@@ -1042,7 +998,6 @@ export const FIXTURE_COLLECTIONS: readonly CatalogueCollection[] = [
   {
     slug: "american-silents",
     title: "American Silents",
-    titleBn: "আমেরিকান নির্বাক চলচ্চিত্র",
     description:
       "Locomotives, wheat fields, frozen coasts and a projection booth that opens onto dreams. Five American films made when the movies still spoke only in pictures.",
     items: ["sherlock-jr", "the-general", "nanook-of-the-north", "sunrise", "city-girl"],

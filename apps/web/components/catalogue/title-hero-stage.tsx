@@ -7,6 +7,16 @@ import { KeyArt } from "@/components/art/key-art";
 import { AuthorizedDownloadButton } from "@/components/catalogue/download-button";
 import { WatchlistToggleButton } from "@/components/catalogue/watchlist-toggle";
 import { AvailabilityBadge, Badge, ButtonLink } from "@/components/ui";
+import type { OmdbRatings } from "@/lib/metadata/omdb-client";
+import type {
+  ArtworkGalleryItem,
+  MultiSourceRatingsData,
+  ProductionReleaseDossierData,
+} from "@/lib/metadata/omdb-types";
+import { CriticRatingsBadges } from "@/components/catalogue/critic-ratings-badges";
+import { OfficialArtworkGallery } from "@/components/catalogue/official-artwork-gallery";
+import { ProductionReleaseDossier } from "@/components/catalogue/production-release-dossier";
+import { VerifiedRatingsBreakdown } from "@/components/catalogue/verified-ratings-breakdown";
 import {
   getCinevaFilmBySlug,
   getCinevaSimilarTitles,
@@ -28,9 +38,9 @@ export interface TitleHeroStageProps {
     maturityRating: string;
     isDevelopmentFixture: boolean;
     localizedTitleEn: string;
-    localizedTitleBn: string | null;
+    localizedTitleBn?: string | null;
     synopsisEn: string;
-    synopsisBn: string | null;
+    synopsisBn?: string | null;
     availability: {
       streamAllowed: boolean;
       downloadAllowed: boolean;
@@ -59,6 +69,10 @@ export interface TitleHeroStageProps {
   territoryCode: string;
   isAuthenticated: boolean;
   initialSaved: boolean;
+  criticRatings?: OmdbRatings | null;
+  multiSourceRatings?: MultiSourceRatingsData | null;
+  productionDossier?: ProductionReleaseDossierData | null;
+  artworkGallery?: ArtworkGalleryItem[];
 }
 
 function formatRuntime(minutes: number): string {
@@ -256,6 +270,10 @@ export function TitleHeroStage({
   territoryCode,
   isAuthenticated,
   initialSaved,
+  criticRatings,
+  multiSourceRatings,
+  productionDossier,
+  artworkGallery,
 }: TitleHeroStageProps) {
   const filmRecord = useMemo(() => getCinevaFilmBySlug(title.slug), [title.slug]);
   const topRanking = useMemo(() => getCinevaTopRatedMap().get(title.slug) ?? null, [title.slug]);
@@ -322,7 +340,7 @@ export function TitleHeroStage({
             <li>
               <Link
                 href="/"
-                className="hover:text-text transition-colors motion-reduce:transition-none"
+                className="hover:text-text inline-flex min-h-11 items-center px-1.5 py-0.5 transition-colors motion-reduce:transition-none sm:min-h-6"
               >
                 Main
               </Link>
@@ -333,7 +351,7 @@ export function TitleHeroStage({
             <li>
               <Link
                 href="/movies"
-                className="hover:text-text transition-colors motion-reduce:transition-none"
+                className="hover:text-text inline-flex min-h-11 items-center px-1.5 py-0.5 transition-colors motion-reduce:transition-none sm:min-h-6"
               >
                 Films
               </Link>
@@ -345,7 +363,7 @@ export function TitleHeroStage({
               <li>
                 <Link
                   href={`/people/${director.personSlug}`}
-                  className="hover:text-text transition-colors motion-reduce:transition-none"
+                  className="hover:text-text inline-flex min-h-11 items-center px-1.5 py-0.5 transition-colors motion-reduce:transition-none sm:min-h-6"
                 >
                   {breadcrumbCategory}
                 </Link>
@@ -367,22 +385,13 @@ export function TitleHeroStage({
               {title.localizedTitleEn}
             </h1>
 
-            {title.localizedTitleBn ? (
-              <p
-                className="font-display text-text/85 mt-3 text-xl font-medium sm:text-2xl"
-                lang="bn"
-              >
-                {title.localizedTitleBn}
-              </p>
-            ) : null}
-
             {title.genres && title.genres.length > 0 ? (
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 {title.genres.map((g) => (
                   <Link
                     key={g.slug}
                     href={`/genres/${g.slug}`}
-                    className="border-text/35 bg-canvas/30 text-text/90 hover:border-text hover:bg-canvas/55 rounded-pill border px-3 py-1 text-xs backdrop-blur-xs transition-colors motion-reduce:transition-none"
+                    className="border-text/35 bg-canvas/30 text-text/90 hover:border-text hover:bg-canvas/55 rounded-pill inline-flex min-h-11 items-center border px-3.5 py-1 text-xs backdrop-blur-xs transition-colors motion-reduce:transition-none sm:min-h-7"
                   >
                     {g.nameEn}
                   </Link>
@@ -402,12 +411,6 @@ export function TitleHeroStage({
               {title.synopsisEn}
               {studioSource ? ` — ${studioSource}` : ""}
             </p>
-
-            {title.synopsisBn ? (
-              <p className="text-text/80 max-w-[350px] text-xs leading-relaxed" lang="bn">
-                {title.synopsisBn}
-              </p>
-            ) : null}
 
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <span className="bg-accent text-on-accent rounded-pill inline-flex items-center gap-2.5 px-4 py-1.5 text-xs font-bold shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
@@ -548,7 +551,7 @@ export function TitleHeroStage({
               {filmRecord?.studioSlug ? (
                 <Link
                   href={`/studios/${filmRecord.studioSlug}`}
-                  className="border-text/75 text-text hover:border-accent hover:bg-canvas/45 rounded-pill inline-block max-w-[240px] truncate border px-4 py-1 font-medium transition-colors motion-reduce:transition-none"
+                  className="border-text/75 text-text hover:border-accent hover:bg-canvas/45 rounded-pill inline-flex min-h-11 max-w-[240px] items-center truncate border px-4 py-1 font-medium transition-colors motion-reduce:transition-none sm:min-h-7"
                 >
                   {studioSource}
                 </Link>
@@ -602,6 +605,7 @@ export function TitleHeroStage({
                     ? `${filmRecord.cinevaScore}% CINEVA Index`
                     : "CINEVA Selection"}
               </Badge>
+              <CriticRatingsBadges ratings={criticRatings} variant="scorebar" />
               {isSeries ? (
                 <Badge tone="info">
                   Original Series · {filmRecord?.seasons?.length ?? 1} Seasons
@@ -618,8 +622,8 @@ export function TitleHeroStage({
               {filmRecord?.tagline ?? "Watch & Save"}
             </h2>
             <p className="text-text-secondary text-xs sm:text-sm">
-              Stream instantly in adaptive high definition with English &amp; বাংলা subtitles, or
-              save to your personal watchlist.
+              Stream instantly in adaptive high definition with English subtitles, or save to your
+              personal watchlist.
             </p>
           </div>
 
@@ -644,6 +648,18 @@ export function TitleHeroStage({
             />
           </div>
         </section>
+
+        {multiSourceRatings ? <VerifiedRatingsBreakdown ratings={multiSourceRatings} /> : null}
+
+        {artworkGallery && artworkGallery.length > 1 ? (
+          <OfficialArtworkGallery
+            title={title.localizedTitleEn || title.originalTitle}
+            items={artworkGallery}
+            fallbackArt={filmRecord?.art ?? DEFAULT_HERO_ART}
+          />
+        ) : null}
+
+        {productionDossier ? <ProductionReleaseDossier dossier={productionDossier} /> : null}
 
         {/* Interactive Seasons & Episodes Guide (for SERIES) */}
         {isSeries && filmRecord?.seasons && filmRecord.seasons.length > 0 ? (
@@ -709,9 +725,6 @@ export function TitleHeroStage({
                       <h3 className="font-display text-text group-hover:text-accent text-lg font-bold transition-colors motion-reduce:transition-none">
                         {ep.titleEn}
                       </h3>
-                      <p className="text-text-secondary text-xs" lang="bn">
-                        {ep.titleBn}
-                      </p>
                       <p className="text-text-secondary pt-1 text-xs leading-relaxed">
                         {ep.synopsisEn}
                       </p>
@@ -817,16 +830,11 @@ export function TitleHeroStage({
                     <p className="text-text mt-2 text-base font-semibold">
                       <Link
                         href={`/people/${c.personSlug}`}
-                        className="hover:text-accent transition-colors motion-reduce:transition-none"
+                        className="hover:text-accent inline-flex min-h-11 items-center transition-colors motion-reduce:transition-none sm:min-h-6"
                       >
                         {c.nameEn}
                       </Link>
                     </p>
-                    {c.nameBn ? (
-                      <p className="text-text-secondary mt-0.5 text-xs" lang="bn">
-                        {c.nameBn}
-                      </p>
-                    ) : null}
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-2">
                     {c.characterName ? (
@@ -842,7 +850,7 @@ export function TitleHeroStage({
                             ? `/movies?director=${c.personSlug}`
                             : `/movies?cast=${c.personSlug}`
                         }
-                        className="text-accent hover:text-text font-mono text-[11px] font-semibold"
+                        className="text-accent hover:text-text inline-flex min-h-11 items-center px-1 font-mono text-[11px] font-semibold transition-colors motion-reduce:transition-none sm:min-h-6"
                       >
                         Filter Works →
                       </Link>
@@ -875,7 +883,7 @@ export function TitleHeroStage({
               <div>
                 <dt className="text-text-muted uppercase">Audio Language</dt>
                 <dd className="text-text mt-1 font-sans text-sm font-medium">
-                  {title.originalLanguage.toUpperCase()} · Subtitles EN / বাংলা
+                  {title.originalLanguage.toUpperCase()} · Subtitles EN
                 </dd>
               </div>
               <div>
@@ -932,6 +940,7 @@ export function TitleHeroStage({
                   </dd>
                 </div>
               ) : null}
+              <CriticRatingsBadges ratings={criticRatings} variant="ledger" />
             </dl>
           </div>
         </section>

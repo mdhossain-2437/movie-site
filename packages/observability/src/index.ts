@@ -16,10 +16,10 @@ export interface LogContext {
 const REDACTED = "[REDACTED]";
 
 const SENSITIVE_KEY_PATTERN =
-  /^(?:password|passphrase|secret|client_?secret|access_?key|secret_?key|private_?key|content_?key|encryption_?key|api_?key|auth_?secret|session_?secret|signing_?secret|token|playback_?token|license_?token|refresh_?token|access_?token|id_?token|authorization|cookie|set-cookie|signed_?url|presigned_?url|upload_?url|download_?url|manifest_?url|source_?object_?key)$/i;
+  /^(?:password|passphrase|secret|client_?secret|access_?key|secret_?key|private_?key|content_?key|encryption_?key|(?:[a-z0-9_-]+_)?api_?key|apikey|[a-z0-9_-]*api_?key|auth_?secret|session_?secret|signing_?secret|token|playback_?token|license_?token|refresh_?token|access_?token|id_?token|authorization|cookie|set-cookie|signed_?url|presigned_?url|upload_?url|download_?url|manifest_?url|source_?object_?key)$/i;
 
 const SENSITIVE_QUERY_PARAM_PATTERN =
-  /([?&](?:token|playback_token|license_token|access_token|refresh_token|signature|sig|key|api_key|x-amz-signature|x-amz-credential|x-amz-security-token|policy|key-pair-id)=)[^&\s#]+/gi;
+  /([?&](?:token|playback_token|license_token|access_token|refresh_token|signature|sig|key|api_?key|apikey|x-amz-signature|x-amz-credential|x-amz-security-token|policy|key-pair-id)=)[^&\s#]+/gi;
 
 const JWT_PATTERN = /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g;
 const BEARER_PATTERN = /\b(Bearer|Basic)\s+[A-Za-z0-9._~+/-]+=*/gi;

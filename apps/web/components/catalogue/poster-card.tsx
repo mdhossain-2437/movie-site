@@ -40,9 +40,6 @@ export function PosterCard({
             )}
           </div>
           <h3 className="poster-title">{card.title}</h3>
-          <span lang="bn" className="poster-title-bn">
-            {card.titleBn}
-          </span>
         </div>
         <div className="poster-caption">
           <p className="poster-director">

@@ -30,24 +30,6 @@ export function DevicePreferences() {
           <span />
         </button>
       </div>
-      <div className="preference-row">
-        <div>
-          <h3>Bangla titles</h3>
-          <p>Show বাংলা title labels alongside the English names on film posters.</p>
-        </div>
-        <button
-          type="button"
-          role="switch"
-          aria-label="Show Bangla titles"
-          aria-checked={state.banglaTitles}
-          className="preference-switch"
-          onClick={() =>
-            updateDeviceState((current) => ({ ...current, banglaTitles: !current.banglaTitles }))
-          }
-        >
-          <span />
-        </button>
-      </div>
       <div className="preference-clear">
         <span>
           <Icon name="shield" />
@@ -65,8 +47,8 @@ export function DevicePreferences() {
         <p className="eyebrow">Your device, your choice</p>
         <h2 id="reset-local-heading">A clean slate.</h2>
         <p>
-          Reset the motion and language settings and clear your device’s saved list. This does not
-          affect server-side data or accounts.
+          Reset motion settings and clear your device’s saved list. This does not affect server-side
+          data or accounts.
         </p>
         <div>
           <button
@@ -80,7 +62,7 @@ export function DevicePreferences() {
             type="button"
             className="action-button action-primary"
             onClick={() => {
-              updateDeviceState(() => ({ saved: [], banglaTitles: false, reduceMotion: false }));
+              updateDeviceState(() => ({ saved: [], reduceMotion: false }));
               confirm.current?.close();
               notify("Local preferences and saved references reset.");
             }}

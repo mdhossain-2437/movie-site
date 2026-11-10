@@ -104,35 +104,31 @@ export const TMDB_STUDIO_PRESETS: readonly TmdbStudioPreset[] = [
 export interface TmdbGenrePreset {
   slug: string;
   labelEn: string;
-  labelBn: string;
   movieGenreId: number;
   tvGenreId: number;
 }
 
 export const TMDB_GENRE_PRESETS: readonly TmdbGenrePreset[] = [
-  { slug: "action", labelEn: "Action", labelBn: "অ্যাকশন", movieGenreId: 28, tvGenreId: 10759 },
+  { slug: "action", labelEn: "Action", movieGenreId: 28, tvGenreId: 10759 },
   {
     slug: "sci-fi",
     labelEn: "Sci-Fi",
-    labelBn: "কল্পবিজ্ঞান",
     movieGenreId: 878,
     tvGenreId: 10765,
   },
-  { slug: "thriller", labelEn: "Thriller", labelBn: "থ্রিলার", movieGenreId: 53, tvGenreId: 9648 },
-  { slug: "drama", labelEn: "Drama", labelBn: "নাটক", movieGenreId: 18, tvGenreId: 18 },
-  { slug: "crime", labelEn: "Crime", labelBn: "অপরাধ", movieGenreId: 80, tvGenreId: 80 },
-  { slug: "mystery", labelEn: "Mystery", labelBn: "রহস্য", movieGenreId: 9648, tvGenreId: 9648 },
+  { slug: "thriller", labelEn: "Thriller", movieGenreId: 53, tvGenreId: 9648 },
+  { slug: "drama", labelEn: "Drama", movieGenreId: 18, tvGenreId: 18 },
+  { slug: "crime", labelEn: "Crime", movieGenreId: 80, tvGenreId: 80 },
+  { slug: "mystery", labelEn: "Mystery", movieGenreId: 9648, tvGenreId: 9648 },
   {
     slug: "animation",
     labelEn: "Animation",
-    labelBn: "অ্যানিমেশন",
     movieGenreId: 16,
     tvGenreId: 16,
   },
   {
     slug: "documentary",
     labelEn: "Documentary",
-    labelBn: "প্রামাণ্যচিত্র",
     movieGenreId: 99,
     tvGenreId: 99,
   },
@@ -170,9 +166,19 @@ export interface TmdbPersonHit {
 export interface TmdbCreditSummary {
   personId: number;
   name: string;
-  department: "DIRECTOR" | "CREATOR" | "ACTOR";
+  department: "DIRECTOR" | "CREATOR" | "WRITER" | "ACTOR";
   roleLabel: string;
   profileUrl: string | null;
+}
+
+export interface TmdbGalleryArtwork {
+  url: string;
+  width: number;
+  height: number;
+  aspectRatio: number;
+  voteAverage: number;
+  voteCount: number;
+  language: string | null;
 }
 
 export interface TmdbSeasonSummary {
@@ -204,12 +210,25 @@ export interface TmdbWorkDetail extends TmdbCatalogItem {
   tagline: string | null;
   statusLabel: string;
   runtimeMinutes: number | null;
+  certification: string | null;
   seasonCount: number | null;
   episodeCount: number | null;
-  studios: Array<{ id: number; name: string; originCountry: string }>;
+  budget: number | null;
+  revenue: number | null;
+  formattedBudget: string | null;
+  formattedRevenue: string | null;
+  studios: Array<{ id: number; name: string; originCountry: string; logoUrl?: string | null }>;
+  spokenLanguages: Array<{ iso_639_1: string; name: string; englishName: string }>;
   countries: string[];
   directors: TmdbCreditSummary[];
+  writers: TmdbCreditSummary[];
   cast: TmdbCreditSummary[];
+  posters: TmdbGalleryArtwork[];
+  backdrops: TmdbGalleryArtwork[];
+  externalIds: {
+    imdbId: string | null;
+    wikidataId: string | null;
+  };
   seasons: TmdbSeasonSummary[];
   initialSeasonEpisodes: TmdbEpisodeItem[];
   recommendations: TmdbRecommendationItem[];

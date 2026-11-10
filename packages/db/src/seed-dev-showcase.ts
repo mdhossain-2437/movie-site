@@ -34,18 +34,18 @@ export interface FixtureFilmDefinition {
   runtimeMinutes: number;
   maturityRating: MaturityRating;
   titleEn: string;
-  titleBn: string;
+  titleBn?: string;
   taglineEn: string;
-  taglineBn: string;
+  taglineBn?: string;
   synopsisEn: string;
-  synopsisBn: string;
+  synopsisBn?: string;
   originCountry: string;
   genreSlugs: string[];
   collectionSlug: "monsoon-noir-archive" | "public-domain-restoration-vault";
   collectionSortOrder: number;
   studioName: string;
   castNameEn: string;
-  castNameBn: string;
+  castNameBn?: string;
   characterName: string;
 }
 
@@ -58,20 +58,15 @@ export const SHOWCASE_FILMS: readonly FixtureFilmDefinition[] = [
     runtimeMinutes: 118,
     maturityRating: "PG13",
     titleEn: "The Last Monsoon",
-    titleBn: "শেষ বর্ষা",
     taglineEn: "Secrets run deeper than rain.",
-    taglineBn: "বৃষ্টির চেয়েও গভীর গোপন কথা।",
     synopsisEn:
       "In the shadow of a prolonged monsoon in Old Dhaka, an archivist uncovers a forgotten film reel that implicates a prominent riverfront family in an unresolved 1980s disappearance.",
-    synopsisBn:
-      "পুরান ঢাকায় এক দীর্ঘ বর্ষার ছায়ায়, একজন মহাফেজখানা কর্মী একটি বিস্মৃত রিল আবিষ্কার করেন যা এক প্রভাবশালী পরিবারকে এক অমীমাংসিত নিখোঁজের সাথে যুক্ত করে।",
     originCountry: "BD",
     genreSlugs: ["noir", "drama"],
     collectionSlug: "monsoon-noir-archive",
     collectionSortOrder: 1,
     studioName: "Monsoon Shadow Studios",
     castNameEn: "Tariq Anam",
-    castNameBn: "তারিক আনাম",
     characterName: "Ahsan Habib",
   },
   {
@@ -82,20 +77,15 @@ export const SHOWCASE_FILMS: readonly FixtureFilmDefinition[] = [
     runtimeMinutes: 104,
     maturityRating: "PG13",
     titleEn: "Neon Bhasha",
-    titleBn: "নিয়ন ভাষা",
     taglineEn: "In a city of algorithms, poetry is contraband.",
-    taglineBn: "অ্যালগরিদমের শহরে কবিতা এক নিষিদ্ধ বার্তা।",
     synopsisEn:
       "Across the neon-washed rain towers of near-future coastal Chittagong, a synthetic linguist decodes an encrypted transmission hidden inside obsolete analog maritime frequencies.",
-    synopsisBn:
-      "চট্টগ্রাম উপকূলের এক নিকট-ভবিষ্যতের সাইবারপাঙ্ক মহানগরে, এক সিন্থেটিক ভাষাবিদ অপ্রচলিত অ্যানালগ ফ্রিকোয়েন্সিতে লুকানো এক সাংকেতিক বার্তা পাঠোদ্ধার করেন।",
     originCountry: "BD",
     genreSlugs: ["sci-fi", "noir"],
     collectionSlug: "monsoon-noir-archive",
     collectionSortOrder: 2,
     studioName: "Bengal Cyber Cinema",
     castNameEn: "Mehazabien Chowdhury",
-    castNameBn: "মেহজাবীন চৌধুরী",
     characterName: "Dr. Maya Sen",
   },
   {
@@ -106,20 +96,15 @@ export const SHOWCASE_FILMS: readonly FixtureFilmDefinition[] = [
     runtimeMinutes: 132,
     maturityRating: "R16",
     titleEn: "Shadows Over Buriganga",
-    titleBn: "বুড়িগঙ্গার ছায়া",
     taglineEn: "The river remembers what the city tries to drown.",
-    taglineBn: "নদী মনে রাখে যা শহর ডুবিয়ে দিতে চায়।",
     synopsisEn:
       "A veteran river-police detective navigates the labyrinthine docks and fog-shrouded cargo hulls of the Buriganga to dismantle an illicit international shipping syndicate.",
-    synopsisBn:
-      "বুড়িগঙ্গার কুয়াশাচ্ছন্ন কার্গো জাহাজ ও নদীর ডক ঘিরে এক নৌ-পুলিশ গোয়েন্দার অবৈধ সিন্ডিকেট ধ্বংসের শ্বাসরুদ্ধকর তদন্ত।",
     originCountry: "BD",
     genreSlugs: ["thriller", "noir"],
     collectionSlug: "monsoon-noir-archive",
     collectionSortOrder: 3,
     studioName: "Dhaka Riverfront Films",
     castNameEn: "Fazlur Rahman Babu",
-    castNameBn: "ফজলুর রহমান বাবু",
     characterName: "Inspector Kabir",
   },
   {
@@ -130,20 +115,15 @@ export const SHOWCASE_FILMS: readonly FixtureFilmDefinition[] = [
     runtimeMinutes: 92,
     maturityRating: "U",
     titleEn: "Echoes of the Delta",
-    titleBn: "বদ্বীপের প্রতিধ্বনি",
     taglineEn: "Where water writes history.",
-    taglineBn: "যেখানে জল রচনা করে ইতিহাস।",
     synopsisEn:
       "An intimate, sweeping visual study documenting the resilient wooden boat-building masters and nocturnal musical traditions of the lower Brahmaputra-Meghna confluence.",
-    synopsisBn:
-      "ব্রহ্মপুত্র-মেঘনা বদ্বীপের ঐতিহ্যবাহী নৌকা নির্মাণকারী সমাজ এবং লোকসংগীত সংস্কৃতির এক নিবিড় প্রামাণ্যচিত্র।",
     originCountry: "BD",
     genreSlugs: ["documentary"],
     collectionSlug: "public-domain-restoration-vault",
     collectionSortOrder: 1,
     studioName: "Delta Heritage Trust",
     castNameEn: "Amina Rahman",
-    castNameBn: "আমিনা রহমান",
     characterName: "Narrator",
   },
   {
@@ -154,20 +134,15 @@ export const SHOWCASE_FILMS: readonly FixtureFilmDefinition[] = [
     runtimeMinutes: 126,
     maturityRating: "PG13",
     titleEn: "Midnight at Curzon Hall",
-    titleBn: "কার্জন হলে মধ্যরাত",
     taglineEn: "Red brick walls guard colonial ghosts.",
-    taglineBn: "লাল ইটের দেয়াল আগলে রাখে ঔপনিবেশিক স্মৃতি।",
     synopsisEn:
       "A visiting archivist spends a storm-locked night inside the century-old red-brick halls, unearthing forgotten correspondence that rewrites the history of an early expedition.",
-    synopsisBn:
-      "এক ঝোড়ো রাতে শতবর্ষী বিশ্ববিদ্যালয়ের সংগ্রহশালায় এক গবেষক আবিষ্কার করেন এমন কিছু চিঠি যা ১৯১১ সালের এক অভিযানের ইতিহাসকে প্রশ্নের মুখে ফেলে।",
     originCountry: "BD",
     genreSlugs: ["thriller", "drama"],
     collectionSlug: "monsoon-noir-archive",
     collectionSortOrder: 4,
     studioName: "Curzon Archival Media",
     castNameEn: "Chanchal Chowdhury",
-    castNameBn: "চঞ্চল চৌধুরী",
     characterName: "Professor Alam",
   },
   {
@@ -178,20 +153,15 @@ export const SHOWCASE_FILMS: readonly FixtureFilmDefinition[] = [
     runtimeMinutes: 140,
     maturityRating: "PG",
     titleEn: "Voyage Beyond Stars",
-    titleBn: "নক্ষত্রের ওপারে যাত্রা",
     taglineEn: "The quietest journey across the cosmos.",
-    taglineBn: "মহাকাশ পাড়ি দেওয়ার শান্ততম যাত্রা।",
     synopsisEn:
       "A generational sleeper transport embarks on a silent century-long drift as the custodial botanist discovers an unexpected bloom thriving inside the cryogenic engine bay.",
-    synopsisBn:
-      "গ্লিজে নক্ষত্রমণ্ডলীর অভিমুখে ধাবমান এক প্রজন্মের মহাকাশযানের শান্ত যাত্রা, যেখানে উদ্ভিদবিদ এক অভাবনীয় প্রাণের সন্ধান পান।",
     originCountry: "US",
     genreSlugs: ["sci-fi", "drama"],
     collectionSlug: "public-domain-restoration-vault",
     collectionSortOrder: 2,
     studioName: "Cosmos Restorations International",
     castNameEn: "Elena Vance",
-    castNameBn: "এলেনা ভ্যান্স",
     characterName: "Chief Botanist Iris",
   },
   {
@@ -202,20 +172,15 @@ export const SHOWCASE_FILMS: readonly FixtureFilmDefinition[] = [
     runtimeMinutes: 85,
     maturityRating: "U",
     titleEn: "Symphony of the Loom",
-    titleBn: "তাঁতের সিম্ফনি",
     taglineEn: "The lost rhythm of Jamdani.",
-    taglineBn: "জামদানির হারানো ছন্দ।",
     synopsisEn:
       "A lyrical restoration capturing traditional master Jamdani weavers along the Shitalakshya River, preserving ancient geometric motifs and acoustic loom rhythms.",
-    synopsisBn:
-      "শীতলক্ষ্যা নদীর তীরে জামদানি বয়নশিল্পীদের প্রাচীন ঐতিহ্য ও নকশার এক সুরময় দৃশ্যরূপ।",
     originCountry: "BD",
     genreSlugs: ["documentary"],
     collectionSlug: "public-domain-restoration-vault",
     collectionSortOrder: 3,
     studioName: "Shitalakshya Textile Arts",
     castNameEn: "Monirul Islam",
-    castNameBn: "মনিরুল ইসলাম",
     characterName: "Master Weaver Kashem",
   },
 ] as const;
@@ -280,7 +245,7 @@ export async function seedDevShowcase(customDb?: MovieDatabase): Promise<{
         id: aminaId,
         slug: "amina-rahman",
         nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
+        nameBn: null,
         bio: "Pioneering Bangladeshi independent filmmaker and visual artist celebrated for atmospheric noir and neo-realist cinema.",
       })
       .onConflictDoNothing({ target: people.slug });
@@ -291,7 +256,6 @@ export async function seedDevShowcase(customDb?: MovieDatabase): Promise<{
         id: "col_monsoon_noir",
         slug: "monsoon-noir-archive",
         titleEn: "Monsoon Noir Archive",
-        titleBn: "মনসুন নোয়ার আর্কাইভ",
         description:
           "Curated atmospheric neo-noir and mystery films set during the South Asian monsoon.",
         isPublished: true,
@@ -300,7 +264,6 @@ export async function seedDevShowcase(customDb?: MovieDatabase): Promise<{
         id: "col_public_domain_vault",
         slug: "public-domain-restoration-vault",
         titleEn: "Public Domain Restoration Vault",
-        titleBn: "পাবলিক ডোমেন রিস্টোরেশন ভল্ট",
         description:
           "Lawful digital restorations of seminal open-licensed and public-domain cinematic works.",
         isPublished: true,
@@ -314,7 +277,7 @@ export async function seedDevShowcase(customDb?: MovieDatabase): Promise<{
           id: c.id,
           slug: c.slug,
           titleEn: c.titleEn,
-          titleBn: c.titleBn,
+          titleBn: null,
           description: c.description,
           isPublished: c.isPublished,
         })
@@ -323,11 +286,11 @@ export async function seedDevShowcase(customDb?: MovieDatabase): Promise<{
 
     // 5. Curated Genres
     const genreDefs = [
-      { slug: "sci-fi", nameEn: "Sci-Fi", nameBn: "সায়েন্স ফিকশন" },
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
-      { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
-      { slug: "thriller", nameEn: "Thriller", nameBn: "থ্রিলার" },
-      { slug: "documentary", nameEn: "Documentary", nameBn: "প্রামাণ্যচিত্র" },
+      { slug: "sci-fi", nameEn: "Sci-Fi", nameBn: null },
+      { slug: "noir", nameEn: "Noir", nameBn: null },
+      { slug: "drama", nameEn: "Drama", nameBn: null },
+      { slug: "thriller", nameEn: "Thriller", nameBn: null },
+      { slug: "documentary", nameEn: "Documentary", nameBn: null },
     ] as const;
 
     const genreIdMap = new Map<string, string>();
@@ -403,18 +366,6 @@ export async function seedDevShowcase(customDb?: MovieDatabase): Promise<{
           localizedTitle: film.titleEn,
           tagline: film.taglineEn,
           synopsis: film.synopsisEn,
-        })
-        .onConflictDoNothing();
-
-      await db
-        .insert(titleTranslations)
-        .values({
-          id: `ttr_${film.slug.replace(/-/g, "_")}_bn`,
-          titleId,
-          locale: "bn",
-          localizedTitle: film.titleBn,
-          tagline: film.taglineBn,
-          synopsis: film.synopsisBn,
         })
         .onConflictDoNothing();
 
@@ -554,18 +505,6 @@ export async function seedDevShowcase(customDb?: MovieDatabase): Promise<{
           languageCode: "en",
           label: "English (SDH)",
           objectKey: `assets/${assetId}/subtitles/en/v1.vtt`,
-          isForced: false,
-        })
-        .onConflictDoNothing({ target: subtitleTracks.id });
-
-      await db
-        .insert(subtitleTracks)
-        .values({
-          id: `sub_${film.slug.replace(/-/g, "_")}_bn`,
-          assetId,
-          languageCode: "bn",
-          label: "বাংলা (সাবটাইটেল)",
-          objectKey: `assets/${assetId}/subtitles/bn/v1.vtt`,
           isForced: false,
         })
         .onConflictDoNothing({ target: subtitleTracks.id });

@@ -5,6 +5,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge, Button, ButtonLink, Spinner } from "@/components/ui";
 import { getCinevaFilmBySlug } from "@/lib/catalogue/cineva-database";
 import { pushRecentSeedSlug } from "@/lib/catalogue/recent-seeds";
+import {
+  AUTHORIZED_OPEN_STREAMS,
+  computeBufferedAheadSeconds,
+  detectStreamProtocol,
+  pickClosestQualityIndex,
+} from "@/lib/player/adaptive-engine";
 import { CinemaCanvasReel } from "./cinema-canvas-reel";
 
 export type PlayerLifecycleState =
@@ -109,16 +115,33 @@ export function VideoPlayerShell({
   const [selectedResolution, setSelectedResolution] = useState<ResolutionTier | "AUTO">("AUTO");
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [captionsEnabled, setCaptionsEnabled] = useState(true);
-  const [selectedSubtitleLang, setSelectedSubtitleLang] = useState<"en" | "bn">("en");
   const [showChaptersDrawer, setShowChaptersDrawer] = useState(false);
   const [showStatsHud, setShowStatsHud] = useState(false);
   const [volume, setVolume] = useState(85);
   const [muted, setMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(initialStartSeconds);
   const [duration, setDuration] = useState(runtimeMinutes * 60);
+  const [streamSourceMode, setStreamSourceMode] = useState<"session" | "hls_open" | "dash_open">(
+    "session",
+  );
+  const [engineLabel, setEngineLabel] = useState<string>("ANAMORPHIC CANVAS 24FPS");
+  const [bufferedAheadSeconds, setBufferedAheadSeconds] = useState<number>(24);
+  const [isRebuffering, setIsRebuffering] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const hlsInstanceRef = useRef<{
+    currentLevel: number;
+    levels: Array<{ height: number; bitrate: number }>;
+    destroy: () => void;
+  } | null>(null);
+  const dashInstanceRef = useRef<{
+    updateSettings: (cfg: unknown) => void;
+    getRepresentationsByType?: (type: string) => Array<{ height?: number }>;
+    setRepresentationForTypeByIndex?: (type: string, idx: number, replace?: boolean) => void;
+    reset: () => void;
+  } | null>(null);
+  const currentTimeRef = useRef<number>(initialStartSeconds);
   const authStartTimeRef = useRef<number>(0);
   const firstFrameEmittedRef = useRef<boolean>(false);
 
@@ -165,19 +188,10 @@ export function VideoPlayerShell({
     const loopedTime = currentTime % 60;
     const match = cues.find((c) => loopedTime >= c.start && loopedTime < c.end);
     if (match) {
-      return selectedSubtitleLang === "bn" ? match.bn : match.en;
+      return match.en;
     }
-    return selectedSubtitleLang === "bn"
-      ? `${filmRecord?.localizedTitleBn ?? localizedTitle} · অধ্যায় ${activeChapter?.index ?? 1}`
-      : `${localizedTitle} · ${activeChapter?.title ?? "Feature Stream"}`;
-  }, [
-    activeChapter,
-    captionsEnabled,
-    currentTime,
-    filmRecord,
-    localizedTitle,
-    selectedSubtitleLang,
-  ]);
+    return `${localizedTitle} · ${activeChapter?.title ?? "Feature Stream"}`;
+  }, [activeChapter, captionsEnabled, currentTime, filmRecord, localizedTitle]);
 
   const emitQoeEvent = useCallback(
     async (
@@ -392,31 +406,243 @@ export function VideoPlayerShell({
     }
   }, []);
 
-  // Playback clock & 20s session heartbeat
+  // Keep ref synchronized for non-restarting heartbeat intervals
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+  }, [currentTime]);
+
+  const masterManifestUrl = useMemo(() => {
+    if (!sessionData) return null;
+    if (streamSourceMode === "hls_open") {
+      return AUTHORIZED_OPEN_STREAMS.hls.url;
+    }
+    if (streamSourceMode === "dash_open") {
+      return AUTHORIZED_OPEN_STREAMS.dash.url;
+    }
+    return sessionData.renditions[0]?.manifestUrl ?? null;
+  }, [sessionData, streamSourceMode]);
+
+  const streamProtocol = useMemo(
+    () => detectStreamProtocol(masterManifestUrl),
+    [masterManifestUrl],
+  );
+  const hasHttpStream = streamProtocol !== "canvas";
+
+  // Sync playbackRate and audio gain to HTML5 <video>
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.playbackRate = playbackSpeed;
+  }, [playbackSpeed]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.volume = Math.min(1, Math.max(0, volume / 100));
+    video.muted = muted;
+  }, [muted, volume]);
+
+  // Adaptive Bitrate MSE Engine Attachment (hls.js / dashjs) — never resets on resolution switch
+  useEffect(() => {
+    const video = videoRef.current;
+    const teardownEngines = () => {
+      if (hlsInstanceRef.current) {
+        hlsInstanceRef.current.destroy();
+        hlsInstanceRef.current = null;
+      }
+      if (dashInstanceRef.current) {
+        dashInstanceRef.current.reset();
+        dashInstanceRef.current = null;
+      }
+    };
+
+    if (!sessionData || !video || !masterManifestUrl || streamProtocol === "canvas") {
+      teardownEngines();
+      if (video) {
+        video.removeAttribute("src");
+      }
+      setEngineLabel("ANAMORPHIC CANVAS 24FPS");
+      setIsRebuffering(false);
+      setBufferedAheadSeconds(24);
+      return teardownEngines;
+    }
+
+    let cancelled = false;
+    const startAt = currentTimeRef.current > 0 ? currentTimeRef.current : 0;
+
+    if (streamProtocol === "hls") {
+      void (async () => {
+        try {
+          const { default: Hls } = await import("hls.js");
+          if (cancelled) return;
+
+          if (Hls.isSupported()) {
+            teardownEngines();
+            const hls = new Hls({
+              enableWorker: true,
+              lowLatencyMode: false,
+              maxBufferLength: 30,
+              maxMaxBufferLength: 60,
+              backBufferLength: 30,
+              startPosition: startAt,
+            });
+            hlsInstanceRef.current = hls;
+            setEngineLabel("HLS.JS MSE ABR");
+
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+              if (cancelled) return;
+              setIsRebuffering(false);
+              void video.play().catch(() => {});
+            });
+
+            hls.on(Hls.Events.ERROR, (_event, data) => {
+              if (!data.fatal || cancelled) return;
+              if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                hls.startLoad();
+              } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                hls.recoverMediaError();
+              } else {
+                teardownEngines();
+                setStreamSourceMode("session");
+              }
+            });
+
+            hls.loadSource(masterManifestUrl);
+            hls.attachMedia(video);
+            return;
+          }
+
+          if (video.canPlayType("application/vnd.apple.mpegurl")) {
+            teardownEngines();
+            setEngineLabel("NATIVE HLS ABR");
+            video.src = masterManifestUrl;
+            if (startAt > 0) {
+              video.currentTime = startAt;
+            }
+            void video.play().catch(() => {});
+          }
+        } catch {
+          if (!cancelled) {
+            setStreamSourceMode("session");
+          }
+        }
+      })();
+    } else if (streamProtocol === "dash") {
+      void (async () => {
+        try {
+          const dashMod = await import("dashjs");
+          if (cancelled) return;
+          teardownEngines();
+          const player = dashMod.MediaPlayer().create();
+          player.updateSettings({
+            streaming: {
+              buffer: {
+                fastSwitchEnabled: true,
+                bufferTimeAtTopQuality: 30,
+                bufferTimeAtTopQualityLongForm: 60,
+              },
+              abr: {
+                autoSwitchBitrate: { video: true, audio: true },
+              },
+            },
+          });
+          player.initialize(video, masterManifestUrl, true, startAt);
+          dashInstanceRef.current = player as unknown as typeof dashInstanceRef.current;
+          setEngineLabel("DASH.JS MSE 4K ABR");
+        } catch {
+          if (!cancelled) {
+            setStreamSourceMode("session");
+          }
+        }
+      })();
+    } else {
+      teardownEngines();
+      video.src = masterManifestUrl;
+      if (startAt > 0) {
+        video.currentTime = startAt;
+      }
+      void video.play().catch(() => {});
+      queueMicrotask(() => {
+        if (!cancelled) {
+          setEngineLabel("PROGRESSIVE STREAM");
+        }
+      });
+    }
+
+    return () => {
+      cancelled = true;
+      teardownEngines();
+    };
+  }, [masterManifestUrl, sessionData, streamProtocol]);
+
+  // Dynamic ABR Quality Level Switching without resetting video.src or dumping MSE buffer
+  useEffect(() => {
+    const hls = hlsInstanceRef.current;
+    if (hls) {
+      if (selectedResolution === "AUTO") {
+        hls.currentLevel = -1;
+      } else {
+        const heights = hls.levels.map((lvl) => lvl.height);
+        const targetIdx = pickClosestQualityIndex(heights, selectedResolution);
+        if (targetIdx >= 0) {
+          hls.currentLevel = targetIdx;
+        }
+      }
+    }
+
+    const dash = dashInstanceRef.current;
+    if (dash) {
+      try {
+        if (selectedResolution === "AUTO") {
+          dash.updateSettings({
+            streaming: { abr: { autoSwitchBitrate: { video: true } } },
+          });
+        } else {
+          dash.updateSettings({
+            streaming: { abr: { autoSwitchBitrate: { video: false } } },
+          });
+          const reps = dash.getRepresentationsByType?.("video") ?? [];
+          const heights = reps.map((r) => r.height ?? 0);
+          const targetIdx = pickClosestQualityIndex(heights, selectedResolution);
+          if (targetIdx >= 0) {
+            dash.setRepresentationForTypeByIndex?.("video", targetIdx, false);
+          }
+        }
+      } catch {
+        // Ignore transient representation switch before manifest initialization finishes
+      }
+    }
+  }, [selectedResolution]);
+
+  // Playback clock (canvas fallback only) & 20s session heartbeat
   useEffect(() => {
     if (playerState !== "PLAYING") return;
 
-    const tick = window.setInterval(() => {
-      setCurrentTime((prev) => {
-        const next = prev + playbackSpeed;
-        if (next >= duration) {
-          setPlayerState("ENDED");
-          void emitQoeEvent("ENDED");
-          return duration;
-        }
-        return next;
-      });
-    }, 1000);
+    const tick = !hasHttpStream
+      ? window.setInterval(() => {
+          setCurrentTime((prev) => {
+            const next = prev + playbackSpeed;
+            if (next >= duration) {
+              setPlayerState("ENDED");
+              void emitQoeEvent("ENDED");
+              return duration;
+            }
+            return next;
+          });
+        }, 1000)
+      : null;
 
     const hb = window.setInterval(() => {
-      void sendHeartbeat(currentTime);
+      void sendHeartbeat(currentTimeRef.current);
     }, 20_000);
 
     return () => {
-      window.clearInterval(tick);
+      if (tick !== null) {
+        window.clearInterval(tick);
+      }
       window.clearInterval(hb);
     };
-  }, [currentTime, duration, emitQoeEvent, playbackSpeed, playerState, sendHeartbeat]);
+  }, [duration, emitQoeEvent, hasHttpStream, playbackSpeed, playerState, sendHeartbeat]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -489,30 +715,63 @@ export function VideoPlayerShell({
     );
   }, [selectedResolution, sessionData]);
 
-  const hasHttpStream = Boolean(
-    activeRendition?.manifestUrl &&
-    /^https?:\/\//i.test(activeRendition.manifestUrl) &&
-    !activeRendition.manifestUrl.includes("memory-storage.local") &&
-    !activeRendition.manifestUrl.includes(".invalid"),
-  );
-
   return (
     <div className="space-y-5">
       <div
         ref={containerRef}
         data-player-state={playerState}
+        data-stream-engine={engineLabel}
         className="border-border-strong bg-canvas relative mx-auto aspect-video max-h-[66vh] w-full overflow-hidden rounded-lg border shadow-[0_28px_80px_rgba(0,0,0,0.85)]"
       >
-        {/* Native HTML5 Video Layer */}
+        {/* Native HTML5 / MSE (HLS.js & DASH.js) Video Layer */}
         <video
           ref={videoRef}
-          src={hasHttpStream ? activeRendition?.manifestUrl : undefined}
           playsInline
           preload="none"
           muted={muted}
           aria-label={`Video player for ${localizedTitle}`}
           className="h-full w-full object-contain"
+          onLoadedMetadata={(e) => {
+            const mediaDuration = e.currentTarget.duration;
+            if (Number.isFinite(mediaDuration) && mediaDuration > 0) {
+              setDuration(Math.floor(mediaDuration));
+            }
+          }}
+          onTimeUpdate={(e) => {
+            if (!hasHttpStream) return;
+            const t = e.currentTarget.currentTime;
+            setCurrentTime(t);
+            setBufferedAheadSeconds(computeBufferedAheadSeconds(e.currentTarget.buffered, t));
+          }}
+          onProgress={(e) => {
+            if (!hasHttpStream) return;
+            setBufferedAheadSeconds(
+              computeBufferedAheadSeconds(e.currentTarget.buffered, e.currentTarget.currentTime),
+            );
+          }}
+          onWaiting={() => {
+            if (hasHttpStream) {
+              setIsRebuffering(true);
+            }
+          }}
+          onPlaying={() => {
+            if (hasHttpStream) {
+              setIsRebuffering(false);
+              setPlayerState("PLAYING");
+            }
+          }}
+          onCanPlay={() => {
+            if (hasHttpStream) {
+              setIsRebuffering(false);
+            }
+          }}
+          onPause={() => {
+            if (hasHttpStream && !videoRef.current?.ended && playerState === "PLAYING") {
+              setPlayerState("PAUSED");
+            }
+          }}
           onEnded={() => {
+            setIsRebuffering(false);
             setPlayerState("ENDED");
             void emitQoeEvent("ENDED");
           }}
@@ -522,7 +781,6 @@ export function VideoPlayerShell({
         {sessionData && !hasHttpStream && playerState !== "ERROR" && playerState !== "REVOKED" ? (
           <CinemaCanvasReel
             title={localizedTitle}
-            titleBn={filmRecord?.localizedTitleBn}
             preset={filmRecord?.visualPreset ?? "monsoon-noir"}
             currentTime={currentTime}
             playing={playerState === "PLAYING"}
@@ -543,14 +801,27 @@ export function VideoPlayerShell({
             className="border-border bg-canvas/90 text-text-secondary absolute top-4 left-4 z-30 max-w-xs space-y-1 rounded-md border p-3 font-mono text-[11px] backdrop-blur-md"
           >
             <p className="text-accent font-semibold uppercase">CINEVA Stream Telemetry</p>
+            <p>Engine: {engineLabel}</p>
             <p>Session: {sessionData.sessionId.slice(0, 16)}…</p>
             <p>
               Profile: {activeRendition?.resolution ?? sessionData.maxResolution} ·{" "}
               {activeRendition?.codec ?? "av01.0.08M.08"}
             </p>
-            <p>Bitrate: {activeRendition?.bitrateKbps ?? 6800} kbps · 24.00 fps</p>
+            <p>
+              Bitrate: {activeRendition?.bitrateKbps ?? 6800} kbps · Buffer: +{bufferedAheadSeconds}
+              s
+            </p>
             <p>Aspect: {filmRecord?.aspectRatio ?? "2.39:1 Anamorphic"} · Dropped: 0</p>
             <p className="text-success">Rights Gate: STREAM_ALLOWED (Fail-Closed Verified)</p>
+          </div>
+        ) : null}
+
+        {isRebuffering && playerState === "PLAYING" ? (
+          <div className="bg-canvas/65 pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
+            <div className="border-border bg-surface-1 flex items-center gap-2.5 rounded-full border px-4 py-2 font-mono text-xs">
+              <Spinner label="Optimizing adaptive stream buffer" />
+              <span className="text-text">Buffering ABR segments…</span>
+            </div>
           </div>
         ) : null}
 
@@ -639,7 +910,7 @@ export function VideoPlayerShell({
             ) : null}
             <p className="text-text-secondary max-w-md text-xs leading-relaxed sm:text-sm">
               Stream in high definition with adaptive bitrate playback, scene chapters, and English
-              or বাংলা subtitles. Audio never auto-plays without your selection.
+              subtitles. Audio never auto-plays without your selection.
             </p>
             <Button
               type="button"
@@ -697,14 +968,14 @@ export function VideoPlayerShell({
           </div>
         ) : null}
 
-        {/* Live Bilingual On-Screen Subtitle Overlay */}
+        {/* Live English On-Screen Subtitle Overlay */}
         {sessionData &&
         captionsEnabled &&
         activeCueText &&
         (playerState === "PLAYING" || playerState === "PAUSED") ? (
           <div
             aria-live="off"
-            lang={selectedSubtitleLang}
+            lang="en"
             className="bg-canvas/85 text-text border-border/60 pointer-events-none absolute right-4 bottom-34 left-4 z-20 mx-auto max-w-2xl rounded-sm border px-4 py-2 text-center text-sm font-medium shadow-lg backdrop-blur-xs sm:bottom-36 sm:text-base"
           >
             {activeCueText}
@@ -795,20 +1066,8 @@ export function VideoPlayerShell({
                   aria-label="Toggle closed captions (C)"
                   onClick={() => setCaptionsEnabled((c) => !c)}
                 >
-                  CC {captionsEnabled ? selectedSubtitleLang.toUpperCase() : "Off"}
+                  CC {captionsEnabled ? "ON" : "OFF"}
                 </Button>
-
-                {captionsEnabled ? (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    aria-label="Switch subtitle language"
-                    onClick={() => setSelectedSubtitleLang((l) => (l === "en" ? "bn" : "en"))}
-                  >
-                    {selectedSubtitleLang === "en" ? "বাংলা" : "EN"}
-                  </Button>
-                ) : null}
 
                 <label htmlFor="player-speed-picker" className="sr-only">
                   Playback speed
@@ -824,6 +1083,22 @@ export function VideoPlayerShell({
                   <option value={1.25}>1.25x</option>
                   <option value={1.5}>1.5x</option>
                   <option value={2}>2x</option>
+                </select>
+
+                <label htmlFor="player-protocol-picker" className="sr-only">
+                  Select adaptive streaming protocol
+                </label>
+                <select
+                  id="player-protocol-picker"
+                  value={streamSourceMode}
+                  onChange={(e) =>
+                    setStreamSourceMode(e.target.value as "session" | "hls_open" | "dash_open")
+                  }
+                  className="border-border bg-surface-2 text-text min-h-11 rounded-sm border px-2 py-1 font-mono text-xs"
+                >
+                  <option value="session">Master Stream</option>
+                  <option value="hls_open">HLS ABR (.m3u8)</option>
+                  <option value="dash_open">DASH 4K (.mpd)</option>
                 </select>
 
                 <label htmlFor="player-resolution-picker" className="sr-only">

@@ -14,12 +14,11 @@ import { resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
   title: "Search Film Database · CINEVA",
-  description: "Search films, cast, directors, genres, and Bangla or English titles on CINEVA.",
+  description: "Search films, cast, directors, genres, and titles on CINEVA.",
 };
 
 const QUICK_SEARCH_CHIPS = [
   "The Last Monsoon",
-  "বর্ষা",
   "Amina Rahman",
   "Noir",
   "Sci-Fi",
@@ -100,8 +99,8 @@ async function SearchResultsSection({
         ) : (
           <EmptyState
             eyebrow="Search ready"
-            title="Enter a title, filmmaker, or Bangla/English keyword"
-            description="Queries search published titles across English and Bangla localized metadata, synopses, and credited filmmakers."
+            title="Enter a title, filmmaker, or keyword"
+            description="Queries search published titles across localized metadata, synopses, and credited filmmakers."
             actions={
               <ButtonLink href="/movies" variant="secondary">
                 Browse Movies Directory
@@ -217,8 +216,7 @@ export default function SearchPage(props: {
         <Badge tone="accent">CINEVA Search Index</Badge>
         <h1 className="font-display text-text text-3xl font-bold sm:text-5xl">Search Catalogue</h1>
         <p className="cg-prose text-text-secondary text-base leading-7">
-          Find authorized films by English title, বাংলা শিরোনাম, director, cast member, genre, or
-          release year.
+          Find authorized films by title, director, cast member, genre, or release year.
         </p>
       </header>
 
@@ -237,7 +235,7 @@ export default function SearchPage(props: {
           name="q"
           type="search"
           maxLength={120}
-          placeholder="Search English or বাংলা titles, directors, cast, genres…"
+          placeholder="Search titles, directors, cast, genres…"
           className="border-border-strong bg-surface-2 text-text placeholder:text-text-muted min-h-11 flex-1 rounded-sm border px-4 py-2.5 text-base"
         />
         <Button type="submit" variant="primary" size="md">

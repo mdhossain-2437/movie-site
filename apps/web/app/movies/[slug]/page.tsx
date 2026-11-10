@@ -20,8 +20,18 @@ import { ConsumerShell } from "@/components/layout/site-shell";
 import { ContentRowSkeleton } from "@/components/ui";
 import { Icon } from "@/components/ui/icon";
 import { formatRuntime, pad2, splitDisplayTitle } from "@/lib/catalogue/format";
+import { getCinevaFilmBySlug, getCinevaTopRatedMap } from "@/lib/catalogue/cineva-database";
 import { getDevShowcaseTitleBySlug } from "@/lib/catalogue/dev-showcase";
 import { getTitle } from "@/lib/catalogue/repository";
+import { getOmdbTitleDetail } from "@/lib/metadata/omdb-client";
+import {
+  buildArtworkGalleryItems,
+  buildMultiSourceRatings,
+  buildProductionDossierFromTmdbAndOmdb,
+  type OmdbRatings,
+  type ProductionReleaseDossierData,
+} from "@/lib/metadata/omdb-types";
+import { resolveTmdbWorkDetailSafely } from "@/lib/metadata/tmdb-client";
 import { getCurrentSession, resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
@@ -47,12 +57,110 @@ async function TitleDetailBody({ params }: { params: Promise<{ slug: string }> }
       initialSaved = saved.some((s) => s.id === title.id);
     }
 
+    const imdbSource = title.sources?.find(
+      (s) => s.provider === "IMDB" || s.attributionText?.startsWith("tt"),
+    );
+    const externalImdbId = imdbSource?.attributionText?.startsWith("tt")
+      ? imdbSource.attributionText
+      : undefined;
+
+    const primaryTitle = title.localizedTitleEn || title.originalTitle;
+    const tmdbDetail = await resolveTmdbWorkDetailSafely({
+      slug: title.slug,
+      title: primaryTitle,
+      year: title.releaseYear,
+      kind: title.kind,
+    });
+
+    const omdbDetail = await getOmdbTitleDetail(
+      externalImdbId ?? tmdbDetail?.externalIds.imdbId,
+      primaryTitle,
+      title.releaseYear,
+    ).catch(() => null);
+
+    const criticRatings: OmdbRatings | null =
+      omdbDetail &&
+      (omdbDetail.imdbRating ||
+        omdbDetail.imdbVotes ||
+        omdbDetail.metascore ||
+        omdbDetail.rottenTomatoes)
+        ? {
+            imdbRating: omdbDetail.imdbRating,
+            imdbVotes: omdbDetail.imdbVotes,
+            metascore: omdbDetail.metascore,
+            rottenTomatoes: omdbDetail.rottenTomatoes,
+          }
+        : null;
+
+    const filmRecord = getCinevaFilmBySlug(title.slug);
+    const rankedEntry = getCinevaTopRatedMap().get(title.slug);
+
+    const multiSourceRatings = buildMultiSourceRatings({
+      omdb: omdbDetail,
+      tmdbVoteAverage: tmdbDetail?.voteAverage ?? null,
+      tmdbVoteCount: tmdbDetail?.voteCount ?? null,
+      tmdbPopularity: tmdbDetail?.popularity ?? null,
+      bayesianScore: rankedEntry?.bayesianScore ?? tmdbDetail?.bayesianScore ?? null,
+      cinevaScore: filmRecord?.cinevaScore ?? null,
+      cinevaVoteCount: filmRecord?.voteCountNumeric ?? null,
+    });
+
+    let productionDossier: ProductionReleaseDossierData | null = null;
+    if (tmdbDetail) {
+      productionDossier = buildProductionDossierFromTmdbAndOmdb({
+        detail: tmdbDetail,
+        omdb: omdbDetail,
+      });
+    } else if (omdbDetail) {
+      productionDossier = {
+        title: omdbDetail.title ?? primaryTitle,
+        originalTitle: title.originalTitle !== primaryTitle ? title.originalTitle : null,
+        plot: omdbDetail.plot,
+        rated: omdbDetail.rated ?? title.maturityRating,
+        released: omdbDetail.released ?? String(title.releaseYear),
+        runtime: omdbDetail.runtime ?? `${title.runtimeMinutes} min`,
+        type: omdbDetail.type ? omdbDetail.type.toUpperCase() : (title.kind ?? "MOVIE"),
+        genres:
+          omdbDetail.genres.length > 0 ? omdbDetail.genres : title.genres?.map((g) => g.nameEn),
+        directors:
+          omdbDetail.directors.length > 0
+            ? omdbDetail.directors
+            : title.credits?.filter((c) => c.department === "DIRECTOR").map((c) => c.nameEn),
+        writers:
+          omdbDetail.writers.length > 0
+            ? omdbDetail.writers
+            : title.credits?.filter((c) => c.department === "WRITER").map((c) => c.nameEn),
+        actors:
+          omdbDetail.actorsList.length > 0
+            ? omdbDetail.actorsList
+            : title.credits?.filter((c) => c.department === "ACTOR").map((c) => c.nameEn),
+        languages: omdbDetail.languages,
+        countries: omdbDetail.countries,
+        awards: omdbDetail.awards ?? filmRecord?.awardsNote ?? null,
+        boxOffice: omdbDetail.boxOffice,
+        production: omdbDetail.production ?? filmRecord?.studio ?? null,
+        dvd: omdbDetail.dvd,
+        website: omdbDetail.website,
+        imdbId: omdbDetail.imdbId,
+        totalSeasons: omdbDetail.totalSeasons,
+      };
+    }
+
+    const artworkGallery = buildArtworkGalleryItems({
+      detail: tmdbDetail,
+      omdb: omdbDetail,
+    });
+
     return (
       <TitleHeroStage
         title={title}
         territoryCode={territoryCode}
         isAuthenticated={Boolean(session)}
         initialSaved={initialSaved}
+        criticRatings={criticRatings}
+        multiSourceRatings={multiSourceRatings}
+        productionDossier={productionDossier}
+        artworkGallery={artworkGallery}
       />
     );
   }
@@ -90,9 +198,6 @@ async function TitleDetailBody({ params }: { params: Promise<{ slug: string }> }
                 </span>
               ))}
             </h1>
-            <p lang="bn" className="detail-title-bn">
-              {card.titleBn}
-            </p>
           </div>
           <div className="detail-intro">
             <p>{card.synopsis}</p>
@@ -188,7 +293,7 @@ async function TitleDetailBody({ params }: { params: Promise<{ slug: string }> }
             <section id="overview" className="story-section">
               <p className="eyebrow">Behind the frame</p>
               <h2>The story.</h2>
-              <Synopsis english={card.synopsis} bangla={card.synopsisBn} />
+              <Synopsis english={card.synopsis} />
               <MetadataChips card={card} />
               <dl className="film-specs">
                 <div>

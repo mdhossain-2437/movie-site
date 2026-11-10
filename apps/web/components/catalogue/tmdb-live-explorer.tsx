@@ -27,7 +27,6 @@ export interface TmdbLiveExplorerProps {
 const LANGUAGE_OPTIONS = [
   { code: "all", label: "All Languages" },
   { code: "en", label: "English" },
-  { code: "bn", label: "Bangla (বাংলা)" },
   { code: "hi", label: "Hindi" },
   { code: "ko", label: "Korean" },
   { code: "ja", label: "Japanese" },
@@ -547,9 +546,6 @@ export function TmdbLiveExplorer({
                 }`}
               >
                 <span>{g.labelEn}</span>
-                <span className="opacity-75" lang="bn">
-                  · {g.labelBn}
-                </span>
               </button>
             );
           })}

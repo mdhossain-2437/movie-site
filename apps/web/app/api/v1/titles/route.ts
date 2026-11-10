@@ -104,7 +104,7 @@ export async function GET(request: Request) {
       if (query.q) {
         const needle = query.q.toLowerCase();
         const hay =
-          `${item.localizedTitleEn} ${item.localizedTitleBn ?? ""} ${item.originalTitle} ${item.synopsisEn} ${item.studioName ?? ""}`.toLowerCase();
+          `${item.localizedTitleEn} ${item.originalTitle} ${item.synopsisEn} ${item.studioName ?? ""}`.toLowerCase();
         if (!hay.includes(needle)) continue;
       }
       seenSlugs.add(item.slug);

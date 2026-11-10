@@ -132,7 +132,7 @@ export function SearchCommandModal() {
         aria-expanded={open}
         aria-label="Open quick catalogue search (Ctrl+K)"
         data-hydrated={hydrated ? "true" : undefined}
-        className="border-border bg-surface-1 text-text-secondary hover:bg-surface-2 hover:text-text inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors"
+        className="border-border bg-surface-1 text-text-secondary hover:bg-surface-2 hover:text-text inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors motion-reduce:transition-none"
       >
         <svg
           aria-hidden="true"
@@ -183,7 +183,7 @@ export function SearchCommandModal() {
 
             <div>
               <label htmlFor="quick-search-modal-input" className="sr-only">
-                Search published films, cast, or Bangla/English titles
+                Search films, cast, or directors
               </label>
               <input
                 ref={inputRef}
@@ -200,7 +200,7 @@ export function SearchCommandModal() {
                   }
                 }}
                 maxLength={120}
-                placeholder="Type an English or বাংলা title, director, or actor…"
+                placeholder="Search films, cast, or directors…"
                 className="border-border-strong bg-surface-2 text-text placeholder:text-text-muted min-h-11 w-full rounded-sm border px-4 py-2.5 text-base"
               />
             </div>
@@ -240,17 +240,12 @@ export function SearchCommandModal() {
                       <Link
                         href={`/movies/${item.slug}`}
                         onClick={() => setOpen(false)}
-                        className="hover:bg-surface-2 flex min-h-11 flex-wrap items-center justify-between gap-2 rounded-sm p-2 transition-colors"
+                        className="hover:bg-surface-2 flex min-h-11 flex-wrap items-center justify-between gap-2 rounded-sm p-2 transition-colors motion-reduce:transition-none"
                       >
                         <div>
                           <p className="font-display text-text text-sm font-semibold">
                             {item.localizedTitleEn}
                           </p>
-                          {item.localizedTitleBn ? (
-                            <p className="text-text-secondary text-xs" lang="bn">
-                              {item.localizedTitleBn}
-                            </p>
-                          ) : null}
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge tone="neutral">{item.releaseYear}</Badge>

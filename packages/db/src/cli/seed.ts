@@ -7,11 +7,11 @@ import { genres } from "../schema/index.ts";
 const logger = createLogger({ service: "@movie/db:seed" });
 
 const BASELINE_GENRES = [
-  { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
-  { slug: "documentary", nameEn: "Documentary", nameBn: "প্রামাণ্যচিত্র" },
-  { slug: "classic", nameEn: "Classic", nameBn: "ধ্রুপদী" },
-  { slug: "mystery", nameEn: "Mystery", nameBn: "রহস্য" },
-  { slug: "history", nameEn: "History", nameBn: "ইতিহাস" },
+  { slug: "drama", nameEn: "Drama", nameBn: null },
+  { slug: "documentary", nameEn: "Documentary", nameBn: null },
+  { slug: "classic", nameEn: "Classic", nameBn: null },
+  { slug: "mystery", nameEn: "Mystery", nameBn: null },
+  { slug: "history", nameEn: "History", nameBn: null },
 ] as const;
 
 async function main() {

@@ -51,6 +51,8 @@ import {
   subtitleTracks,
   takedownCases,
   titles,
+  titleTranslations,
+  watchlistItems,
 } from "./schema/index.ts";
 
 function hashPlaybackToken(rawToken: string): string {
@@ -1897,4 +1899,163 @@ export async function verifyReplicationTaskChecksum(
     checksumVerifiedAt: matches ? now : null,
     lastError,
   };
+}
+
+export interface ContinueWatchingRecord {
+  titleId: string;
+  titleSlug: string;
+  titleEn: string;
+  kind: "MOVIE" | "SERIES";
+  releaseYear: number;
+  runtimeMinutes: number;
+  lastPositionSeconds: number;
+  durationSeconds: number;
+  progressPercent: number;
+  updatedAt: Date;
+}
+
+/**
+ * Lists in-progress titles for an authenticated viewer, ordered by most recent playback session.
+ * Deduplicates multiple sessions per title and omits completed titles (>= 96% and within 20s of end).
+ */
+export async function listUserContinueWatching(
+  db: MovieDatabase,
+  userId: string,
+  limit = 8,
+): Promise<ContinueWatchingRecord[]> {
+  const normalizedUserId = typeof userId === "string" ? userId.trim() : "";
+  if (!normalizedUserId || limit <= 0) {
+    return [];
+  }
+
+  const rows = await db
+    .select({
+      titleId: titles.id,
+      titleSlug: titles.slug,
+      originalTitle: titles.originalTitle,
+      localizedTitleEn: titleTranslations.localizedTitle,
+      kind: titles.kind,
+      releaseYear: titles.releaseYear,
+      runtimeMinutes: titles.runtimeMinutes,
+      assetDurationSeconds: mediaAssets.durationSeconds,
+      lastPositionSeconds: playbackSessions.lastPositionSeconds,
+      createdAt: playbackSessions.createdAt,
+    })
+    .from(playbackSessions)
+    .innerJoin(titles, eq(playbackSessions.titleId, titles.id))
+    .innerJoin(mediaAssets, eq(playbackSessions.assetId, mediaAssets.id))
+    .leftJoin(
+      titleTranslations,
+      and(eq(titleTranslations.titleId, titles.id), eq(titleTranslations.locale, "en")),
+    )
+    .where(
+      and(
+        eq(playbackSessions.userId, normalizedUserId),
+        gt(playbackSessions.lastPositionSeconds, 0),
+        eq(titles.status, "PUBLISHED"),
+        eq(titles.legalHold, false),
+      ),
+    )
+    .orderBy(desc(playbackSessions.createdAt))
+    .limit(Math.max(limit * 4, 24));
+
+  const seenSlugs = new Set<string>();
+  const items: ContinueWatchingRecord[] = [];
+
+  for (const row of rows) {
+    if (seenSlugs.has(row.titleSlug)) {
+      continue;
+    }
+    seenSlugs.add(row.titleSlug);
+
+    const fallbackDuration = Math.max(1, row.runtimeMinutes) * 60;
+    const durationSeconds = Math.max(
+      60,
+      row.assetDurationSeconds && row.assetDurationSeconds > 0
+        ? row.assetDurationSeconds
+        : fallbackDuration,
+    );
+    const clampedPosition = Math.min(row.lastPositionSeconds, durationSeconds);
+    const rawPercent = Math.round((clampedPosition / durationSeconds) * 100);
+    const isCompleted = rawPercent >= 96 && clampedPosition >= durationSeconds - 20;
+    if (isCompleted) {
+      continue;
+    }
+
+    items.push({
+      titleId: row.titleId,
+      titleSlug: row.titleSlug,
+      titleEn: row.localizedTitleEn ?? row.originalTitle,
+      kind: row.kind === "SERIES" ? "SERIES" : "MOVIE",
+      releaseYear: row.releaseYear,
+      runtimeMinutes: row.runtimeMinutes,
+      lastPositionSeconds: clampedPosition,
+      durationSeconds,
+      progressPercent: Math.min(99, Math.max(1, rawPercent)),
+      updatedAt: row.createdAt,
+    });
+
+    if (items.length >= limit) {
+      break;
+    }
+  }
+
+  return items;
+}
+
+/**
+ * Returns distinct published title slugs from the authenticated viewer's recent playback sessions
+ * and watchlist items to seed server-side personalized similarity recommendations.
+ */
+export async function listUserWatchHistorySlugs(
+  db: MovieDatabase,
+  userId: string,
+  limit = 8,
+): Promise<string[]> {
+  const normalizedUserId = typeof userId === "string" ? userId.trim() : "";
+  if (!normalizedUserId || limit <= 0) {
+    return [];
+  }
+
+  const sessionRows = await db
+    .select({ slug: titles.slug })
+    .from(playbackSessions)
+    .innerJoin(titles, eq(playbackSessions.titleId, titles.id))
+    .where(
+      and(
+        eq(playbackSessions.userId, normalizedUserId),
+        eq(titles.status, "PUBLISHED"),
+        eq(titles.legalHold, false),
+      ),
+    )
+    .orderBy(desc(playbackSessions.createdAt))
+    .limit(limit * 3);
+
+  const watchlistRows = await db
+    .select({ slug: titles.slug })
+    .from(watchlistItems)
+    .innerJoin(titles, eq(watchlistItems.titleId, titles.id))
+    .where(
+      and(
+        eq(watchlistItems.userId, normalizedUserId),
+        eq(titles.status, "PUBLISHED"),
+        eq(titles.legalHold, false),
+      ),
+    )
+    .orderBy(desc(watchlistItems.createdAt))
+    .limit(limit * 2);
+
+  const slugs: string[] = [];
+  const seen = new Set<string>();
+  for (const row of [...sessionRows, ...watchlistRows]) {
+    if (!seen.has(row.slug)) {
+      seen.add(row.slug);
+      slugs.push(row.slug);
+      if (slugs.length >= limit) {
+        break;
+      }
+    }
+  }
+
+  return slugs;
 }

@@ -73,4 +73,15 @@ describe("@movie/config", () => {
       ),
     ).not.toThrow();
   });
+
+  it("allows OMDB_API_KEY to be omitted, empty, or provided", () => {
+    const omitted = parseEnv({ NODE_ENV: "development" });
+    expect(omitted.OMDB_API_KEY).toBeUndefined();
+
+    const empty = parseEnv({ NODE_ENV: "development", OMDB_API_KEY: "" });
+    expect(empty.OMDB_API_KEY).toBeUndefined();
+
+    const populated = parseEnv({ NODE_ENV: "development", OMDB_API_KEY: "test_omdb_key" });
+    expect(populated.OMDB_API_KEY).toBe("test_omdb_key");
+  });
 });

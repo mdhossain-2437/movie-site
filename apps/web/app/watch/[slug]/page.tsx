@@ -1,4 +1,4 @@
-import { getDatabase, getPublishedTitleBySlug } from "@movie/db";
+import { getDatabase, getPublishedTitleBySlug, listUserContinueWatching } from "@movie/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,7 +15,7 @@ import {
 } from "@/lib/catalogue/cineva-database";
 import { getDevShowcaseTitleBySlug } from "@/lib/catalogue/dev-showcase";
 import { authorizePlayback } from "@/lib/catalogue/repository";
-import { resolveViewerTerritory } from "@/lib/server/api-helpers";
+import { getCurrentSession, resolveViewerTerritory } from "@/lib/server/api-helpers";
 
 export const metadata: Metadata = {
   title: "Watch · CINEVA",
@@ -49,8 +49,8 @@ async function WatchPageBody({
   const rawS = firstParam(resolvedSearch.s);
   const rawE = firstParam(resolvedSearch.e);
 
-  const initialStartSeconds =
-    rawT && Number.isFinite(Number(rawT)) && Number(rawT) >= 0 ? Math.floor(Number(rawT)) : 0;
+  const explicitStartSeconds =
+    rawT && Number.isFinite(Number(rawT)) && Number(rawT) >= 0 ? Math.floor(Number(rawT)) : null;
   const requestedSeason =
     rawS && Number.isFinite(Number(rawS)) && Number(rawS) >= 1 ? Math.floor(Number(rawS)) : null;
   const requestedEpisode =
@@ -60,6 +60,18 @@ async function WatchPageBody({
   const db = await getDatabase();
   const title =
     (await getPublishedTitleBySlug(db, slug, { territoryCode })) ?? getDevShowcaseTitleBySlug(slug);
+
+  let initialStartSeconds = explicitStartSeconds ?? 0;
+  if (explicitStartSeconds === null && title) {
+    const { session } = await getCurrentSession();
+    if (session?.actor.userId) {
+      const resumeItems = await listUserContinueWatching(db, session.actor.userId, 16);
+      const matchedResume = resumeItems.find((entry) => entry.titleSlug === slug);
+      if (matchedResume) {
+        initialStartSeconds = matchedResume.lastPositionSeconds;
+      }
+    }
+  }
   const filmMeta = getCinevaFilmBySlug(slug);
   const isSeries = filmMeta?.kind === "SERIES";
   const activeEpisode = isSeries
@@ -100,10 +112,6 @@ async function WatchPageBody({
               {activeEpisode ? (
                 <p className="text-text-secondary max-w-2xl text-xs sm:text-sm">
                   {activeEpisode.synopsisEn}
-                </p>
-              ) : title.localizedTitleBn ? (
-                <p className="text-text-secondary text-sm" lang="bn">
-                  {title.localizedTitleBn}
                 </p>
               ) : null}
             </div>
@@ -208,7 +216,10 @@ async function WatchPageBody({
                   Up Next in Theater Mode
                 </h2>
               </div>
-              <Link href="/movies" className="text-accent hover:text-text text-xs font-semibold">
+              <Link
+                href="/movies"
+                className="text-accent hover:text-text inline-flex min-h-11 items-center px-2 text-xs font-semibold transition-colors motion-reduce:transition-none sm:min-h-6"
+              >
                 Full Catalogue Explorer →
               </Link>
             </div>
@@ -277,9 +288,6 @@ async function WatchPageBody({
           <h1 className="font-display text-text pt-1 text-2xl font-bold sm:text-3xl">
             {archiveAuth.card.title}
           </h1>
-          <p className="text-text-secondary text-sm" lang="bn">
-            {archiveAuth.card.titleBn}
-          </p>
         </div>
 
         <ButtonLink href={`/movies/${archiveAuth.card.slug}`} variant="outline" size="sm">

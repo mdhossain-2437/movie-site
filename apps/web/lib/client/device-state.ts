@@ -5,12 +5,11 @@ import { useSyncExternalStore } from "react";
 export interface DeviceState {
   saved: string[];
   reduceMotion: boolean;
-  banglaTitles: boolean;
 }
 
 const KEY = "cinematic-graphite:device:v1";
 const EVENT = "cg:device-state";
-const EMPTY: DeviceState = { saved: [], reduceMotion: false, banglaTitles: false };
+const EMPTY: DeviceState = { saved: [], reduceMotion: false };
 let cachedRaw: string | null | undefined;
 let snapshot: DeviceState = EMPTY;
 let memoryOnly = false;
@@ -33,7 +32,6 @@ function parse(raw: string | null): DeviceState {
           ].slice(0, 200)
         : [],
       reduceMotion: obj.reduceMotion === true,
-      banglaTitles: obj.banglaTitles === true,
     };
   } catch {
     return EMPTY;

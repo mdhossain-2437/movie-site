@@ -33,11 +33,10 @@ const WipeContext = createContext<BeginWipe | null>(null);
 export const usePosterTransition = () => useContext(WipeContext);
 
 function PreferencesSync() {
-  const { reduceMotion, banglaTitles } = useDeviceState();
+  const { reduceMotion } = useDeviceState();
   useEffect(() => {
     document.documentElement.dataset.motion = reduceMotion ? "reduce" : "system";
-    document.documentElement.dataset.bangla = banglaTitles ? "show" : "hide";
-  }, [reduceMotion, banglaTitles]);
+  }, [reduceMotion]);
   return null;
 }
 

@@ -51,7 +51,7 @@ test.describe("Cinematic Graphite Hybrid Discovery & Editorial Archive Experienc
     ).toBeVisible({ timeout: 15_000 });
   });
 
-  test("toggles local reduced-motion and Bangla-title preferences on /account alongside auth controls", async ({
+  test("toggles local reduced-motion preference on /account alongside auth controls", async ({
     page,
   }) => {
     await page.goto("/account");
@@ -60,16 +60,11 @@ test.describe("Cinematic Graphite Hybrid Discovery & Editorial Archive Experienc
     ).toBeVisible({ timeout: 15_000 });
 
     const motionSwitch = page.getByRole("switch", { name: "Reduced motion" });
-    const banglaSwitch = page.getByRole("switch", { name: "Show Bangla titles" });
 
     await expect(motionSwitch).toBeVisible({ timeout: 15_000 });
-    await expect(banglaSwitch).toBeVisible({ timeout: 15_000 });
 
     await motionSwitch.click();
     await expect(page.locator("html")).toHaveAttribute("data-motion", "reduce");
-
-    await banglaSwitch.click();
-    await expect(page.locator("html")).toHaveAttribute("data-bangla", "show");
   });
 
   test("keeps every hybrid & archive screen within the viewport with zero console errors", async ({

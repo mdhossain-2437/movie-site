@@ -15,8 +15,18 @@ import {
   createTestDatabase,
   initiateAuthorizedAssetUpload,
   leaseAndProcessNextOutboxJob,
+  listUserContinueWatching,
+  listUserWatchHistorySlugs,
+  mediaAssets,
   newEntityId,
   outboxJobs,
+  playbackSessions,
+  rightsEvidence,
+  rightsGrants,
+  rightsHolders,
+  titles,
+  titleTranslations,
+  watchlistItems,
   createReplicationTask,
   getPlaybackQoeSummaryForAdmin,
   mediaObjects,
@@ -271,7 +281,7 @@ describe("@movie/db M3–M5 — quarantine upload, durable outbox worker, playba
         expect(workerRun.assetState).toBe("READY_FOR_REVIEW");
       }
 
-      // 6. Media operator signs off QC (attaching 360p, 720p, and 1080p renditions + Bangla/English VTT)
+      // 6. Media operator signs off QC (attaching 360p, 720p, and 1080p renditions + English VTT)
       await approveAssetPackagingQc(
         handle.db,
         storage,
@@ -288,10 +298,7 @@ describe("@movie/db M3–M5 — quarantine upload, durable outbox worker, playba
               bitrateKbps: 5200,
             },
           ],
-          subtitles: [
-            { trackId: "sub-bn", languageCode: "bn", label: "বাংলা (Bangla)" },
-            { trackId: "sub-en", languageCode: "en", label: "English CC" },
-          ],
+          subtitles: [{ trackId: "sub-en", languageCode: "en", label: "English CC" }],
           at: now,
         },
       );
@@ -320,7 +327,7 @@ describe("@movie/db M3–M5 — quarantine upload, durable outbox worker, playba
       expect(sessionBd.renditions.map((r) => r.resolution)).toEqual(["360p", "720p"]);
       expect(JSON.stringify(sessionBd)).not.toContain("quarantine/");
       expect(JSON.stringify(sessionBd)).not.toContain("source.bin");
-      expect(sessionBd.subtitles).toHaveLength(2);
+      expect(sessionBd.subtitles).toHaveLength(1);
 
       // Territorial restriction: US viewer must be denied!
       await expect(
@@ -856,6 +863,180 @@ describe("@movie/db M3–M5 — quarantine upload, durable outbox worker, playba
           at: now,
         }),
       ).rejects.toThrowError(/revoked/);
+    } finally {
+      await handle.close();
+    }
+  });
+
+  it("lists in-progress Continue Watching records (deduplicated, completed-filtered, legal-hold-safe) and watch history slugs", async () => {
+    const handle = await createTestDatabase();
+    try {
+      const viewer = await seedActor(handle.db, "viewer-cw@example.org", ["VIEWER"], false);
+      const holderId = newEntityId("rh");
+      await handle.db.insert(rightsHolders).values({
+        id: holderId,
+        legalName: "Cineva Studio Holdings",
+        contactEmail: "rights@cineva.example",
+      });
+
+      const seedPublishedTitle = async (
+        slug: string,
+        titleEn: string,
+        runtimeMinutes: number,
+        legalHold = false,
+      ) => {
+        const titleId = newEntityId("ttl");
+        const assetId = newEntityId("ast");
+        const grantId = newEntityId("grt");
+        await handle.db.insert(titles).values({
+          id: titleId,
+          slug,
+          kind: "MOVIE",
+          status: "PUBLISHED",
+          originalTitle: titleEn,
+          originalLanguage: "en",
+          releaseYear: 2025,
+          runtimeMinutes,
+          maturityRating: "PG13",
+          legalHold,
+        });
+        await handle.db.insert(titleTranslations).values({
+          id: newEntityId("trn"),
+          titleId,
+          locale: "en",
+          localizedTitle: titleEn,
+          synopsis: "English synopsis.",
+        });
+        await handle.db.insert(mediaAssets).values({
+          id: assetId,
+          titleId,
+          kind: "FEATURE",
+          lifecycleState: "PUBLISHED",
+          durationSeconds: runtimeMinutes * 60,
+        });
+        const evidenceId = newEntityId("rev");
+        await handle.db.insert(rightsEvidence).values({
+          id: evidenceId,
+          rightsHolderId: holderId,
+          titleId,
+          basis: "OWNED",
+          documentRef: `DOC-${slug}`,
+          evidenceSha256: "a".repeat(64),
+          submittedByUserId: viewer.userId,
+        });
+        await handle.db.insert(rightsGrants).values({
+          id: grantId,
+          titleId,
+          assetId,
+          rightsHolderId: holderId,
+          evidenceId,
+          status: "APPROVED",
+          allowedActions: ["STREAM"],
+          allowedTerritories: ["WORLDWIDE"],
+          maxResolution: "1080p",
+          requiresDrm: false,
+          validFrom: new Date("2026-01-01T00:00:00Z"),
+          validUntil: new Date("2028-01-01T00:00:00Z"),
+          createdByUserId: viewer.userId,
+        });
+        return { titleId, assetId, grantId };
+      };
+
+      const filmA = await seedPublishedTitle("the-last-monsoon", "The Last Monsoon", 100);
+      const filmB = await seedPublishedTitle("iron-eclipse", "Iron Eclipse", 120);
+      const filmCompleted = await seedPublishedTitle("finished-film", "Finished Film", 100);
+      const filmHeld = await seedPublishedTitle("held-film", "Held Film", 100, true);
+      const filmWatchlistOnly = await seedPublishedTitle(
+        "syndicate-of-ash",
+        "Syndicate of Ash",
+        110,
+      );
+
+      // Older session on filmA at 120s, newer session on filmA at 900s (15% of 6000s)
+      await handle.db.insert(playbackSessions).values([
+        {
+          id: newEntityId("pbs"),
+          userId: viewer.userId,
+          titleId: filmA.titleId,
+          assetId: filmA.assetId,
+          grantId: filmA.grantId,
+          territoryCode: "US",
+          maxResolution: "1080p",
+          tokenHash: crypto.randomBytes(32).toString("hex"),
+          lastPositionSeconds: 120,
+          expiresAt: new Date("2027-01-01T00:00:00Z"),
+          createdAt: new Date("2026-11-06T10:00:00Z"),
+        },
+        {
+          id: newEntityId("pbs"),
+          userId: viewer.userId,
+          titleId: filmA.titleId,
+          assetId: filmA.assetId,
+          grantId: filmA.grantId,
+          territoryCode: "US",
+          maxResolution: "1080p",
+          tokenHash: crypto.randomBytes(32).toString("hex"),
+          lastPositionSeconds: 900,
+          expiresAt: new Date("2027-01-01T00:00:00Z"),
+          createdAt: new Date("2026-11-06T11:00:00Z"),
+        },
+        {
+          id: newEntityId("pbs"),
+          userId: viewer.userId,
+          titleId: filmB.titleId,
+          assetId: filmB.assetId,
+          grantId: filmB.grantId,
+          territoryCode: "US",
+          maxResolution: "1080p",
+          tokenHash: crypto.randomBytes(32).toString("hex"),
+          lastPositionSeconds: 1800,
+          expiresAt: new Date("2027-01-01T00:00:00Z"),
+          createdAt: new Date("2026-11-06T12:00:00Z"),
+        },
+        {
+          id: newEntityId("pbs"),
+          userId: viewer.userId,
+          titleId: filmCompleted.titleId,
+          assetId: filmCompleted.assetId,
+          grantId: filmCompleted.grantId,
+          territoryCode: "US",
+          maxResolution: "1080p",
+          tokenHash: crypto.randomBytes(32).toString("hex"),
+          lastPositionSeconds: 5990,
+          expiresAt: new Date("2027-01-01T00:00:00Z"),
+          createdAt: new Date("2026-11-06T12:30:00Z"),
+        },
+        {
+          id: newEntityId("pbs"),
+          userId: viewer.userId,
+          titleId: filmHeld.titleId,
+          assetId: filmHeld.assetId,
+          grantId: filmHeld.grantId,
+          territoryCode: "US",
+          maxResolution: "1080p",
+          tokenHash: crypto.randomBytes(32).toString("hex"),
+          lastPositionSeconds: 600,
+          expiresAt: new Date("2027-01-01T00:00:00Z"),
+          createdAt: new Date("2026-11-06T13:00:00Z"),
+        },
+      ]);
+
+      await handle.db.insert(watchlistItems).values({
+        userId: viewer.userId,
+        titleId: filmWatchlistOnly.titleId,
+      });
+
+      const cw = await listUserContinueWatching(handle.db, viewer.userId, 8);
+      expect(cw.map((item) => item.titleSlug)).toEqual(["iron-eclipse", "the-last-monsoon"]);
+      expect(cw[0]?.progressPercent).toBe(25);
+      expect(cw[1]?.lastPositionSeconds).toBe(900);
+      expect(cw[1]?.progressPercent).toBe(15);
+
+      const historySlugs = await listUserWatchHistorySlugs(handle.db, viewer.userId, 6);
+      expect(historySlugs).toContain("iron-eclipse");
+      expect(historySlugs).toContain("the-last-monsoon");
+      expect(historySlugs).toContain("syndicate-of-ash");
+      expect(historySlugs).not.toContain("held-film");
     } finally {
       await handle.close();
     }

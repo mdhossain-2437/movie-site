@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { FloatingDock } from "./floating-dock";
+import { HeaderAccountControl } from "./header-account-control";
 import { DesktopNavLinks, MobileNavLinks, type NavItem } from "./nav-links";
 import { SearchCommandModal } from "./search-command";
 
@@ -53,7 +54,7 @@ function DesktopNavFallback({ items }: { items: readonly NavItem[] }) {
         <li key={item.href}>
           <Link
             href={item.href}
-            className="text-text-muted hover:text-text inline-flex min-h-10 items-center rounded-sm px-2.5 py-2 text-xs font-medium tracking-wide whitespace-nowrap transition-colors xl:px-3.5"
+            className="text-text-muted hover:text-text inline-flex min-h-10 items-center rounded-sm px-2.5 py-2 text-xs font-medium tracking-wide whitespace-nowrap transition-colors motion-reduce:transform-none motion-reduce:transition-none xl:px-3.5"
           >
             {item.label}
           </Link>
@@ -70,7 +71,7 @@ function MobileNavFallback({ items }: { items: readonly NavItem[] }) {
         <li key={item.href}>
           <Link
             href={item.href}
-            className="text-text-secondary hover:bg-surface-2 hover:text-text flex min-h-11 flex-col items-center justify-center rounded-sm px-2 py-1.5 text-xs font-medium"
+            className="text-text-secondary hover:bg-surface-2 hover:text-text flex min-h-11 flex-col items-center justify-center rounded-sm px-2 py-1.5 text-xs font-medium transition-colors motion-reduce:transform-none motion-reduce:transition-none"
           >
             {item.label}
           </Link>
@@ -103,12 +104,7 @@ export function SiteHeader() {
 
         <div className="flex shrink-0 items-center gap-2">
           <SearchCommandModal />
-          <Link
-            href="/account"
-            className="border-border bg-surface-1 text-text-secondary hover:border-border-strong hover:text-text rounded-pill hidden min-h-9 items-center border px-4 py-1.5 text-xs font-medium transition-colors lg:inline-flex"
-          >
-            Sign In
-          </Link>
+          <HeaderAccountControl />
         </div>
       </div>
     </header>
@@ -149,52 +145,82 @@ export function SiteFooter() {
         <nav aria-label="Legal and compliance">
           <ul className="text-text-muted flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
             <li>
-              <Link href="/movies" className="hover:text-text transition-colors">
+              <Link
+                href="/movies"
+                className="hover:text-text inline-flex min-h-11 items-center px-2 py-1 transition-colors motion-reduce:transform-none motion-reduce:transition-none sm:min-h-6"
+              >
                 Films
               </Link>
             </li>
             <li>
-              <Link href="/series" className="hover:text-text transition-colors">
+              <Link
+                href="/series"
+                className="hover:text-text inline-flex min-h-11 items-center px-2 py-1 transition-colors motion-reduce:transform-none motion-reduce:transition-none sm:min-h-6"
+              >
                 Series
               </Link>
             </li>
             <li>
-              <Link href="/studios" className="hover:text-text transition-colors">
+              <Link
+                href="/studios"
+                className="hover:text-text inline-flex min-h-11 items-center px-2 py-1 transition-colors motion-reduce:transform-none motion-reduce:transition-none sm:min-h-6"
+              >
                 Studios
               </Link>
             </li>
             <li>
-              <Link href="/collections" className="hover:text-text transition-colors">
+              <Link
+                href="/collections"
+                className="hover:text-text inline-flex min-h-11 items-center px-2 py-1 transition-colors motion-reduce:transform-none motion-reduce:transition-none sm:min-h-6"
+              >
                 Collections
               </Link>
             </li>
             <li>
-              <Link href="/people" className="hover:text-text transition-colors">
+              <Link
+                href="/people"
+                className="hover:text-text inline-flex min-h-11 items-center px-2 py-1 transition-colors motion-reduce:transform-none motion-reduce:transition-none sm:min-h-6"
+              >
                 Directors
               </Link>
             </li>
             <li>
-              <Link href="/legal/terms" className="hover:text-text transition-colors">
+              <Link
+                href="/legal/terms"
+                className="hover:text-text inline-flex min-h-11 items-center px-2 py-1 transition-colors motion-reduce:transform-none motion-reduce:transition-none sm:min-h-6"
+              >
                 Terms
               </Link>
             </li>
             <li>
-              <Link href="/legal/privacy" className="hover:text-text transition-colors">
+              <Link
+                href="/legal/privacy"
+                className="hover:text-text inline-flex min-h-11 items-center px-2 py-1 transition-colors motion-reduce:transform-none motion-reduce:transition-none sm:min-h-6"
+              >
                 Privacy
               </Link>
             </li>
             <li>
-              <Link href="/legal/copyright" className="hover:text-text transition-colors">
+              <Link
+                href="/legal/copyright"
+                className="hover:text-text inline-flex min-h-11 items-center px-2 py-1 transition-colors motion-reduce:transform-none motion-reduce:transition-none sm:min-h-6"
+              >
                 Licensing
               </Link>
             </li>
             <li>
-              <Link href="/legal/takedown" className="hover:text-text transition-colors">
+              <Link
+                href="/legal/takedown"
+                className="hover:text-text inline-flex min-h-11 items-center px-2 py-1 transition-colors motion-reduce:transform-none motion-reduce:transition-none sm:min-h-6"
+              >
                 Rights Inquiries
               </Link>
             </li>
             <li>
-              <Link href="/report-content" className="hover:text-text transition-colors">
+              <Link
+                href="/report-content"
+                className="hover:text-text inline-flex min-h-11 items-center px-2 py-1 transition-colors motion-reduce:transform-none motion-reduce:transition-none sm:min-h-6"
+              >
                 Report Issue
               </Link>
             </li>

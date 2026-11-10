@@ -110,11 +110,6 @@ export function TitleCard({ title, matchPercentage, matchReason, rankNumber }: T
             <h3 className="font-display text-text group-hover:text-accent text-lg leading-snug font-bold transition-colors motion-reduce:transition-none">
               {title.localizedTitleEn}
             </h3>
-            {title.localizedTitleBn ? (
-              <p className="text-text-secondary text-sm font-medium" lang="bn">
-                {title.localizedTitleBn}
-              </p>
-            ) : null}
           </div>
         </div>
 

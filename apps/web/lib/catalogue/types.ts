@@ -59,7 +59,7 @@ export interface CatalogueTitle {
   id: string;
   slug: string;
   title: string;
-  titleBn: string;
+  titleBn?: string | null;
   originalTitle: string;
   originalLanguage: string;
   soundFormat: string;
@@ -71,7 +71,7 @@ export interface CatalogueTitle {
   maturityRating: MaturityRating;
   status: TitleStatus;
   synopsis: string;
-  synopsisBn: string | null;
+  synopsisBn?: string | null;
   credits: readonly FixtureCredit[];
   art: ArtSpec;
   artworkProvenance: ArtworkProvenance;
@@ -84,7 +84,7 @@ export interface CatalogueTitle {
 export interface CataloguePerson {
   slug: string;
   name: string;
-  nameBn: string | null;
+  nameBn?: string | null;
   /** Word shown as the oversized background type on the person page. */
   displayName: string;
   born: number | null;
@@ -96,7 +96,7 @@ export interface CataloguePerson {
 export interface CatalogueCollection {
   slug: string;
   title: string;
-  titleBn: string;
+  titleBn?: string | null;
   description: string;
   items: readonly string[];
 }
@@ -111,7 +111,7 @@ export interface PersonRef {
 export interface TitleCard {
   slug: string;
   title: string;
-  titleBn: string;
+  titleBn?: string | null;
   year: number;
   runtimeMinutes: number;
   countries: readonly string[];
@@ -120,7 +120,7 @@ export interface TitleCard {
   art: ArtSpec;
   availability: AvailabilityKind;
   synopsis: string;
-  synopsisBn: string | null;
+  synopsisBn?: string | null;
   studio: string;
   isDevelopmentFixture: boolean;
 }

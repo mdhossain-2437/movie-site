@@ -4,14 +4,23 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { OfficialArtworkGallery } from "@/components/catalogue/official-artwork-gallery";
+import { ProductionReleaseDossier } from "@/components/catalogue/production-release-dossier";
 import { TmdbArtwork } from "@/components/catalogue/tmdb-artwork";
 import {
   TmdbOperatorImportControl,
   TmdbSeriesSeasonGuide,
 } from "@/components/catalogue/tmdb-detail-interactive";
 import { TmdbTitleCard } from "@/components/catalogue/tmdb-title-card";
+import { VerifiedRatingsBreakdown } from "@/components/catalogue/verified-ratings-breakdown";
 import { ConsumerShell } from "@/components/layout/site-shell";
 import { Badge, ButtonLink, ContentRowSkeleton } from "@/components/ui";
+import { getOmdbTitleDetail } from "@/lib/metadata/omdb-client";
+import {
+  buildArtworkGalleryItems,
+  buildMultiSourceRatings,
+  buildProductionDossierFromTmdbAndOmdb,
+} from "@/lib/metadata/omdb-types";
 import {
   fetchTmdbWorkDetail,
   getTmdbRuntimeStatus,
@@ -61,8 +70,25 @@ async function TmdbWorkDetailSection({
     throw err;
   }
 
-  const { session } = await getCurrentSession();
+  const [{ session }, omdb] = await Promise.all([
+    getCurrentSession(),
+    getOmdbTitleDetail(detail.externalIds.imdbId, detail.title, detail.releaseYear).catch(
+      () => null,
+    ),
+  ]);
   const canImport = hasPermission(session?.actor, "catalogue:create");
+
+  const multiSourceRatings = buildMultiSourceRatings({
+    omdb,
+    tmdbVoteAverage: detail.voteAverage,
+    tmdbVoteCount: detail.voteCount,
+    tmdbPopularity: detail.popularity,
+    bayesianScore: detail.bayesianScore,
+  });
+  const dossier = buildProductionDossierFromTmdbAndOmdb({ detail, omdb });
+  const galleryItems = buildArtworkGalleryItems({ detail, omdb });
+  const effectiveRatingCert = omdb?.rated ?? detail.certification;
+  const heroPosterSrc = detail.posterUrl ?? omdb?.proxiedPosterUrl ?? null;
 
   return (
     <div className="space-y-12">
@@ -84,7 +110,7 @@ async function TmdbWorkDetailSection({
         <div className="relative z-10 grid grid-cols-1 gap-8 p-6 sm:p-10 lg:grid-cols-[260px_1fr]">
           <div className="border-border-strong bg-surface-2 relative mx-auto aspect-[2/3] w-56 overflow-hidden rounded-xl border shadow-2xl lg:mx-0 lg:w-full">
             <TmdbArtwork
-              src={detail.posterUrl}
+              src={heroPosterSrc}
               alt={`${detail.title} poster`}
               fallbackArt={detail.fallbackArt}
               variant="poster"
@@ -111,10 +137,23 @@ async function TmdbWorkDetailSection({
                 <Badge tone="accent">
                   {detail.kind === "SERIES" ? "TV Series" : "Feature Film"}
                 </Badge>
+                {effectiveRatingCert ? <Badge tone="neutral">{effectiveRatingCert}</Badge> : null}
                 <Badge tone="neutral">
-                  Bayesian WR {detail.bayesianScore.toFixed(2)} · ★ {detail.voteAverage.toFixed(1)}{" "}
-                  ({detail.voteCount.toLocaleString()} votes)
+                  Bayesian WR {detail.bayesianScore.toFixed(2)} · TMDB{" "}
+                  {detail.voteAverage.toFixed(1)} ({detail.voteCount.toLocaleString()} votes)
                 </Badge>
+                {omdb?.imdbRating ? (
+                  <Badge tone="accent">
+                    IMDb {omdb.imdbRating}/10
+                    {omdb.imdbVotes ? ` (${omdb.imdbVotes})` : ""}
+                  </Badge>
+                ) : null}
+                {omdb?.rottenTomatoes ? (
+                  <Badge tone="neutral">Rotten Tomatoes {omdb.rottenTomatoes}</Badge>
+                ) : null}
+                {omdb?.metascore ? (
+                  <Badge tone="neutral">Metascore {omdb.metascore}/100</Badge>
+                ) : null}
                 <Badge tone="warning">Metadata Index · Streaming Requires Rights Clearance</Badge>
               </div>
 
@@ -204,6 +243,16 @@ async function TmdbWorkDetailSection({
         </div>
       </section>
 
+      <VerifiedRatingsBreakdown ratings={multiSourceRatings} />
+
+      <OfficialArtworkGallery
+        title={detail.title}
+        items={galleryItems}
+        fallbackArt={detail.fallbackArt}
+      />
+
+      <ProductionReleaseDossier dossier={dossier} />
+
       <TmdbOperatorImportControl
         mediaKind={mediaKind}
         tmdbId={detail.tmdbId}
@@ -220,20 +269,20 @@ async function TmdbWorkDetailSection({
         />
       ) : null}
 
-      {/* Directors / Creators & Principal Cast */}
-      {detail.directors.length > 0 || detail.cast.length > 0 ? (
+      {/* Directors / Creators / Writers & Principal Cast */}
+      {detail.directors.length > 0 || detail.writers.length > 0 || detail.cast.length > 0 ? (
         <section aria-labelledby="tmdb-credits-heading" className="space-y-5">
           <div>
             <p className="text-accent font-mono text-xs tracking-widest uppercase">
               Verified Filmography Graph
             </p>
             <h2 id="tmdb-credits-heading" className="font-display text-text text-2xl font-bold">
-              Directors, Creators &amp; Principal Cast
+              Directors, Writers &amp; Principal Cast
             </h2>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[...detail.directors, ...detail.cast].map((person) => (
+            {[...detail.directors, ...detail.writers, ...detail.cast].map((person) => (
               <Link
                 key={`${person.department}-${person.personId}`}
                 href={`/tmdb/person/${person.personId}`}

@@ -43,6 +43,7 @@ export const EnvSchema = z
     TMDB_API_KEY: z.string().min(1).optional(),
     TMDB_READ_ACCESS_TOKEN: z.string().min(1).optional(),
     TMDB_COMMERCIAL_LICENSE_CONFIRMED: BooleanFlagSchema.default(false),
+    OMDB_API_KEY: z.string().min(1).optional(),
 
     UPLOAD_MAX_BYTES: z.coerce.number().int().positive().default(53_687_091_200),
     TEMP_STORAGE_MAX_BYTES: z.coerce.number().int().positive().default(21_474_836_480),

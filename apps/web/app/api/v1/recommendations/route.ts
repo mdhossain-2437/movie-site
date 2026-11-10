@@ -1,4 +1,4 @@
-import { getDatabase, listPublishedTitles } from "@movie/db";
+import { getDatabase, listPublishedTitles, listUserWatchHistorySlugs } from "@movie/db";
 import {
   type RecommendationCandidate,
   recommendPersonalizedForSeeds,
@@ -14,6 +14,7 @@ import { toPublicSummary } from "@/lib/catalogue/dev-showcase";
 import { isFixtureCatalogueEnabled } from "@/lib/catalogue/stage";
 import {
   extractRequestId,
+  getCurrentSession,
   jsonNoStore,
   resolveViewerTerritory,
   toProblemResponse,
@@ -80,18 +81,33 @@ export async function GET(request: Request) {
     }
 
     const pool = Array.from(candidateMap.values());
-    const seedSlugs = query.seeds
+    let seedSlugs = query.seeds
       ? query.seeds
           .split(",")
           .map((s) => s.trim())
           .filter((s) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s))
       : [];
 
+    let seedSource: "item_slug" | "query_seeds" | "watch_history" | "bayesian_prior" =
+      seedSlugs.length > 0 ? "query_seeds" : "bayesian_prior";
+
+    if (!query.slug && seedSlugs.length === 0) {
+      const { session } = await getCurrentSession();
+      if (session?.actor.userId) {
+        const dbHistorySlugs = await listUserWatchHistorySlugs(db, session.actor.userId, 6);
+        if (dbHistorySlugs.length > 0) {
+          seedSlugs = dbHistorySlugs;
+          seedSource = "watch_history";
+        }
+      }
+    }
+
     let mode: "item_similarity" | "personalized_seeds" | "bayesian_top_rated" =
       "bayesian_top_rated";
     let matches = [] as ReturnType<typeof recommendSimilarTitles>;
 
     if (query.slug) {
+      seedSource = "item_slug";
       const target = candidateMap.get(query.slug);
       if (target) {
         mode = "item_similarity";
@@ -116,6 +132,8 @@ export async function GET(request: Request) {
       {
         algorithm: "idf-cosine-graph-bayesian-v1",
         mode,
+        seedSource,
+        seedSlugs,
         territoryCode,
         count: items.length,
         items,

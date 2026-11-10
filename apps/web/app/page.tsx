@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { KeyArt } from "@/components/art/key-art";
+import { ContinueWatchingRail } from "@/components/catalogue/continue-watching-rail";
 import { TitleRail } from "@/components/catalogue/editorial";
 import { FilmStripShowcase, type FilmStripItem } from "@/components/catalogue/film-strip-showcase";
 import { PersonalizedRecommendationsRail } from "@/components/catalogue/personalized-recommendations-rail";
@@ -39,7 +40,6 @@ const FEATURED_CINEMA_SELECTION: FilmStripItem[] = [
     id: f.id,
     slug: f.slug,
     titleEn: f.localizedTitleEn,
-    titleBn: f.localizedTitleBn,
     releaseYear: f.releaseYear,
     runtimeMinutes: f.runtimeMinutes,
     maturityRating: f.maturityRating,
@@ -70,6 +70,9 @@ export default function Home() {
 
       {/* Below-the-Fold Streaming Swimlanes, Recommendation Engine & Studio Hubs */}
       <div className="cg-container max-w-full space-y-20 overflow-x-clip py-14 sm:py-20">
+        {/* 0. Authenticated Continue Watching Resume Rail */}
+        <ContinueWatchingRail />
+
         {/* 1. Netflix-Class Personalized Similarity Graph Recommendation Engine */}
         <PersonalizedRecommendationsRail />
 
@@ -131,9 +134,13 @@ export default function Home() {
                           #{ranking.topRank}
                         </span>
                         <span className="border-border-strong bg-canvas/90 text-text inline-flex items-center gap-1 rounded-xs border px-2 py-0.5 font-mono text-[11px] font-semibold">
-                          <span aria-hidden="true" className="text-accent">
-                            ★
-                          </span>
+                          <svg
+                            aria-hidden="true"
+                            viewBox="0 0 24 24"
+                            className="text-accent h-3 w-3 shrink-0 fill-current"
+                          >
+                            <path d="M12 2.5l2.85 5.77 6.37.93-4.61 4.49 1.09 6.34L12 17.04l-5.7 2.99 1.09-6.34L2.78 9.2l6.37-.93L12 2.5z" />
+                          </svg>
                           <span>{ranking.bayesianScore.toFixed(2)}</span>
                         </span>
                       </div>
@@ -149,9 +156,6 @@ export default function Home() {
                         <h3 className="font-display text-text group-hover:text-accent mt-0.5 line-clamp-1 text-base font-bold transition-colors motion-reduce:transition-none">
                           {film.localizedTitleEn}
                         </h3>
-                        <p className="text-text-secondary line-clamp-1 text-xs" lang="bn">
-                          {film.localizedTitleBn}
-                        </p>
                       </div>
                     </div>
                   </Link>
@@ -317,7 +321,7 @@ export default function Home() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-1.5">
               <p className="text-accent font-mono text-xs font-semibold tracking-widest uppercase">
-                Instant Theater Playback · Bilingual EN &amp; বাংলা Subtitles
+                Instant Theater Playback · High-Definition Master
               </p>
               <h2
                 id="streaming-now-heading"
@@ -369,9 +373,6 @@ export default function Home() {
                         <h3 className="font-display text-text text-2xl font-bold sm:text-3xl">
                           {film.localizedTitleEn}
                         </h3>
-                        <p className="text-text-secondary text-sm" lang="bn">
-                          {film.localizedTitleBn}
-                        </p>
                       </div>
                     </div>
                   </div>
@@ -417,9 +418,6 @@ export default function Home() {
                 className="border-border bg-surface-1 text-text hover:border-accent hover:bg-surface-2 rounded-pill inline-flex min-h-11 min-w-11 items-center gap-2 border px-4 py-2 text-sm font-medium transition-colors motion-reduce:transition-none"
               >
                 <span>{genre.nameEn}</span>
-                <span className="text-text-muted text-xs" lang="bn">
-                  {genre.nameBn}
-                </span>
               </Link>
             ))}
           </div>
@@ -438,9 +436,6 @@ export default function Home() {
                   <h3 className="font-display text-text group-hover:text-accent text-lg font-bold transition-colors motion-reduce:transition-none">
                     {col.titleEn}
                   </h3>
-                  <p className="text-text-secondary text-xs" lang="bn">
-                    {col.titleBn}
-                  </p>
                   <p className="text-text-muted line-clamp-2 text-xs leading-relaxed">
                     {col.description}
                   </p>

@@ -1,94 +1,78 @@
-# Project: Cinematic Graphite V4 Multi-Stream Architecture
+# Project: CINEVA Production-Ready Media Platform Release
 
 ## Architecture
-Cinematic Graphite is a lawful movie discovery and authorized media distribution platform built on a 7-plane architecture:
+CINEVA is a lawful movie discovery and authorized media distribution platform built on a 7-plane architecture:
 - **Control Plane**: Next.js 16.4.5 (`apps/web`) with Turbopack, App Router, `proxy.ts`, `cacheComponents: true`, and PPR `<Suspense>` boundaries.
 - **Data & Contracts Plane**: `@movie/db` (Drizzle ORM, PostgreSQL / PGlite WASM engine) and `@movie/contracts` (Zod schemas).
-- **Domain & Rights Plane**: `@movie/domain` central rights evaluation (`RightsDecisionService`).
+- **Domain & Rights Plane**: `@movie/domain` central rights evaluation (`RightsDecisionService`) and recommendation engines (`recommendation-engine.ts`).
 - **Storage & Ingestion Plane**: `@movie/storage` multi-adapter object storage with RFC 9110 HTTP Range byte serving.
 - **Media Plane**: `@movie/media` adaptive bitrate packaging, capacity models, and delivery bitrate formulas.
 - **Protection & Observability Plane**: `@movie/observability` and privacy-safe QoE telemetry (`delivery_events`).
-- **Production Infrastructure Plane**: Pilot Compose (`infra/compose/prod.pilot.yml`), Caddy TLS reverse proxy, and multi-stage Docker container calibrated for 4 vCPU / 16 GB RAM VPS (`dark-crow`).
+- **Production Infrastructure Plane**: Pilot Compose (`docker-compose.yml`), Caddy TLS reverse proxy, and multi-stage Docker container (`Dockerfile`).
 
 ## Feature Inventory
 | # | Feature | Description | Milestone | Source |
 |---|---------|-------------|-----------|--------|
-| 1 | .gitignore Tracking Fix | Update `.gitignore` line 4 to ignore `.agents/teamwork/` while tracking `.agents/rules/` and `.agents/skills/` | M1 | User Follow-up |
-| 2 | V4 Database Schema & Migration | Add `delivery_events`, `replication_tasks`, `drm_configurations` tables and generate incremental migration | M1 | Master Spec §85, §91, §93 |
-| 3 | V4 DAL & QoE Telemetry API | Add `recordPlaybackQoeEvent`, `getPlaybackQoeSummaryForAdmin` in DAL and `POST /api/v1/playback-sessions/[id]/qoe` | M1 | Master Spec §89, §91 |
-| 4 | Replica State Machine & Takedown Kill-Switch | Add replica lifecycle helpers and atomic replication task decommissioning in `resolveTakedownCase` | M1 | Master Spec §85.4 |
-| 5 | RFC 9110 HTTP Range Byte-Serving | Add `parseHttpByteRange` and `readObjectByteRange` with 206 Partial Content and 416 Range Not Satisfiable | M1 | Master Spec §86.3 |
-| 6 | Delivery Capacity & Bitrate Math | Add `calculateDeliveryCapacityModel` and `calculateFileSizeFromBitrate` with control-plane guardrails | M1 | Master Spec §87, §88 |
-| 7 | Opt-In Dev Showcase Fixture Seeder | Add `seed-dev-showcase.ts` + `db:seed:dev` script with 7 lawful fixture films, Bangla Unicode, and dev HLS manifests | M1 | WS1.3 Request |
-| 8 | V4 Architecture & Evidence Doc | Write `docs/architecture/v4-distributed-delivery-and-evidence.md` with HDHub4u classification matrix and 7-plane doc | M1 | WS1.4 Request |
-| 9 | DESIGN.md Standards | Create `d:\movie-site\DESIGN.md` with Taste sliders (7/6/5), anti-slop rules, tokens, and accessibility standards | M2 | WS2.1 Request |
-| 10 | UI Primitives & Async Spinner | Add `Spinner` primitive, integrate `loading` in `Button`, enforce mobile >=44x44px touch targets across all forms | M2 | WS2.2 Request |
-| 11 | Video Player QoE Telemetry | Integrate QoE lifecycle telemetry emission into `VideoPlayerShell` | M2 | WS2.2 Request |
-| 12 | Concept #1 Vertical Film-Strip Showcase | Add `FilmStripShowcase` with 7 vertical panels, procedural SVG art, hover elevation, and Garamond watermark backdrop | M2 | WS2.3 Request, Concept #1 |
-| 13 | Concept #2 Full-Bleed Title Detail Hero | Add `TitleHeroStage` and update `/movies/[slug]/page.tsx` with multi-line title, Bangla subtitle, metadata pills, right quick rail, play CTA | M2 | WS2.4 Request, Concept #2 |
-| 14 | New Discovery Pages | Add `/people/[slug]`, `/collections/[slug]`, `/genres/[slug]` with DAL queries and Next.js 16 Suspense boundaries | M2 | WS2.5 Request |
-| 15 | Signature Floating Bottom Dock | Add `FloatingDock` with warm gold aperture BrandMark, nav links, search modal trigger, profile, and pb-28 spacing | M2 | WS2.6 Request |
-| 16 | Workflow Migration Verification | Inspect and record clean state of global and workspace workflow directories per `migrate-workflows` skill | M3 | WS3.1 Request |
-| 17 | Workspace Customizations & Skills | Create `rules/frontend-design-engineering.md`, `CLAUDE.md`, and skills `impeccable-audit`, `visual-qa` | M3 | WS3.2 Request |
-| 18 | Local Antigravity Plugin Bundle | Create local plugin `cinematic-frontend-qa` at `%USERPROFILE%\.gemini\config\plugins\` | M3 | WS3.2 Request |
-| 19 | Closed-Loop Playwright Visual QA | Add `tests/e2e/visual-qa.spec.ts` capturing 5 screenshots across Desktop/Mobile and asserting bounding boxes >=24px / >=44px | M3 | WS3.3 Request |
-| 20 | Host boxd CLI & Remote VPS Inspection | Run read-only hardware/OS check on `dark-crow` via `boxd` CLI and document verified host resources | M4 | WS4.1 Request |
-| 21 | Multi-Stage Production Dockerfile | Author hardened multi-stage `Dockerfile` and `.dockerignore` for Node 24 + pnpm 11.18.0 with non-root user and healthcheck | M4 | WS4.2 Request |
-| 22 | Pilot Compose & Caddy Reverse Proxy | Create `infra/compose/prod.pilot.yml` (calibrated for 4 vCPU / 16 GB) and `infra/caddy/Caddyfile` | M4 | WS4.2 Request |
-| 23 | VPS Automation & Pipeline Scripts | Create `bootstrap-vps.sh`, `deploy.sh`, `healthcheck.sh`, `backup-postgres.sh`, `restore-postgres.sh`, `connect-dark-crow.ps1` | M4 | WS4.2 Request |
-| 24 | Full Verification Suite Pass | Run and pass with 0 errors: format:check, lint, typecheck, vitest (42/42), build, test:e2e (30/30) | M4 | WS4.3 Request |
-| 25 | Clean Git Commit & Remote Push | Stage verified lawful files, rebase with origin/main if needed, commit, and push cleanly to GitHub remote | M4 | WS4.3 Request |
+| 1 | Font & CSS Bengali Purge | Remove `Noto_Sans_Bengali` from `layout.tsx`, `--font-bengali` and `:lang(bn)` rules from `experience.css` | M1 | Survey 1 (R1) |
+| 2 | Device Preferences Localization | Remove `banglaTitles` from `DeviceState`, remove "Bangla titles" toggle in `preferences.tsx`, simplify `synopsis.tsx` | M1 | Survey 1 (R1) |
+| 3 | Page & Component English Normalization | Remove secondary `<p lang="bn">` titles and search Bengali placeholders across 11 pages and 7 components | M1 | Survey 1 (R1) |
+| 4 | Data Fixtures & DAL Bengali Removal | Purge Bengali strings from `cineva-database.ts`, `fixtures.ts`, `tmdb-types.ts`, `search.ts`, and db seeds | M1 | Survey 1 (R1) |
+| 5 | Test Assertions English Alignment | Update unit tests and Playwright E2E (`discovery.spec.ts`) to remove Bengali assertions and assert 100% English | M1 | Survey 1 (R1) |
+| 6 | Mobile Touch Target Standardization | Adjust 6 responsive CSS rules in `experience.css` and admin nav to guarantee `>= 44x44px` on mobile (<768px) and `>= 24x24px` on desktop | M1 | Survey 1 (R5) |
+| 7 | Motion-Reduction Fallback Coverage | Add explicit `motion-reduce:transition-none` and `motion-reduce:transform-none` to 14 interactive components | M1 | Survey 1 (R5) |
+| 8 | OMDb Environment & Secret Redaction | Add optional `OMDB_API_KEY` to `packages/config`, `# OMDB_API_KEY=` to `.env.example`, and redact `apikey=` in `packages/observability` | M2 | Survey 2 (R2) |
+| 9 | Server-Only OMDb Metadata Client | Implement `apps/web/lib/metadata/omdb-client.ts` with graceful degradation, 5s timeout, and normalized critic scores | M2 | Survey 2 (R2) |
+| 10 | Lawful TMDb & Critic Ratings Presentation | Enforce `language=en-US` on TMDb and render clean semantic badges for IMDb, Metascore, Rotten Tomatoes (no fake emblems) | M2 | Survey 2 (R2) |
+| 11 | Piracy & Scraping Zero-Tolerance Gate | Maintain strict audit gate ensuring zero scraping, shortlink bypass, CAPTCHA bypass, or torrent ingestion code | M2 | Survey 2 (R2) |
+| 12 | Adaptive Player Library Integration | Install `hls.js` and `dashjs` in `apps/web` and integrate MSE adaptive engines into `video-player-shell.tsx` | M3 | Survey 2 (R3) |
+| 13 | ABR Dynamic Quality Switching | Switch resolution tiers via `hls.currentLevel` and `dashjs.setQualityFor` without altering `video.src` or dumping buffer | M3 | Survey 2 (R3) |
+| 14 | Event-Driven Buffer & Clock Sync | Replace `setInterval` with native `<video>` events (`timeupdate`, `waiting`, `playing`, `pause`, `ended`) for playback and heartbeats | M3 | Survey 2 (R3) |
+| 15 | Authorized Media Test Streams & CSP | Configure lawful open-source test streams (Blender Foundation HLS/DASH) and configure CSP `connect-src` / `media-src` in `proxy.ts` | M3 | Survey 2 (R3) |
+| 16 | Continue-Watching DAL & API | Implement `listUserContinueWatching` in `@movie/db` and route `/api/v1/continue-watching` for user in-progress resume | M4 | Survey 3 (R4) |
+| 17 | Server-Side Personalized Recommendations | Connect authenticated user watch history (`playback_sessions`) to `GET /api/v1/recommendations` and render personalized rail | M4 | Survey 3 (R4) |
+| 18 | Dynamic Auth UI & Session Persistence | Update header to display user status/name when authenticated, backed by existing scrypt/TOTP/cookie auth system | M4 | Survey 3 (R4) |
+| 19 | Production VPS Docker Compose | Create root `docker-compose.yml` with right-sized limits (2 vCPU / 8 GB RAM VPS) and automated startup migrations | M5 | Survey 3 (R6) |
+| 20 | Monorepo Verification & E2E Test Suite | Pass 6-gate verification: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `APP_ENV=test pnpm build`, `pnpm test:e2e` | M5 | Survey 3 (R6) |
+| 21 | Requirement-Driven E2E Test Track | Build independent 4-tier E2E test suite derived from ORIGINAL_REQUEST.md and publish TEST_READY.md | E2E | Top-Level Orchestrator |
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| 1 | M1: V4 Core Media Engine & Backend Evidence | Features 1–8 (`.gitignore`, schema, DAL, Range serving, capacity math, seeder, doc) | none | DONE |
-| 2 | M2: Score 98/100 Cinematic Editorial UI/UX Upgrade | Features 9–15 (`DESIGN.md`, Spinner, FilmStripShowcase, TitleHeroStage, Discovery Pages, FloatingDock) | M1 | DONE |
-| 3 | M3: Antigravity Customizations, Plugin & Visual QA | Features 16–19 (Rules, skills, local plugin bundle, Playwright visual QA spec) | M2 | IN_PROGRESS |
-| 4 | M4: Production Pipeline, Verification & Git Push | Features 20–25 (boxd VPS check, Dockerfile, Compose, Caddy, Scripts, 6-gate verification, Git push) | M3 | PLANNED |
+| M1 | Complete English Localization & Design System Accessibility | Features 1–7 (Bengali purge across 24 files, touch targets >=44px mobile, motion-reduce fallbacks) | none | IN_PROGRESS |
+| M2 | Lawful Movie Catalog, Open Metadata & Secret Hygiene | Features 8–11 (OMDb client, config, observability redaction, TMDb en-US, critic rating badges) | M1 | PLANNED |
+| M3 | Adaptive Bitrate Video Player & Streaming Architecture | Features 12–15 (hls.js, dashjs, ABR quality switching, native event sync, CSP, authorized test streams) | M1 | PLANNED |
+| M4 | Backend Auth, Playback Resume & Recommendation Engine | Features 16–18 (Continue-watching DAL/API, server watch history recs, auth header session display) | M1, M2 | PLANNED |
+| M5 | Docker VPS Architecture & Production Verification | Features 19–20 (Root docker-compose.yml, 2 vCPU / 8 GB sizing, 6-gate repository verification, Playwright E2E) | M1, M2, M3, M4, TEST_READY | PLANNED |
+| E2E | Requirement-Driven E2E Testing Suite | Feature 21 (Opaque-box test suite for R1–R6, published via TEST_READY.md) | none (parallel track) | DONE |
 
 ## Interface Contracts
-### @movie/db ↔ apps/web (QoE & DAL)
-- `recordPlaybackQoeEvent(sessionTokenHash: string, event: PlaybackQoeEventInput): Promise<DeliveryEvent>`
-- `getPlaybackQoeSummaryForAdmin(titleId?: string): Promise<PlaybackQoeSummary>`
-- `getPublicPersonBySlug(slug: string): Promise<PublicPersonWithTitles | null>`
-- `getPublicCollectionBySlug(slug: string): Promise<PublicCollectionWithTitles | null>`
-- `getPublicGenreBySlug(slug: string): Promise<PublicGenreWithTitles | null>`
-- `listPublicCollections(): Promise<PublicCollectionSummary[]>`
+### Metadata Contracts (M1 ↔ M2)
+- All catalog schemas (`titles`, `genres`, `people`, `collections`, `SearchEntry`) use English strings exclusively.
+- OMDb metadata model: `{ imdbRating: string | null, imdbVotes: string | null, metascore: string | null, rottenTomatoes: string | null }`.
+- OMDb client function: `getOmdbRatings(imdbId?: string, title?: string, year?: number): Promise<OmdbRatings | null>`.
+- Secret hygiene: `OMDB_API_KEY` never appears in client bundles, log messages, or URL parameters.
 
-### @movie/storage ↔ HTTP Range Clients
-- `parseHttpByteRange(rangeHeader: string | null | undefined, totalSize: number): ByteRangeSelection | null`
-- `readObjectByteRange(key: string, rangeHeader?: string): Promise<ByteRangeResult>`
-  - Returns: `{ stream: ReadableStream | Buffer, statusCode: 200 | 206, contentRange?: string, contentLength: number, acceptRanges: "bytes", etag: string }`
-  - Error: throws/returns 416 `RangeNotSatisfiableError`
+### Player Contracts (M1 ↔ M3 ↔ M4)
+- Player props: `interface VideoPlayerShellProps { title: PublishedTitleSummary; activeRendition?: DeliveryRendition; initialStartSeconds?: number; streamSessionId?: string; ... }`.
+- Manifest types: HLS (`application/x-mpegURL` / `.m3u8`), DASH (`application/dash+xml` / `.mpd`).
+- Player ABR interface: Level switching without video element teardown or src modification.
+- Heartbeat interface: `POST /api/v1/playback-sessions/[id]/heartbeat` with `{ positionSeconds: number, bufferedSeconds: number, metrics: QoEMetrics }`.
 
-### @movie/media ↔ Delivery Planning
-- `calculateDeliveryCapacityModel(params: DeliveryCapacityParams): DeliveryCapacityModel`
-  - Egress Mbps = concurrentViewers * avgBitrateMbps
-  - Session GB = (avgBitrateMbps * durationSeconds) / (8 * 1024)
+### User & Resume Contracts (M4 ↔ M5)
+- Continue-watching record: `{ titleSlug: string, titleEn: string, lastPositionSeconds: number, durationSeconds: number, progressPercent: number, updatedAt: string }`.
+- Route: `GET /api/v1/continue-watching` returns `{ continueWatching: ContinueWatchingItem[] }`.
+- Recommendations route: `GET /api/v1/recommendations` without `seeds` queries database for authenticated user's recent sessions.
 
 ## Code Layout
-- `packages/db/src/schema/playback-audit.ts` & `media.ts` — V4 entity schemas
-- `packages/db/migrations/0001_v4_media_qoe_replication.sql` — Migration
-- `packages/db/src/media-playback-dal.ts` & `dal.ts` — DAL methods
-- `packages/storage/src/range.ts` — RFC 9110 Range serving
-- `packages/media/src/capacity.ts` — Delivery capacity math
-- `packages/db/src/seed-dev-showcase.ts` — Dev showcase seeder
-- `docs/architecture/v4-distributed-delivery-and-evidence.md` — V4 architecture doc
-- `d:\movie-site\DESIGN.md` — Design system & taste calibration standards
-- `apps/web/components/ui/spinner.tsx` — Spinner primitive
-- `apps/web/components/catalogue/film-strip-showcase.tsx` — Concept #1 vertical film-strip stage
-- `apps/web/components/catalogue/title-hero-stage.tsx` — Concept #2 full-bleed detail hero stage
-- `apps/web/components/layout/floating-dock.tsx` — Signature floating bottom dock
-- `apps/web/app/people/[slug]/page.tsx` — Director/talent showcase page
-- `apps/web/app/collections/[slug]/page.tsx` — Curated collection showcase page
-- `apps/web/app/genres/[slug]/page.tsx` — Genre archive page
-- `d:\movie-site\.agents/rules/frontend-design-engineering.md` — Workspace design rule
-- `d:\movie-site\CLAUDE.md` — Pointer to AGENTS.md & DESIGN.md
-- `d:\movie-site\.agents/skills/` — `impeccable-audit`, `visual-qa`
-- `%USERPROFILE%\.gemini\config\plugins\cinematic-frontend-qa\` — Local plugin bundle
-- `tests/e2e/visual-qa.spec.ts` — Closed-loop visual QA spec
-- `Dockerfile` & `.dockerignore` — Production container
-- `infra/compose/prod.pilot.yml` — Hardened pilot compose
-- `infra/caddy/Caddyfile` — Production reverse proxy
-- `infra/scripts/` — VPS automation scripts
+- `apps/web/app/` — Next.js 16 App Router pages and API routes
+- `apps/web/components/` — UI components (catalogue, layout, player, account)
+- `apps/web/lib/metadata/` — TMDb and OMDb metadata adapters
+- `apps/web/styles/` — `globals.css`, `experience.css`, `cinematic-graphite.tokens.css`
+- `packages/auth/` — Native scrypt, TOTP MFA, session tokens
+- `packages/config/` — Environment validation schemas
+- `packages/contracts/` — Zod schemas and API contracts
+- `packages/db/` — Database schema (catalogue, identity, playback-audit), migrations, DAL
+- `packages/domain/` — Rights evaluation, recommendation engine
+- `packages/observability/` — Structured logging, sensitive query param redaction, QoE telemetry
+- `tests/e2e/` — Playwright end-to-end test suites
+- `docker-compose.yml` & `Dockerfile` — Production container and self-hosting configuration

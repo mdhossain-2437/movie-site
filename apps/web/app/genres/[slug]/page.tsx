@@ -32,7 +32,6 @@ async function GenreDetailBody({ params }: { params: Promise<{ slug: string }> }
       id: t.id,
       slug: t.slug,
       titleEn: t.localizedTitleEn,
-      titleBn: t.localizedTitleBn,
       releaseYear: t.releaseYear,
       runtimeMinutes: t.runtimeMinutes,
       maturityRating: t.maturityRating,
@@ -58,15 +57,6 @@ async function GenreDetailBody({ params }: { params: Promise<{ slug: string }> }
           >
             {genre.nameEn}
           </h1>
-
-          {genre.nameBn ? (
-            <p
-              className="font-display text-text-secondary mt-2 text-2xl font-semibold sm:text-3xl"
-              lang="bn"
-            >
-              {genre.nameBn}
-            </p>
-          ) : null}
 
           <p className="cg-prose text-text-secondary mt-4 text-base leading-relaxed sm:text-lg">
             Verified lawful cinematic works classified under the {genre.nameEn} category. All titles
@@ -98,7 +88,7 @@ async function GenreDetailBody({ params }: { params: Promise<{ slug: string }> }
               {titles.map((t) => (
                 <article
                   key={t.id}
-                  className="cg-surface hover:border-accent/60 flex flex-col justify-between p-5 transition-colors"
+                  className="cg-surface hover:border-accent/60 flex flex-col justify-between p-5 transition-colors motion-reduce:transition-none"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2">
@@ -110,16 +100,11 @@ async function GenreDetailBody({ params }: { params: Promise<{ slug: string }> }
                     <h3 className="font-display text-text mt-2 text-lg font-semibold">
                       <Link
                         href={`/movies/${t.slug}`}
-                        className="hover:text-accent transition-colors"
+                        className="hover:text-accent transition-colors motion-reduce:transition-none"
                       >
                         {t.localizedTitleEn}
                       </Link>
                     </h3>
-                    {t.localizedTitleBn ? (
-                      <p className="text-text-secondary mt-0.5 text-xs" lang="bn">
-                        {t.localizedTitleBn}
-                      </p>
-                    ) : null}
                     <p className="text-text-secondary mt-2 line-clamp-2 text-xs leading-relaxed">
                       {t.synopsisEn}
                     </p>

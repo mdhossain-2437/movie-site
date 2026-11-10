@@ -17,7 +17,6 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   document.documentElement.removeAttribute("data-motion");
-  document.documentElement.removeAttribute("data-bangla");
 });
 
 describe("device-only preview interactions", () => {
@@ -71,7 +70,7 @@ describe("device-only preview interactions", () => {
     fireEvent.click(screen.getByRole("button", { name: /remove sunrise/i }));
     expect(getDeviceState().saved).toEqual([]);
   });
-  it("applies reduced-motion and Bangla-title switches to the actual document", () => {
+  it("applies reduced-motion switch to the actual document", () => {
     render(
       <ExperienceProviders>
         <DevicePreferences />
@@ -79,20 +78,16 @@ describe("device-only preview interactions", () => {
     );
     fireEvent.click(screen.getByRole("switch", { name: "Reduced motion" }));
     expect(document.documentElement).toHaveAttribute("data-motion", "reduce");
-    fireEvent.click(screen.getByRole("switch", { name: "Show Bangla titles" }));
-    expect(document.documentElement).toHaveAttribute("data-bangla", "show");
-    expect(getDeviceState()).toMatchObject({ reduceMotion: true, banglaTitles: true });
+    expect(getDeviceState()).toMatchObject({ reduceMotion: true });
   });
   it("rejects malformed or unsafe saved values in browser storage", () => {
     window.localStorage.setItem(
       "cinematic-graphite:device:v1",
       JSON.stringify({
         saved: ["sunrise", "sunrise", "../secret", "https://bad.test"],
-        banglaTitles: "true",
       }),
     );
     expect(getDeviceState().saved).toEqual(["sunrise"]);
-    expect(getDeviceState().banglaTitles).toBe(false);
     window.localStorage.setItem("cinematic-graphite:device:v1", "{broken");
     expect(getDeviceState().saved).toEqual([]);
   });

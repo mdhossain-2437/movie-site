@@ -42,22 +42,20 @@ async function PublishedCollectionsSection() {
         {dbCollections.map((col) => (
           <article
             key={col.id}
-            className="cg-surface hover:border-accent/60 flex flex-col justify-between p-6 transition-colors"
+            className="cg-surface hover:border-accent/60 flex flex-col justify-between p-6 transition-colors motion-reduce:transition-none"
           >
             <div>
               <div className="flex items-center justify-between gap-2">
                 <Badge tone="neutral">{col.itemCount} Titles</Badge>
               </div>
               <h3 className="font-display text-text mt-3 text-xl font-bold">
-                <Link href={`/collections/${col.slug}`} className="hover:text-accent">
+                <Link
+                  href={`/collections/${col.slug}`}
+                  className="hover:text-accent transition-colors motion-reduce:transition-none"
+                >
                   {col.titleEn}
                 </Link>
               </h3>
-              {col.titleBn ? (
-                <p className="text-text-secondary mt-1 text-sm" lang="bn">
-                  {col.titleBn}
-                </p>
-              ) : null}
               {col.description ? (
                 <p className="text-text-secondary mt-3 text-sm leading-relaxed">
                   {col.description}
@@ -154,9 +152,6 @@ export default function CollectionsPage() {
                     <h3 className="font-display text-text group-hover:text-accent text-2xl font-bold transition-colors motion-reduce:transition-none">
                       <Link href={`/collections/${col.slug}`}>{col.titleEn}</Link>
                     </h3>
-                    <p className="text-text-secondary mt-1 text-sm" lang="bn">
-                      {col.titleBn}
-                    </p>
                     <p className="text-text-secondary mt-3 text-sm leading-relaxed">
                       {col.description}
                     </p>

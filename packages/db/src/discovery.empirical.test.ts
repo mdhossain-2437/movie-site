@@ -87,7 +87,6 @@ describe("Empirical Challenger: Milestone 2 DAL Discovery & Rights Boundary Stre
         id: solitaryPersonId,
         slug: "solitary-writer-zero-credits",
         nameEn: "Solitary Writer",
-        nameBn: "একাকী লেখক",
       });
       const solitaryRes = await getPublicPersonBySlug(handle.db, "solitary-writer-zero-credits");
       expect(solitaryRes).not.toBeNull();
@@ -100,7 +99,6 @@ describe("Empirical Challenger: Milestone 2 DAL Discovery & Rights Boundary Stre
         id: draftColId,
         slug: "secret-internal-draft-collection",
         titleEn: "Draft Internal Collection",
-        titleBn: "খসড়া সংগ্রহ",
         isPublished: false,
       });
       const draftColRes = await getPublicCollectionBySlug(

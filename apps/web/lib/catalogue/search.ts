@@ -7,7 +7,7 @@ export interface SearchEntry {
   slug: string;
   href: string;
   label: string;
-  labelBn: string | null;
+  labelBn?: string | null;
   sublabel: string;
   /** Extra searchable text: original titles, people, years, countries, genres. */
   keywords: string;
@@ -22,7 +22,6 @@ export interface SearchHit {
 
 /**
  * Lower-cases and strips Latin diacritics only (U+0300–U+036F) so "Méliès" matches "melies".
- * Bangla vowel signs are combining marks too, so a blanket \p{M} strip would corrupt Bangla.
  */
 export function normalizeForSearch(value: string): string {
   return value

@@ -57,7 +57,7 @@ describe("Empirical Challenger: Milestone 2 UI, Search Navigation & QoE Telemetr
       expect(dialog).toBeInTheDocument();
       expect(dialog).toHaveAttribute("aria-modal", "true");
       expect(screen.getByRole("heading", { name: /quick catalogue search/i })).toBeInTheDocument();
-      expect(screen.getByPlaceholderText(/type an english or বাংলা title/i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/search films, cast, or directors/i)).toBeInTheDocument();
     });
 
     it("opens SearchCommandModal on Meta+K (macOS Cmd+K support)", () => {

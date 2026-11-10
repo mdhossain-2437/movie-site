@@ -1053,7 +1053,7 @@ These are goals to validate, not guarantees about the free VPS.
 
 ### 26.1 Global navigation
 
-Brand/home, Movies, optional Series, Genres, Collections, Search, English/বাংলা selector, Account/Sign in. On mobile, keep search visible or one tap away. Do not bury core filters in several layers of menus.
+Brand/home, Movies, optional Series, Genres, Collections, Search, English selector, Account/Sign in. On mobile, keep search visible or one tap away. Do not bury core filters in several layers of menus.
 
 ### 26.2 Home page composition
 

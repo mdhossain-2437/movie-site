@@ -101,7 +101,7 @@ function toCard(
   return {
     slug: title.slug,
     title: title.title,
-    titleBn: title.titleBn,
+    titleBn: title.titleBn ?? null,
     year: title.year,
     runtimeMinutes: title.runtimeMinutes,
     countries: title.countries,
@@ -110,7 +110,7 @@ function toCard(
     art: title.art,
     availability: deriveAvailability(title, scope),
     synopsis: title.synopsis,
-    synopsisBn: title.synopsisBn,
+    synopsisBn: title.synopsisBn ?? null,
     studio: title.studio,
     isDevelopmentFixture: title.isDevelopmentFixture,
   };
@@ -315,7 +315,7 @@ function summarize(person: CataloguePerson, credits: PersonCredit[]): PersonSumm
   return {
     slug: person.slug,
     name: person.name,
-    nameBn: person.nameBn,
+    nameBn: person.nameBn ?? null,
     displayName: person.displayName,
     born: person.born,
     died: person.died,
@@ -371,7 +371,7 @@ export function roleLabel(role: CreditDepartment): string {
 export interface CollectionSummary {
   slug: string;
   title: string;
-  titleBn: string;
+  titleBn?: string | null;
   description: string;
   titles: TitleCard[];
 }
@@ -381,7 +381,7 @@ function collectionSummaries(src: CatalogueSource): CollectionSummary[] {
   return src.collections.map((collection) => ({
     slug: collection.slug,
     title: collection.title,
-    titleBn: collection.titleBn,
+    titleBn: collection.titleBn ?? null,
     description: collection.description,
     titles: collection.items.flatMap((slug) => {
       const card = cards.get(slug);

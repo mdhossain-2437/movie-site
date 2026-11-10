@@ -336,7 +336,7 @@ export function Chrome({ entries }: { entries: SearchEntry[] }) {
                   ? "The catalogue is awaiting rights-approved records."
                   : `No results for “${query}”.`}
               </p>
-              <small>Try an English or Bangla title, a year, or a filmmaker.</small>
+              <small>Try a title, a year, or a filmmaker.</small>
             </div>
           ) : null}
         </div>

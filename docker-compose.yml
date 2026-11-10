@@ -1,0 +1,154 @@
+name: cineva-platform
+
+# Production self-hosting stack right-sized for a 2 vCPU / 8 GB RAM / 100 GB NVMe Linux VPS.
+# Total container ceilings: 1.95 vCPUs and 4,224 MiB (~4.13 GiB) RAM, leaving ~3.8 GiB for
+# Linux kernel page cache, TLS termination, and transient FFmpeg/maintenance headroom.
+#
+# Usage:
+#   1. Copy .env.example to .env and populate SESSION_SECRET, POSTGRES_PASSWORD,
+#      MEDIA_URL_SIGNING_SECRET, and optional TMDB_* / OMDB_API_KEY credentials.
+#   2. Start stack: docker compose up -d --build
+#   3. Verify health: curl -fsS http://127.0.0.1:3000/api/v1/health
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    command:
+      - postgres
+      - -c
+      - shared_buffers=512MB
+      - -c
+      - effective_cache_size=2GB
+      - -c
+      - work_mem=8MB
+      - -c
+      - maintenance_work_mem=128MB
+      - -c
+      - max_connections=80
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cineva}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-cineva_prod}
+    volumes:
+      - cineva_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-cineva} -d $${POSTGRES_DB:-cineva_prod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    cpus: 0.50
+    mem_limit: 1536m
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--maxmemory",
+        "256mb",
+        "--maxmemory-policy",
+        "allkeys-lru",
+      ]
+    volumes:
+      - cineva_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    cpus: 0.20
+    mem_limit: 384m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cineva-web:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["sh", "-c", "pnpm db:migrate && pnpm --filter @movie/web start"]
+    ports:
+      - "${WEB_BIND_HOST:-127.0.0.1}:${WEB_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      APP_ENV: ${APP_ENV:-production}
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cineva}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-cineva_prod}
+      REDIS_URL: redis://redis:6379/0
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET must be set in .env}
+      MEDIA_URL_SIGNING_SECRET: ${MEDIA_URL_SIGNING_SECRET:?MEDIA_URL_SIGNING_SECRET must be set in .env}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-memory}
+      STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-}
+      STORAGE_REGION: ${STORAGE_REGION:-auto}
+      STORAGE_ACCESS_KEY_ID: ${STORAGE_ACCESS_KEY_ID:-}
+      STORAGE_SECRET_ACCESS_KEY: ${STORAGE_SECRET_ACCESS_KEY:-}
+      TMDB_READ_ACCESS_TOKEN: ${TMDB_READ_ACCESS_TOKEN:-}
+      TMDB_API_KEY: ${TMDB_API_KEY:-}
+      TMDB_COMMERCIAL_LICENSE_CONFIRMED: ${TMDB_COMMERCIAL_LICENSE_CONFIRMED:-false}
+      OMDB_API_KEY: ${OMDB_API_KEY:-}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/v1/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    cpus: 1.00
+    mem_limit: 1792m
+    logging:
+      driver: json-file
+      options:
+        max-size: "25m"
+        max-file: "4"
+
+  worker:
+    image: cineva-web:latest
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    command: ["pnpm", "worker:start"]
+    environment:
+      NODE_ENV: production
+      APP_ENV: ${APP_ENV:-production}
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cineva}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-cineva_prod}
+      REDIS_URL: redis://redis:6379/0
+      SESSION_SECRET: ${SESSION_SECRET}
+      MEDIA_URL_SIGNING_SECRET: ${MEDIA_URL_SIGNING_SECRET}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-memory}
+      STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-}
+      STORAGE_REGION: ${STORAGE_REGION:-auto}
+      STORAGE_ACCESS_KEY_ID: ${STORAGE_ACCESS_KEY_ID:-}
+      STORAGE_SECRET_ACCESS_KEY: ${STORAGE_SECRET_ACCESS_KEY:-}
+    cpus: 0.25
+    mem_limit: 512m
+    logging:
+      driver: json-file
+      options:
+        max-size: "15m"
+        max-file: "3"
+
+volumes:
+  cineva_pgdata:
+  cineva_redisdata:

@@ -701,7 +701,6 @@ async function hydratePublicTitleSummaries(
 
     const rowTranslations = translations.filter((t) => t.titleId === row.id);
     const enTr = rowTranslations.find((t) => t.locale === "en") ?? rowTranslations[0];
-    const bnTr = rowTranslations.find((t) => t.locale === "bn") ?? null;
     const titleFeatureAssets = assets.filter((a) => a.titleId === row.id);
     const featureAsset =
       titleFeatureAssets.find((a) => a.lifecycleState === "PUBLISHED") ?? titleFeatureAssets[0];
@@ -795,9 +794,9 @@ async function hydratePublicTitleSummaries(
       maturityRating: row.maturityRating,
       isDevelopmentFixture: row.isDevelopmentFixture,
       localizedTitleEn: enTr?.localizedTitle ?? row.originalTitle,
-      localizedTitleBn: bnTr?.localizedTitle ?? null,
+      localizedTitleBn: null,
       synopsisEn: enTr?.synopsis ?? "",
-      synopsisBn: bnTr?.synopsis ?? null,
+      synopsisBn: null,
       genreSlugs: rowGenres,
       directorSlugs: rowDirectors,
       castSlugs: rowCast,
@@ -1055,9 +1054,15 @@ export async function getPublishedTitleBySlug(
 
   return {
     ...summary,
-    credits,
+    credits: credits.map((c) => ({
+      ...c,
+      nameBn: null,
+    })),
     sources,
-    genres: titleGenreRows,
+    genres: titleGenreRows.map((g) => ({
+      ...g,
+      nameBn: null,
+    })),
   };
 }
 
@@ -1088,7 +1093,13 @@ export async function getPublicPersonBySlug(
 
   const titleIds = [...new Set(credits.map((c) => c.titleId))];
   if (titleIds.length === 0) {
-    return { person, titles: [] };
+    return {
+      person: {
+        ...person,
+        nameBn: null,
+      },
+      titles: [],
+    };
   }
 
   const titleRows = await db
@@ -1110,7 +1121,13 @@ export async function getPublicPersonBySlug(
     options?.at ?? new Date(),
   );
 
-  return { person, titles: summaries };
+  return {
+    person: {
+      ...person,
+      nameBn: null,
+    },
+    titles: summaries,
+  };
 }
 
 /**

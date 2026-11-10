@@ -9,8 +9,9 @@ const BASE_CSP = [
   "img-src 'self' data: blob:",
   "font-src 'self'",
   "style-src 'self' 'unsafe-inline'",
-  "connect-src 'self'",
-  "media-src 'self' blob:",
+  "worker-src 'self' blob:",
+  "connect-src 'self' https://test-streams.mux.dev https://dash.akamaized.net",
+  "media-src 'self' blob: https://test-streams.mux.dev https://dash.akamaized.net",
 ];
 
 export function proxy(request: NextRequest) {

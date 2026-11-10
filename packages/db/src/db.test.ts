@@ -37,7 +37,7 @@ async function seedActor(
 }
 
 describe("@movie/db centralized DAL, rights gate, separation of duties & IDOR defense", () => {
-  it("enforces RBAC, MFA, separation of duties, territorial rights, Bangla search, IDOR isolation, and legal hold kill-switch", async () => {
+  it("enforces RBAC, MFA, separation of duties, territorial rights, catalogue search, IDOR isolation, and legal hold kill-switch", async () => {
     const handle = await createTestDatabase();
     try {
       const viewerA = await seedActor(handle.db, "viewer-a@example.org", ["VIEWER"], false);
@@ -104,7 +104,7 @@ describe("@movie/db centralized DAL, rights gate, separation of duties & IDOR de
         ),
       ).rejects.toThrow(/TMDb metadata cannot be persisted/);
 
-      // 3. EDITOR creates a valid draft with English + Bangla localized metadata.
+      // 3. EDITOR creates a valid draft with English localized metadata.
       const draft = await createDraftTitle(
         handle.db,
         { actor: editor, requestId: "req_3" },
@@ -122,17 +122,11 @@ describe("@movie/db centralized DAL, rights gate, separation of duties & IDOR de
               localizedTitle: "Open River Chronicle",
               synopsis: "Archival public-domain test fixture set along the Padma river.",
             },
-            {
-              locale: "bn",
-              localizedTitle: "মুক্ত নদীর উপাখ্যান",
-              synopsis: "পদ্মা নদীর তীরে নির্মিত পরীক্ষামূলক পাবলিক ডোমেইন চলচ্চিত্র রেকর্ড।",
-            },
           ],
           credits: [
             {
               personSlug: "kamal-choudhury-fixture",
               nameEn: "Kamal Choudhury",
-              nameBn: "কামাল চৌধুরী",
               department: "DIRECTOR",
               billingOrder: 1,
             },
@@ -147,7 +141,7 @@ describe("@movie/db centralized DAL, rights gate, separation of duties & IDOR de
 
       // Drafts must NEVER appear in public listings or search.
       expect(await listPublishedTitles(handle.db)).toHaveLength(0);
-      expect(await searchPublishedTitles(handle.db, "মুক্ত নদীর")).toHaveLength(0);
+      expect(await searchPublishedTitles(handle.db, "Open River")).toHaveLength(0);
 
       // 4. Negative MFA check: ADMIN without MFA cannot publish.
       await expect(
@@ -224,15 +218,15 @@ describe("@movie/db centralized DAL, rights gate, separation of duties & IDOR de
       const usList = await listPublishedTitles(handle.db, { territoryCode: "US", at: now });
       expect(usList[0]?.availability.badgeKind).toBe("region_restricted");
 
-      // 10. Search works across Bangla script and filmmaker credit name.
-      const bnMatches = await searchPublishedTitles(handle.db, "মুক্ত নদীর", {
+      // 10. Search works across title and filmmaker credit name.
+      const titleMatches = await searchPublishedTitles(handle.db, "Open River", {
         territoryCode: "BD",
         at: now,
       });
-      expect(bnMatches).toHaveLength(1);
-      expect(bnMatches[0]?.localizedTitleBn).toBe("মুক্ত নদীর উপাখ্যান");
+      expect(titleMatches).toHaveLength(1);
+      expect(titleMatches[0]?.localizedTitleEn).toBe("Open River Chronicle");
 
-      const directorMatches = await searchPublishedTitles(handle.db, "কামাল চৌধুরী", {
+      const directorMatches = await searchPublishedTitles(handle.db, "Kamal Choudhury", {
         territoryCode: "BD",
         at: now,
       });

@@ -22,7 +22,7 @@ export interface CinevaSubtitleCue {
   start: number;
   end: number;
   en: string;
-  bn: string;
+  bn?: string;
 }
 
 export interface CinevaCreditEntry {
@@ -37,14 +37,14 @@ export interface CinevaCreditEntry {
 export interface CinevaGenreEntry {
   slug: string;
   nameEn: string;
-  nameBn: string;
+  nameBn?: string;
 }
 
 export interface CinevaEpisode {
   seasonNumber: number;
   episodeNumber: number;
   titleEn: string;
-  titleBn: string;
+  titleBn?: string;
   runtimeMinutes: number;
   synopsisEn: string;
   startSeconds: number;
@@ -61,7 +61,7 @@ export interface CinevaStudioHub {
   id: string;
   slug: string;
   nameEn: string;
-  nameBn: string;
+  nameBn?: string;
   shortLabel: string;
   headquarters: string;
   foundedYear: number;
@@ -73,7 +73,7 @@ export interface CinevaSpecialCategory {
   id: string;
   slug: string;
   titleEn: string;
-  titleBn: string;
+  titleBn?: string;
   shortLabel: string;
   eyebrow: string;
   description: string;
@@ -90,10 +90,10 @@ export interface CinevaDatabaseFilm {
   runtimeMinutes: number;
   maturityRating: MaturityRating;
   localizedTitleEn: string;
-  localizedTitleBn: string;
+  localizedTitleBn?: string | null;
   tagline: string;
   synopsisEn: string;
-  synopsisBn: string;
+  synopsisBn?: string | null;
   /** Percentage match/acclaim index (0..100) */
   cinevaScore: number;
   /** Authoritative 0..10 user/critic rating fed into Bayesian Weighted Rating */
@@ -140,7 +140,7 @@ export interface CinevaPersonProfile {
   id: string;
   slug: string;
   nameEn: string;
-  nameBn: string;
+  nameBn?: string;
   primaryRole: string;
   bornYear: number;
   origin: string;
@@ -151,21 +151,21 @@ export interface CinevaCuratedCollection {
   id: string;
   slug: string;
   titleEn: string;
-  titleBn: string;
+  titleBn?: string;
   eyebrow: string;
   description: string;
   filmSlugs: string[];
 }
 
 export const CINEVA_GENRES: readonly CinevaGenreEntry[] = [
-  { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
-  { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
-  { slug: "action", nameEn: "Action", nameBn: "অ্যাকশন" },
-  { slug: "sci-fi", nameEn: "Sci-Fi", nameBn: "কল্পবিজ্ঞান" },
-  { slug: "thriller", nameEn: "Thriller", nameBn: "থ্রিলার" },
-  { slug: "mystery", nameEn: "Mystery", nameBn: "রহস্য" },
-  { slug: "documentary", nameEn: "Documentary", nameBn: "প্রামাণ্যচিত্র" },
-  { slug: "classic", nameEn: "Classic", nameBn: "ধ্রুপদী" },
+  { slug: "noir", nameEn: "Noir" },
+  { slug: "drama", nameEn: "Drama" },
+  { slug: "action", nameEn: "Action" },
+  { slug: "sci-fi", nameEn: "Sci-Fi" },
+  { slug: "thriller", nameEn: "Thriller" },
+  { slug: "mystery", nameEn: "Mystery" },
+  { slug: "documentary", nameEn: "Documentary" },
+  { slug: "classic", nameEn: "Classic" },
 ];
 
 export const CINEVA_STUDIOS: readonly CinevaStudioHub[] = [
@@ -173,7 +173,6 @@ export const CINEVA_STUDIOS: readonly CinevaStudioHub[] = [
     id: "std-monsoon-shadow",
     slug: "monsoon-shadow-studios",
     nameEn: "Monsoon Shadow Studios",
-    nameBn: "মনসুন শ্যাডো স্টুডিওস",
     shortLabel: "Monsoon Shadow",
     headquarters: "Dhaka, Bangladesh",
     foundedYear: 2016,
@@ -185,7 +184,6 @@ export const CINEVA_STUDIOS: readonly CinevaStudioHub[] = [
     id: "std-vanguard-mythic",
     slug: "vanguard-mythic-studios",
     nameEn: "Vanguard Mythic Studios",
-    nameBn: "ভ্যানগার্ড মিথিক স্টুডিওস",
     shortLabel: "Vanguard Mythic",
     headquarters: "London · Dhaka",
     foundedYear: 2019,
@@ -197,7 +195,6 @@ export const CINEVA_STUDIOS: readonly CinevaStudioHub[] = [
     id: "std-obsidian-knight",
     slug: "obsidian-knight-works",
     nameEn: "Obsidian Knight Works",
-    nameBn: "অবসিডিয়ান নাইট ওয়ার্কস",
     shortLabel: "Obsidian Knight",
     headquarters: "Chicago · Dhaka",
     foundedYear: 2018,
@@ -209,7 +206,6 @@ export const CINEVA_STUDIOS: readonly CinevaStudioHub[] = [
     id: "std-pacific-starlight",
     slug: "pacific-starlight-pictures",
     nameEn: "Pacific Starlight Pictures",
-    nameBn: "প্যাসিফিক স্টারলাইট পিকচার্স",
     shortLabel: "Pacific Starlight",
     headquarters: "Tokyo · Los Angeles · Dhaka",
     foundedYear: 2014,
@@ -221,7 +217,6 @@ export const CINEVA_STUDIOS: readonly CinevaStudioHub[] = [
     id: "std-meridian-century",
     slug: "meridian-century-pictures",
     nameEn: "Meridian Century Pictures",
-    nameBn: "মেরিডিয়ান সেঞ্চুরি পিকচার্স",
     shortLabel: "Meridian Century",
     headquarters: "London · Vancouver",
     foundedYear: 2012,
@@ -233,7 +228,6 @@ export const CINEVA_STUDIOS: readonly CinevaStudioHub[] = [
     id: "std-public-domain-vault",
     slug: "cineva-public-domain-vault",
     nameEn: "CINEVA Public Domain Vault",
-    nameBn: "সিনেভা পাবলিক ডোমেইন ভল্ট",
     shortLabel: "Public Domain Vault",
     headquarters: "Stockholm · Dhaka Archival Lab",
     foundedYear: 2020,
@@ -248,7 +242,6 @@ export const CINEVA_SPECIAL_CATEGORIES: readonly CinevaSpecialCategory[] = [
     id: "cat-top-rated-hall",
     slug: "top-rated-hall",
     titleEn: "Top Rated Hall of Fame",
-    titleBn: "শীর্ষ রেটেড হল অব ফেম",
     shortLabel: "Top Rated 9.0+",
     eyebrow: "Bayesian Weighted Leaderboard",
     description:
@@ -258,7 +251,6 @@ export const CINEVA_SPECIAL_CATEGORIES: readonly CinevaSpecialCategory[] = [
     id: "cat-heroic-multiverse",
     slug: "heroic-multiverse",
     titleEn: "Vanguard Heroic Universe",
-    titleBn: "ভ্যানগার্ড হিরোইক ইউনিভার্স",
     shortLabel: "Heroic Multiverse",
     eyebrow: "Cosmic & Powered Saga",
     description:
@@ -268,7 +260,6 @@ export const CINEVA_SPECIAL_CATEGORIES: readonly CinevaSpecialCategory[] = [
     id: "cat-dark-vigilante",
     slug: "dark-vigilante-mythos",
     titleEn: "Dark Vigilante Mythos",
-    titleBn: "ডার্ক ভিজিল্যান্টে মিথোস",
     shortLabel: "Dark Vigilante",
     eyebrow: "Graphic-Noir Universe",
     description:
@@ -278,7 +269,6 @@ export const CINEVA_SPECIAL_CATEGORIES: readonly CinevaSpecialCategory[] = [
     id: "cat-original-series",
     slug: "original-series",
     titleEn: "CINEVA Original Series",
-    titleBn: "সিনেভা অরিজিনাল সিরিজ",
     shortLabel: "Original Series",
     eyebrow: "Multi-Season Shows",
     description:
@@ -288,7 +278,6 @@ export const CINEVA_SPECIAL_CATEGORIES: readonly CinevaSpecialCategory[] = [
     id: "cat-large-format",
     slug: "large-format-premieres",
     titleEn: "Large-Format 2.39:1 Premieres",
-    titleBn: "লার্জ-ফরম্যাট ২.৩৯:১ প্রিমিয়ার",
     shortLabel: "2.39:1 Large Format",
     eyebrow: "Anamorphic & 65mm Masters",
     description:
@@ -298,7 +287,6 @@ export const CINEVA_SPECIAL_CATEGORIES: readonly CinevaSpecialCategory[] = [
     id: "cat-public-domain-vault",
     slug: "public-domain-vault",
     titleEn: "4K Open-Download Vault",
-    titleBn: "৪কে ওপেন-ডাউনলোড ভল্ট",
     shortLabel: "Stream + Download",
     eyebrow: "Verified Open Rights",
     description:
@@ -311,7 +299,6 @@ export const CINEVA_PEOPLE: readonly CinevaPersonProfile[] = [
     id: "per-amina-rahman",
     slug: "amina-rahman",
     nameEn: "Amina Rahman",
-    nameBn: "আমিনা রহমান",
     primaryRole: "Director & Showrunner",
     bornYear: 1984,
     origin: "Dhaka, Bangladesh",
@@ -321,7 +308,6 @@ export const CINEVA_PEOPLE: readonly CinevaPersonProfile[] = [
     id: "per-tariq-anam",
     slug: "tariq-anam",
     nameEn: "Tariq Anam",
-    nameBn: "তারিক আনাম",
     primaryRole: "Lead Actor",
     bornYear: 1959,
     origin: "Dhaka, Bangladesh",
@@ -331,7 +317,6 @@ export const CINEVA_PEOPLE: readonly CinevaPersonProfile[] = [
     id: "per-nusrat-imrose",
     slug: "nusrat-imrose",
     nameEn: "Nusrat Imrose",
-    nameBn: "নুসরাত ইমরোজ",
     primaryRole: "Lead Actor",
     bornYear: 1989,
     origin: "Rajshahi, Bangladesh",
@@ -341,7 +326,6 @@ export const CINEVA_PEOPLE: readonly CinevaPersonProfile[] = [
     id: "per-kamal-hossain",
     slug: "kamal-hossain",
     nameEn: "Kamal Hossain",
-    nameBn: "কামাল হোসেন",
     primaryRole: "Director",
     bornYear: 1978,
     origin: "Chattogram, Bangladesh",
@@ -351,7 +335,6 @@ export const CINEVA_PEOPLE: readonly CinevaPersonProfile[] = [
     id: "per-elena-rostova",
     slug: "elena-rostova",
     nameEn: "Elena Rostova",
-    nameBn: "এলেনা রোস্তোভা",
     primaryRole: "Director & Showrunner",
     bornYear: 1981,
     origin: "Prague · London",
@@ -361,7 +344,6 @@ export const CINEVA_PEOPLE: readonly CinevaPersonProfile[] = [
     id: "per-rafiq-azad",
     slug: "rafiq-azad",
     nameEn: "Rafiq Azad",
-    nameBn: "রফিক আজাদ",
     primaryRole: "Documentary Filmmaker",
     bornYear: 1975,
     origin: "Narayanganj, Bangladesh",
@@ -371,7 +353,6 @@ export const CINEVA_PEOPLE: readonly CinevaPersonProfile[] = [
     id: "per-fazle-rabbi",
     slug: "fazle-rabbi",
     nameEn: "Fazle Rabbi",
-    nameBn: "ফজলে রাব্বি",
     primaryRole: "Actor",
     bornYear: 1986,
     origin: "Sylhet, Bangladesh",
@@ -381,7 +362,6 @@ export const CINEVA_PEOPLE: readonly CinevaPersonProfile[] = [
     id: "per-aupee-karim",
     slug: "aupee-karim",
     nameEn: "Aupee Karim",
-    nameBn: "অপি করিম",
     primaryRole: "Actor & Architect",
     bornYear: 1979,
     origin: "Dhaka, Bangladesh",
@@ -391,7 +371,6 @@ export const CINEVA_PEOPLE: readonly CinevaPersonProfile[] = [
     id: "per-dev-sen",
     slug: "dev-sen",
     nameEn: "Dev Sen",
-    nameBn: "দেব সেন",
     primaryRole: "Director · Mythic & Action Cinema",
     bornYear: 1983,
     origin: "Kolkata · London",
@@ -401,7 +380,6 @@ export const CINEVA_PEOPLE: readonly CinevaPersonProfile[] = [
     id: "per-zoya-mirza",
     slug: "zoya-mirza",
     nameEn: "Zoya Mirza",
-    nameBn: "জোয়া মির্জা",
     primaryRole: "Lead Actor · Action & Sci-Fi",
     bornYear: 1992,
     origin: "Dhaka · London",
@@ -455,7 +433,7 @@ function buildSeriesEpisodes(
   seasonNumber: number,
   episodeSpecs: Array<{
     titleEn: string;
-    titleBn: string;
+    titleBn?: string;
     runtimeMinutes: number;
     synopsisEn: string;
   }>,
@@ -488,12 +466,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 118,
     maturityRating: "PG13",
     localizedTitleEn: "The Last Monsoon",
-    localizedTitleBn: "শেষ বর্ষা",
     tagline: "Every tide remembers what the city buried.",
     synopsisEn:
       "In the shadow of a prolonged monsoon in Old Dhaka, a film archivist uncovers a silver-nitrate reel implicating a riverfront dynasty in an unresolved 1980s disappearance.",
-    synopsisBn:
-      "পুরান ঢাকায় এক দীর্ঘ বর্ষার ছায়ায়, একজন মহাফেজখানা কর্মী একটি বিস্মৃত রিল আবিষ্কার করেন যা এক প্রভাবশালী পরিবারকে এক অমীমাংসিত নিখোঁজের সাথে যুক্ত করে।",
     cinevaScore: 96,
     rawRating: 9.4,
     votesCount: "18.4K",
@@ -528,9 +503,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
-      { slug: "mystery", nameEn: "Mystery", nameBn: "রহস্য" },
+      { slug: "drama", nameEn: "Drama" },
+      { slug: "noir", nameEn: "Noir" },
+      { slug: "mystery", nameEn: "Mystery" },
     ],
     credits: [
       {
@@ -538,7 +513,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "amina-rahman",
         nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
       },
       {
         department: "ACTOR",
@@ -546,7 +520,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "tariq-anam",
         nameEn: "Tariq Anam",
-        nameBn: "তারিক আনাম",
       },
       {
         department: "ACTOR",
@@ -554,14 +527,12 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 3,
         personSlug: "nusrat-imrose",
         nameEn: "Nusrat Imrose",
-        nameBn: "নুসরাত ইমরোজ",
       },
       {
         department: "WRITER",
         billingOrder: 4,
         personSlug: "amina-rahman",
         nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
       },
     ],
     chapters: buildDefaultChapters("The Last Monsoon", 118),
@@ -570,25 +541,21 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 8,
         en: "[Rain hammering corrugated tin roofs across Sadarghat]",
-        bn: "[সদরঘাটের টিনের চালে মুষলধারে বৃষ্টির শব্দ]",
       },
       {
         start: 8,
         end: 18,
         en: "LEILA: This 1984 reel was logged as destroyed in the warehouse flood.",
-        bn: "লেইলা: ১৯৮৪ সালের এই রিলটি গুদামের বন্যায় নষ্ট হয়েছে বলে নথিভুক্ত ছিল।",
       },
       {
         start: 18,
         end: 30,
         en: "CHOWDHURY: Look at the launch number in the background. Nobody meant for that frame to survive.",
-        bn: "চৌধুরী: পেছনের লঞ্চের নম্বরটা দেখুন। এই ফ্রেমটা টিকে থাকুক তা কেউ চায়নি।",
       },
       {
         start: 30,
         end: 60,
         en: "LEILA: Every tide brings the ledger back to shore.",
-        bn: "লেইলা: প্রতিটি জোয়ার হিসাবের খাতা তীরে ফিরিয়ে আনে।",
       },
     ],
   },
@@ -603,12 +570,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 104,
     maturityRating: "PG13",
     localizedTitleEn: "Neon Bhasha",
-    localizedTitleBn: "নিয়ন ভাষা",
     tagline: "In a city of silenced frequencies, memory speaks in code.",
     synopsisEn:
       "Cybernetic acoustic linguists inside a subterranean delta megacity decode analog tape relays carrying outlawed dialects across flooded transit tunnels.",
-    synopsisBn:
-      "ভূগর্ভস্থ বদ্বীপ মেগাসিটিতে অ্যানালগ রিলে চালিত নিষিদ্ধ উপভাষার সংকেত উদ্ধার করেন এক ধ্বনিবিজ্ঞানী।",
     cinevaScore: 93,
     rawRating: 9.0,
     votesCount: "14.1K",
@@ -643,8 +607,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "sci-fi", nameEn: "Sci-Fi", nameBn: "কল্পবিজ্ঞান" },
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
+      { slug: "sci-fi", nameEn: "Sci-Fi" },
+      { slug: "noir", nameEn: "Noir" },
     ],
     credits: [
       {
@@ -652,7 +616,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "amina-rahman",
         nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
       },
       {
         department: "ACTOR",
@@ -660,7 +623,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "nusrat-imrose",
         nameEn: "Nusrat Imrose",
-        nameBn: "নুসরাত ইমরোজ",
       },
     ],
     chapters: buildDefaultChapters("Neon Bhasha", 104),
@@ -669,13 +631,11 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 10,
         en: "[Analog carrier wave hums at 432 Hz]",
-        bn: "[৪৩২ হার্জে অ্যানালগ ক্যারিয়ার তরঙ্গের গুঞ্জন]",
       },
       {
         start: 10,
         end: 25,
         en: "ZARA: The relay isn't noise—it's an old river lullaby encrypted in pulse width.",
-        bn: "জারা: এই রিলে কোনো যান্ত্রিক শব্দ নয়—এটি পালস কোডে লুকানো এক প্রাচীন নদীর ঘুমপাড়ানি গান।",
       },
     ],
   },
@@ -690,12 +650,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 132,
     maturityRating: "R16",
     localizedTitleEn: "Shadows Over Buriganga",
-    localizedTitleBn: "বুড়িগঙ্গার ছায়া",
     tagline: "Fog hides the cargo. Steel remembers the wake.",
     synopsisEn:
       "Over forty-eight sleepless hours on winter river patrol, a harbour captain tracks ghost barges moving forged chemical manifests beneath heavy industrial fog.",
-    synopsisBn:
-      "শীতের ঘন কুয়াশায় আটচল্লিশ ঘণ্টার নদী টহলে এক ক্যাপ্টেন জাল রাসায়নিক চালানবাহী বার্জের সন্ধান পান।",
     cinevaScore: 91,
     rawRating: 8.8,
     votesCount: "11.9K",
@@ -730,8 +687,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "thriller", nameEn: "Thriller", nameBn: "থ্রিলার" },
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
+      { slug: "thriller", nameEn: "Thriller" },
+      { slug: "noir", nameEn: "Noir" },
     ],
     credits: [
       {
@@ -739,7 +696,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "amina-rahman",
         nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
       },
       {
         department: "ACTOR",
@@ -747,7 +703,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "fazle-rabbi",
         nameEn: "Fazle Rabbi",
-        nameBn: "ফজলে রাব্বি",
       },
     ],
     chapters: buildDefaultChapters("Shadows Over Buriganga", 132),
@@ -756,13 +711,11 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 14,
         en: "[Distant foghorn echoes across iron hulls]",
-        bn: "[লোহার বার্জের ওপাশ থেকে দূরের ফগহর্নের প্রতিধ্বনি]",
       },
       {
         start: 14,
         end: 28,
         en: "MASUD: Cut the searchlight. Let their wake betray the rudder.",
-        bn: "মাসুদ: সার্চলাইট নিভিয়ে দাও। ওদের ঢেউই পথ চিনিয়ে দেবে।",
       },
     ],
   },
@@ -777,12 +730,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 140,
     maturityRating: "PG",
     localizedTitleEn: "Voyage Beyond Stars",
-    localizedTitleBn: "নক্ষত্রের ওপারে যাত্রা",
     tagline: "Twelve light-hours past Neptune, the archive answered back.",
     synopsisEn:
       "A deep-space cartography crew crosses a crimson magnetosphere to retrieve humanity's earliest interstellar probe—discovering fifty years of unscheduled transmissions.",
-    synopsisBn:
-      "নেপচুন ছাড়িয়ে গভীর মহাকাশে এক অভিযাত্রী দল মানবজাতির প্রাচীনতম মহাকাশযানের রহস্যময় সংকেত উদ্ধার করে।",
     cinevaScore: 95,
     rawRating: 9.3,
     votesCount: "22.7K",
@@ -817,8 +767,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "sci-fi", nameEn: "Sci-Fi", nameBn: "কল্পবিজ্ঞান" },
-      { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
+      { slug: "sci-fi", nameEn: "Sci-Fi" },
+      { slug: "drama", nameEn: "Drama" },
     ],
     credits: [
       {
@@ -826,7 +776,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "elena-rostova",
         nameEn: "Elena Rostova",
-        nameBn: "এলেনা রোস্তোভা",
       },
       {
         department: "ACTOR",
@@ -834,7 +783,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "aupee-karim",
         nameEn: "Aupee Karim",
-        nameBn: "অপি করিম",
       },
     ],
     chapters: buildDefaultChapters("Voyage Beyond Stars", 140),
@@ -843,13 +791,11 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 12,
         en: "TELEMETRY: Magnetopause boundary crossed. Dish alignment nominal.",
-        bn: "টেলিমেট্রি: ম্যাগনেটোপজ সীমানা অতিক্রম করেছে। অ্যান্টেনা সংযোগ স্বাভাবিক।",
       },
       {
         start: 12,
         end: 26,
         en: "ARIA: The golden record wasn't silent—someone recorded a reply onto track four.",
-        bn: "আরিয়া: গোল্ডেন রেকর্ডটি নীরব ছিল না—চতুর্থ ট্র্যাকে কেউ উত্তর রেকর্ড করেছে।",
       },
     ],
   },
@@ -864,12 +810,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 126,
     maturityRating: "PG13",
     localizedTitleEn: "Midnight at Curzon Hall",
-    localizedTitleBn: "কার্জন হলে মধ্যরাত",
     tagline: "Four scholars. One locked observatory. Zero coincidences.",
     synopsisEn:
       "During a citywide power blackout, a visiting mathematician discovers geometric cipher plates hidden inside the red-brick arches of Dhaka's historic science hall.",
-    synopsisBn:
-      "শহরজুড়ে ব্ল্যাকআউটের রাতে লাল ইটের ঐতিহাসিক কার্জন হলের খিলানে লুকানো গাণিতিক সংকেত আবিষ্কার করেন এক গবেষক।",
     cinevaScore: 92,
     rawRating: 8.9,
     votesCount: "12.8K",
@@ -904,8 +847,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "mystery", nameEn: "Mystery", nameBn: "রহস্য" },
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
+      { slug: "mystery", nameEn: "Mystery" },
+      { slug: "noir", nameEn: "Noir" },
     ],
     credits: [
       {
@@ -913,7 +856,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "kamal-hossain",
         nameEn: "Kamal Hossain",
-        nameBn: "কামাল হোসেন",
       },
       {
         department: "ACTOR",
@@ -921,7 +863,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "aupee-karim",
         nameEn: "Aupee Karim",
-        nameBn: "অপি করিম",
       },
     ],
     chapters: buildDefaultChapters("Midnight at Curzon Hall", 126),
@@ -930,7 +871,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 15,
         en: "NADIA: Count the arches from the west stairwell—the eleventh keystone turns.",
-        bn: "নাদিয়া: পশ্চিম সিঁড়ি থেকে খিলানগুলো গুনুন—এগারো নম্বর পাথরটি ঘোরে।",
       },
     ],
   },
@@ -945,12 +885,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 92,
     maturityRating: "U",
     localizedTitleEn: "Echoes of the Delta",
-    localizedTitleBn: "বদ্বীপের প্রতিধ্বনি",
     tagline: "A century of iron paddlewheels gliding through mangrove mist.",
     synopsisEn:
       "Recorded on field hydrophones and 16mm reversal stock, this meditative portrait follows the last rocket paddle steamers navigating the tidal channels of the Sundarbans.",
-    synopsisBn:
-      "সুন্দরবনের জোয়ার-ভাটার খাল জুড়ে শতবর্ষী প্যাডেল স্টিমারের ছন্দময় যাত্রা ও ধ্বনিচিত্র।",
     cinevaScore: 94,
     rawRating: 9.1,
     votesCount: "9.3K",
@@ -984,21 +921,19 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       metadataAllowed: true,
       badgeKind: "download_allowed",
     },
-    genres: [{ slug: "documentary", nameEn: "Documentary", nameBn: "প্রামাণ্যচিত্র" }],
+    genres: [{ slug: "documentary", nameEn: "Documentary" }],
     credits: [
       {
         department: "DIRECTOR",
         billingOrder: 1,
         personSlug: "amina-rahman",
         nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
       },
       {
         department: "WRITER",
         billingOrder: 2,
         personSlug: "rafiq-azad",
         nameEn: "Rafiq Azad",
-        nameBn: "রফিক আজাদ",
       },
     ],
     chapters: buildDefaultChapters("Echoes of the Delta", 92),
@@ -1007,7 +942,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 20,
         en: "[Rhythmic churn of paddlewheel blades against slack water]",
-        bn: "[স্থির জলে প্যাডেল স্টিমারের চাকার ছন্দময় ধ্বনি]",
       },
     ],
   },
@@ -1022,12 +956,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 85,
     maturityRating: "U",
     localizedTitleEn: "Symphony of the Loom",
-    localizedTitleBn: "তাঁতের সিম্ফনি",
     tagline: "Woven from river air, Geometry, and three hundred thread-counts of light.",
     synopsisEn:
       "An intimate visual poem chronicling master Jamdani weavers along the Shitalakshya river, where mathematical memory is passed entirely through oral chant.",
-    synopsisBn:
-      "শীতলক্ষ্যার তীরে ঐতিহ্যবাহী জামদানি তাঁতশিল্পীদের গাণিতিক বুনন ও মৌখিক ছন্দের প্রামাণ্য কাব্য।",
     cinevaScore: 90,
     rawRating: 8.7,
     votesCount: "7.6K",
@@ -1062,8 +993,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "download_allowed",
     },
     genres: [
-      { slug: "documentary", nameEn: "Documentary", nameBn: "প্রামাণ্যচিত্র" },
-      { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
+      { slug: "documentary", nameEn: "Documentary" },
+      { slug: "drama", nameEn: "Drama" },
     ],
     credits: [
       {
@@ -1071,7 +1002,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "rafiq-azad",
         nameEn: "Rafiq Azad",
-        nameBn: "রফিক আজাদ",
       },
     ],
     chapters: buildDefaultChapters("Symphony of the Loom", 85),
@@ -1080,7 +1010,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 20,
         en: "WEAVER CHANT: Four threads up, one crimson cross—hold the tension steady.",
-        bn: "তাঁতিদের ছড়া: চার সুতো উপরে, এক লাল ভাঁজ—টান রাখো স্থির।",
       },
     ],
   },
@@ -1095,12 +1024,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 129,
     maturityRating: "PG13",
     localizedTitleEn: "The Crimson Express",
-    localizedTitleBn: "ক্রিমসন এক্সপ্রেস",
     tagline: "Seven carriages. Zero stops before the border.",
     synopsisEn:
       "Aboard an overnight trans-delta sleeper train locked down during a diplomatic courier transfer, an off-duty signal engineer spots a phantom locomotive mirroring their track.",
-    synopsisBn:
-      "রাতের আন্তঃসীমান্ত ট্রেনে এক সিগন্যাল প্রকৌশলী আবিষ্কার করেন তাদের সমান্তরালে ছুটে চলেছে এক রহস্যময় ইঞ্জিন।",
     cinevaScore: 91,
     rawRating: 8.9,
     votesCount: "16.2K",
@@ -1135,9 +1061,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "thriller", nameEn: "Thriller", nameBn: "থ্রিলার" },
-      { slug: "action", nameEn: "Action", nameBn: "অ্যাকশন" },
-      { slug: "mystery", nameEn: "Mystery", nameBn: "রহস্য" },
+      { slug: "thriller", nameEn: "Thriller" },
+      { slug: "action", nameEn: "Action" },
+      { slug: "mystery", nameEn: "Mystery" },
     ],
     credits: [
       {
@@ -1145,7 +1071,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "kamal-hossain",
         nameEn: "Kamal Hossain",
-        nameBn: "কামাল হোসেন",
       },
       {
         department: "ACTOR",
@@ -1153,7 +1078,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "fazle-rabbi",
         nameEn: "Fazle Rabbi",
-        nameBn: "ফজলে রাব্বি",
       },
     ],
     chapters: buildDefaultChapters("The Crimson Express", 129),
@@ -1162,7 +1086,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 18,
         en: "[Steel wheels clattering at 110 km/h across river truss bridge]",
-        bn: "[নদীর লোহার সেতু জুড়ে ঘণ্টায় ১১০ কিমি বেগে ট্রেনের চাকার গর্জন]",
       },
     ],
   },
@@ -1177,12 +1100,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 112,
     maturityRating: "PG",
     localizedTitleEn: "The Sunken Observatory",
-    localizedTitleBn: "নিমজ্জিত মানমন্দির",
     tagline: "Beneath the Bay of Bengal lies a telescope pointed inward.",
     synopsisEn:
       "Marine geophysicists mapping the Swatch of No Ground submarine canyon locate an intact brass astrolabe dome built a century before modern sonar.",
-    synopsisBn:
-      "বঙ্গোপসাগরের গভীর গিরিখাতে সমুদ্রবিজ্ঞানীরা আবিষ্কার করেন শতবর্ষ প্রাচীন এক অক্ষত পিতলের মানমন্দির।",
     cinevaScore: 89,
     rawRating: 8.6,
     votesCount: "10.4K",
@@ -1217,8 +1137,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "sci-fi", nameEn: "Sci-Fi", nameBn: "কল্পবিজ্ঞান" },
-      { slug: "mystery", nameEn: "Mystery", nameBn: "রহস্য" },
+      { slug: "sci-fi", nameEn: "Sci-Fi" },
+      { slug: "mystery", nameEn: "Mystery" },
     ],
     credits: [
       {
@@ -1226,7 +1146,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "elena-rostova",
         nameEn: "Elena Rostova",
-        nameBn: "এলেনা রোস্তোভা",
       },
     ],
     chapters: buildDefaultChapters("The Sunken Observatory", 112),
@@ -1235,7 +1154,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 16,
         en: "SONAR: Canyon depth 1,340 meters. Brass resonance confirmed.",
-        bn: "সোনার: গিরিখাতের গভীরতা ১,৩৪০ মিটার। পিতলের প্রতিধ্বনি নিশ্চিত।",
       },
     ],
   },
@@ -1250,12 +1168,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 109,
     maturityRating: "PG13",
     localizedTitleEn: "Dhaka Nocturne",
-    localizedTitleBn: "ঢাকা নকটার্ন",
     tagline: "Three strangers. One all-night radio broadcast.",
     synopsisEn:
       "Between midnight and first call to prayer, a late-night jazz host, a taxi mechanic, and an ER surgeon cross paths through a single lost cassette tape.",
-    synopsisBn:
-      "মধ্যরাত থেকে ভোর পর্যন্ত এক রেডিও সঞ্চালক, একজন মেকানিক ও একজন চিকিৎসকের জীবন এক হারানো ক্যাসেটে মিলে যায়।",
     cinevaScore: 92,
     rawRating: 8.9,
     votesCount: "13.5K",
@@ -1290,8 +1205,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
+      { slug: "drama", nameEn: "Drama" },
+      { slug: "noir", nameEn: "Noir" },
     ],
     credits: [
       {
@@ -1299,7 +1214,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "amina-rahman",
         nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
       },
       {
         department: "ACTOR",
@@ -1307,7 +1221,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "tariq-anam",
         nameEn: "Tariq Anam",
-        nameBn: "তারিক আনাম",
       },
     ],
     chapters: buildDefaultChapters("Dhaka Nocturne", 109),
@@ -1316,7 +1229,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 16,
         en: "FARHAN (ON AIR): It's 2:14 AM in Dhaka. If you're still awake, this frequency is yours.",
-        bn: "ফারহান (রেডিওতে): ঢাকায় এখন রাত ২টা ১৪। যারা জেগে আছেন, এই ফ্রিকোয়েন্সি আপনাদের।",
       },
     ],
   },
@@ -1330,12 +1242,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 107,
     maturityRating: "PG",
     localizedTitleEn: "The Phantom Carriage (4K Restoration)",
-    localizedTitleBn: "দ্য ফ্যান্টম ক্যারেজ (১৯২১ পুনরুদ্ধার)",
     tagline: "Double-exposure pioneer of world gothic cinema—public domain master.",
     synopsisEn:
       "On New Year's Eve, legend holds that the last soul to die before midnight must drive Death's spectral carriage for the coming year. Public-domain silent masterwork with newly commissioned chamber score.",
-    synopsisBn:
-      "নববর্ষের মধ্যরাতে মৃত্যুর রথ চালানোর প্রাচীন উপকথা নিয়ে নির্মিত ১৯২১ সালের পাবলিক ডোমেইন ধ্রুপদী চলচ্চিত্র।",
     cinevaScore: 97,
     rawRating: 9.6,
     votesCount: "31.0K",
@@ -1370,8 +1279,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "download_allowed",
     },
     genres: [
-      { slug: "classic", nameEn: "Classic", nameBn: "ধ্রুপদী" },
-      { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
+      { slug: "classic", nameEn: "Classic" },
+      { slug: "drama", nameEn: "Drama" },
     ],
     credits: [
       {
@@ -1379,7 +1288,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "rafiq-azad",
         nameEn: "Victor Sjöström (Restored by R. Azad)",
-        nameBn: "ভিক্টর সিওস্ট্রোম",
       },
     ],
     chapters: buildDefaultChapters("The Phantom Carriage", 107),
@@ -1388,7 +1296,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 18,
         en: "[INTERTITLE] Midnight strikes from the old abbey bell-tower.",
-        bn: "[শিরোনাম কার্ড] প্রাচীন গির্জার ঘণ্টায় মধ্যরাতের ধ্বনি বাজে।",
       },
     ],
   },
@@ -1402,12 +1309,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 91,
     maturityRating: "PG",
     localizedTitleEn: "The Lodger: London Fog (1927)",
-    localizedTitleBn: "দ্য লজার: লন্ডন ফগ (১৯২৭)",
     tagline: "Footsteps overhead through a glass ceiling—archival suspense.",
     synopsisEn:
       "As evening fog blankets Bloomsbury, a landlady begins to suspect her quiet upstairs boarder may be the nocturnal fugitive haunting Tuesday nights.",
-    synopsisBn:
-      "কুয়াশাচ্ছন্ন সন্ধ্যায় এক বাড়িওয়ালী সন্দেহ করতে শুরু করেন তার ওপরতলার শান্ত ভাড়াটিয়াই হয়তো রাতের পলাতক আসামি।",
     cinevaScore: 93,
     rawRating: 9.1,
     votesCount: "19.8K",
@@ -1442,9 +1346,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "download_allowed",
     },
     genres: [
-      { slug: "classic", nameEn: "Classic", nameBn: "ধ্রুপদী" },
-      { slug: "thriller", nameEn: "Thriller", nameBn: "থ্রিলার" },
-      { slug: "mystery", nameEn: "Mystery", nameBn: "রহস্য" },
+      { slug: "classic", nameEn: "Classic" },
+      { slug: "thriller", nameEn: "Thriller" },
+      { slug: "mystery", nameEn: "Mystery" },
     ],
     credits: [
       {
@@ -1452,7 +1356,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "elena-rostova",
         nameEn: "Archival Restoration Unit",
-        nameBn: "আর্কাইভ পুনরুদ্ধার ইউনিট",
       },
     ],
     chapters: buildDefaultChapters("The Lodger", 91),
@@ -1461,7 +1364,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 18,
         en: "[INTERTITLE] TO-NIGHT — GOLDEN CURLS.",
-        bn: "[শিরোনাম কার্ড] আজ রাতে — ঘন কুয়াশায় সতর্কতা।",
       },
     ],
   },
@@ -1476,12 +1378,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 146,
     maturityRating: "PG13",
     localizedTitleEn: "Iron Eclipse: Vanguard Protocol",
-    localizedTitleBn: "লৌহ গ্রহণ: ভ্যানগার্ড প্রোটোকল",
     tagline: "When the orbital shield fractures, six guardians hold the sky.",
     synopsisEn:
       "After a solar-storm breach disables Earth's defense lattice, an armored Vanguard engineer and a rogue telemetry pilot unite a fractured squad across a collapsing sky-elevator.",
-    synopsisBn:
-      "সৌরঝড়ে পৃথিবীর প্রতিরক্ষা বলয় ভেঙে পড়লে এক বর্মধারী প্রকৌশলী ও এক পাইলট মহাকাশ লিফট রক্ষায় একত্রিত হন।",
     cinevaScore: 95,
     rawRating: 9.3,
     votesCount: "29.4K",
@@ -1516,8 +1415,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "action", nameEn: "Action", nameBn: "অ্যাকশন" },
-      { slug: "sci-fi", nameEn: "Sci-Fi", nameBn: "কল্পবিজ্ঞান" },
+      { slug: "action", nameEn: "Action" },
+      { slug: "sci-fi", nameEn: "Sci-Fi" },
     ],
     credits: [
       {
@@ -1525,7 +1424,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "dev-sen",
         nameEn: "Dev Sen",
-        nameBn: "দেব সেন",
       },
       {
         department: "ACTOR",
@@ -1533,7 +1431,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "zoya-mirza",
         nameEn: "Zoya Mirza",
-        nameBn: "জোয়া মির্জা",
       },
       {
         department: "ACTOR",
@@ -1541,7 +1438,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 3,
         personSlug: "fazle-rabbi",
         nameEn: "Fazle Rabbi",
-        nameBn: "ফজলে রাব্বি",
       },
     ],
     chapters: buildDefaultChapters("Iron Eclipse: Vanguard Protocol", 146),
@@ -1550,13 +1446,11 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 15,
         en: "RHEA: Thrusters at 104%. If that tether snaps, half the coast goes dark.",
-        bn: "রিয়া: থ্রাস্টার ১০৪ শতাংশে। এই তার ছিঁড়লে পুরো উপকূল অন্ধকারে ডুবে যাবে।",
       },
       {
         start: 15,
         end: 32,
         en: "KIAN: Vanguard formation—lock shields on my mark!",
-        bn: "কিয়ান: ভ্যানগার্ড ফরমেশন—আমার সংকেতে বর্ম যুক্ত করো!",
       },
     ],
   },
@@ -1571,12 +1465,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 152,
     maturityRating: "R16",
     localizedTitleEn: "The Obsidian Watchman",
-    localizedTitleBn: "অবসিডিয়ান প্রহরী",
     tagline: "Justice has no badge in a city owned by the syndicate.",
     synopsisEn:
       "Across seven torrential nights, a masked forensic vigilante stalks a gothic port metropolis to dismantle an untouchable tribunal of industrialists.",
-    synopsisBn:
-      "সাতটি ঝড়ো রাতে এক মুখোশধারী প্রহরী বন্দরনগরীর অপরাধ সিন্ডিকেটের মুখোশ উন্মোচন করেন।",
     cinevaScore: 96,
     rawRating: 9.5,
     votesCount: "34.2K",
@@ -1611,9 +1502,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "action", nameEn: "Action", nameBn: "অ্যাকশন" },
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
-      { slug: "thriller", nameEn: "Thriller", nameBn: "থ্রিলার" },
+      { slug: "action", nameEn: "Action" },
+      { slug: "noir", nameEn: "Noir" },
+      { slug: "thriller", nameEn: "Thriller" },
     ],
     credits: [
       {
@@ -1621,7 +1512,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "kamal-hossain",
         nameEn: "Kamal Hossain",
-        nameBn: "কামাল হোসেন",
       },
       {
         department: "ACTOR",
@@ -1629,7 +1519,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "tariq-anam",
         nameEn: "Tariq Anam",
-        nameBn: "তারিক আনাম",
       },
       {
         department: "ACTOR",
@@ -1637,7 +1526,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 3,
         personSlug: "zoya-mirza",
         nameEn: "Zoya Mirza",
-        nameBn: "জোয়া মির্জা",
       },
     ],
     chapters: buildDefaultChapters("The Obsidian Watchman", 152),
@@ -1646,7 +1534,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 16,
         en: "WATCHMAN (V.O.): They built their towers above the floodline so they'd never hear the streets.",
-        bn: "প্রহরী (কণ্ঠ): ওরা বন্যার রেখার ওপরে মিনার তুলেছে যেন রাজপথের আর্তনাদ শুনতে না হয়।",
       },
     ],
   },
@@ -1660,12 +1547,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 54,
     maturityRating: "R16",
     localizedTitleEn: "Syndicate of Ash",
-    localizedTitleBn: "ছাইয়ের সিন্ডিকেট",
     tagline: "Two seasons. Twelve nights that rewrote the port underworld.",
     synopsisEn:
       "Set in the same rain-lashed port underworld as The Obsidian Watchman, a disgraced prosecutor and an underground courier wage a two-season shadow war against the Ash Dock cartel.",
-    synopsisBn:
-      "বন্দরনগরীর অন্ধকার জগতে এক বরখাস্ত কৌঁসুলি ও এক গোপন বার্তাবাহক দুই মৌসুম জুড়ে অ্যাশ ডক সিন্ডিকেটের বিরুদ্ধে ছায়াযুদ্ধে নামেন।",
     cinevaScore: 96,
     rawRating: 9.4,
     votesCount: "26.8K",
@@ -1700,9 +1584,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
-      { slug: "action", nameEn: "Action", nameBn: "অ্যাকশন" },
-      { slug: "thriller", nameEn: "Thriller", nameBn: "থ্রিলার" },
+      { slug: "noir", nameEn: "Noir" },
+      { slug: "action", nameEn: "Action" },
+      { slug: "thriller", nameEn: "Thriller" },
     ],
     credits: [
       {
@@ -1710,7 +1594,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "amina-rahman",
         nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
       },
       {
         department: "ACTOR",
@@ -1718,7 +1601,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "tariq-anam",
         nameEn: "Tariq Anam",
-        nameBn: "তারিক আনাম",
       },
       {
         department: "ACTOR",
@@ -1726,7 +1608,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 3,
         personSlug: "nusrat-imrose",
         nameEn: "Nusrat Imrose",
-        nameBn: "নুসরাত ইমরোজ",
       },
     ],
     chapters: buildDefaultChapters("Syndicate of Ash", 54),
@@ -1735,7 +1616,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 16,
         en: "MIRA: Every container on Berth 9 has two manifests—one for customs, one for the tribunal.",
-        bn: "মিরা: নয় নম্বর বার্থের প্রতিটি কন্টেইনারের দুটি তালিকা—একটি কাস্টমসের, অন্যটি ট্রাইব্যুনালের।",
       },
     ],
     seasons: [
@@ -1746,28 +1626,24 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         episodes: buildSeriesEpisodes(1, [
           {
             titleEn: "Berth Nine",
-            titleBn: "নয় নম্বর বার্থ",
             runtimeMinutes: 56,
             synopsisEn:
               "A burned customs container exposes an unlisted gold-bullion corridor beneath the river port.",
           },
           {
             titleEn: "The Magistrate's Seal",
-            titleBn: "ম্যাজিস্ট্রেটের সিলমোহর",
             runtimeMinutes: 52,
             synopsisEn:
               "Rafiuddin traces a forged judicial warrant to a shuttered shipyard foundry.",
           },
           {
             titleEn: "Nocturne in Iron",
-            titleBn: "লোহার নকটার্ন",
             runtimeMinutes: 55,
             synopsisEn:
               "Mira intercepts a midnight courier train before the syndicate cleanses the archive.",
           },
           {
             titleEn: "Ashes on the Tide",
-            titleBn: "জোয়ারে ছাই",
             runtimeMinutes: 58,
             synopsisEn:
               "Season finale: an all-night tribunal siege forces every alliance into the open.",
@@ -1781,21 +1657,18 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         episodes: buildSeriesEpisodes(2, [
           {
             titleEn: "The Watchtower Pact",
-            titleBn: "প্রহরী চুক্তি",
             runtimeMinutes: 54,
             synopsisEn:
               "Six months after the dockyard fire, a new masked enforcer seizes the northern tollgates.",
           },
           {
             titleEn: "Glass Witness",
-            titleBn: "কাঁচের সাক্ষী",
             runtimeMinutes: 51,
             synopsisEn:
               "Surveillance negatives hidden inside a cinema projection booth rewrite the prime suspect list.",
           },
           {
             titleEn: "Eclipse Over Sadarghat",
-            titleBn: "সদরঘাটে গ্রহণ",
             runtimeMinutes: 59,
             synopsisEn:
               "Rafiuddin and Mira risk everything in a live parliamentary broadcast showdown.",
@@ -1814,12 +1687,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 50,
     maturityRating: "PG13",
     localizedTitleEn: "Starfall Vanguard",
-    localizedTitleBn: "স্টারফল ভ্যানগার্ড",
     tagline: "Beyond the orbital ring, the multiverse fractures first.",
     synopsisEn:
       "Spinning directly out of Iron Eclipse, Commander Rhea Solis leads an orbital reconnaissance division investigating tachyon rifts opening across Jupiter's moons.",
-    synopsisBn:
-      "আয়রন ইক্লিপ্সের পরবর্তী অধ্যায়ে কমান্ডার রিয়া সোলিস বৃহস্পতির উপগ্রহে সৃষ্ট মহাজাগতিক ফাটল অনুসন্ধানে নামেন।",
     cinevaScore: 94,
     rawRating: 9.2,
     votesCount: "23.1K",
@@ -1859,8 +1729,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "sci-fi", nameEn: "Sci-Fi", nameBn: "কল্পবিজ্ঞান" },
-      { slug: "action", nameEn: "Action", nameBn: "অ্যাকশন" },
+      { slug: "sci-fi", nameEn: "Sci-Fi" },
+      { slug: "action", nameEn: "Action" },
     ],
     credits: [
       {
@@ -1868,7 +1738,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "dev-sen",
         nameEn: "Dev Sen",
-        nameBn: "দেব সেন",
       },
       {
         department: "ACTOR",
@@ -1876,7 +1745,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "zoya-mirza",
         nameEn: "Zoya Mirza",
-        nameBn: "জোয়া মির্জা",
       },
       {
         department: "ACTOR",
@@ -1884,7 +1752,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 3,
         personSlug: "aupee-karim",
         nameEn: "Aupee Karim",
-        nameBn: "অপি করিম",
       },
     ],
     chapters: buildDefaultChapters("Starfall Vanguard", 50),
@@ -1893,7 +1760,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 16,
         en: "ARIA: That rift isn't natural—its harmonic signature matches Vanguard-00.",
-        bn: "আরিয়া: এই ফাটল প্রাকৃতিক নয়—এর কম্পাঙ্ক ভ্যানগার্ড-০০-এর সাথে মিলে যাচ্ছে।",
       },
     ],
     seasons: [
@@ -1904,21 +1770,18 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         episodes: buildSeriesEpisodes(1, [
           {
             titleEn: "Zero-Hour Horizon",
-            titleBn: "জিরো-আওয়ার দিগন্ত",
             runtimeMinutes: 52,
             synopsisEn:
               "A distress beacon beneath Europa's ice crust awakens dormant Vanguard armor.",
           },
           {
             titleEn: "Twin Telemetry",
-            titleBn: "দ্বৈত টেলিমেট্রি",
             runtimeMinutes: 48,
             synopsisEn:
               "Two identical starships arrive from adjacent timelines carrying contradictory orders.",
           },
           {
             titleEn: "Citadel of Glass",
-            titleBn: "কাঁচের দুর্গ",
             runtimeMinutes: 51,
             synopsisEn:
               "Rhea leads a zero-gravity breach to stabilize the orbital relay before collapse.",
@@ -1932,21 +1795,18 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         episodes: buildSeriesEpisodes(2, [
           {
             titleEn: "The Seventh Bastion",
-            titleBn: "সপ্তম ঘাঁটি",
             runtimeMinutes: 50,
             synopsisEn:
               "An exiled Vanguard founder returns from beyond Neptune with a warning for Earth.",
           },
           {
             titleEn: "Red Magnetosphere",
-            titleBn: "লাল চৌম্বকমণ্ডল",
             runtimeMinutes: 53,
             synopsisEn:
               "Aria decodes the tachyon cipher linking every anomaly across both seasons.",
           },
           {
             titleEn: "Convergence Protocol",
-            titleBn: "কনভার্জেন্স প্রোটোকল",
             runtimeMinutes: 57,
             synopsisEn:
               "Season finale: the full Vanguard fleet defends the solar gate in widescreen spectacle.",
@@ -1965,12 +1825,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 48,
     maturityRating: "PG13",
     localizedTitleEn: "The Buriganga Files",
-    localizedTitleBn: "বুড়িগঙ্গা ফাইলস",
     tagline: "Eight cold cases pulled from the river silt.",
     synopsisEn:
       "Inspector Reza Chowdhury leads a river-police cold-case unit reopening decades-old maritime disappearances using forensic acoustic restoration.",
-    synopsisBn:
-      "ইন্সপেক্টর রেজা চৌধুরী নদী পুলিশের এক বিশেষ ইউনিটে দশক-পুরোনো রহস্যময় নিখোঁজ মামলাগুলো পুনরায় তদন্ত করেন।",
     cinevaScore: 95,
     rawRating: 9.2,
     votesCount: "19.1K",
@@ -2005,9 +1862,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "mystery", nameEn: "Mystery", nameBn: "রহস্য" },
-      { slug: "noir", nameEn: "Noir", nameBn: "নোয়ার" },
-      { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
+      { slug: "mystery", nameEn: "Mystery" },
+      { slug: "noir", nameEn: "Noir" },
+      { slug: "drama", nameEn: "Drama" },
     ],
     credits: [
       {
@@ -2015,7 +1872,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "amina-rahman",
         nameEn: "Amina Rahman",
-        nameBn: "আমিনা রহমান",
       },
       {
         department: "ACTOR",
@@ -2023,7 +1879,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "tariq-anam",
         nameEn: "Tariq Anam",
-        nameBn: "তারিক আনাম",
       },
       {
         department: "ACTOR",
@@ -2031,7 +1886,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 3,
         personSlug: "fazle-rabbi",
         nameEn: "Fazle Rabbi",
-        nameBn: "ফজলে রাব্বি",
       },
     ],
     chapters: buildDefaultChapters("The Buriganga Files", 48),
@@ -2040,7 +1894,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 15,
         en: "CHOWDHURY: Open Evidence Locker 19—start with the ferry bell recovered in '98.",
-        bn: "চৌধুরী: উনিশ নম্বর লকারটা খুলুন—৯৮ সালে উদ্ধার হওয়া লঞ্চের ঘণ্টা থেকে শুরু করব।",
       },
     ],
     seasons: [
@@ -2051,21 +1904,18 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         episodes: buildSeriesEpisodes(1, [
           {
             titleEn: "The Ferryman's Watch",
-            titleBn: "মাঝির ঘড়ি",
             runtimeMinutes: 49,
             synopsisEn:
               "A stopped brass pocket watch dredged from Pagla Ghat reopens a 1998 winter disappearance.",
           },
           {
             titleEn: "Lanterns in Fog",
-            titleBn: "কুয়াশায় লণ্ঠন",
             runtimeMinutes: 47,
             synopsisEn:
               "Acoustic analysis of an emergency radio call reveals a second vessel beside the ferry.",
           },
           {
             titleEn: "The Dockyard Ledger",
-            titleBn: "ডকইয়ার্ডের খাতা",
             runtimeMinutes: 50,
             synopsisEn:
               "Chowdhury confronts the retired harbourmaster who signed the falsified salvage report.",
@@ -2084,12 +1934,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 46,
     maturityRating: "PG13",
     localizedTitleEn: "Signal Zero: Sector 7",
-    localizedTitleBn: "সিগন্যাল জিরো: সেক্টর ৭",
     tagline: "When the city grid drops to zero, the underground network wakes.",
     synopsisEn:
       "Acoustic cryptographer Dr. Zara Karim teams up with a rogue cyber-defense operative to stop an autonomous blackout wave spreading across South Asian transit hubs.",
-    synopsisBn:
-      "ধ্বনি-সংকেত বিশেষজ্ঞ ড. জারা করিম ও এক সাইবার অপারেটিভ দক্ষিণ এশিয়ার ট্রানজিট গ্রিডে ছড়িয়ে পড়া ব্ল্যাকআউট রোধে নামেন।",
     cinevaScore: 92,
     rawRating: 8.9,
     votesCount: "15.6K",
@@ -2124,8 +1971,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "sci-fi", nameEn: "Sci-Fi", nameBn: "কল্পবিজ্ঞান" },
-      { slug: "thriller", nameEn: "Thriller", nameBn: "থ্রিলার" },
+      { slug: "sci-fi", nameEn: "Sci-Fi" },
+      { slug: "thriller", nameEn: "Thriller" },
     ],
     credits: [
       {
@@ -2133,7 +1980,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "elena-rostova",
         nameEn: "Elena Rostova",
-        nameBn: "এলেনা রোস্তোভা",
       },
       {
         department: "ACTOR",
@@ -2141,7 +1987,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "nusrat-imrose",
         nameEn: "Nusrat Imrose",
-        nameBn: "নুসরাত ইমরোজ",
       },
       {
         department: "ACTOR",
@@ -2149,7 +1994,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 3,
         personSlug: "zoya-mirza",
         nameEn: "Zoya Mirza",
-        nameBn: "জোয়া মির্জা",
       },
     ],
     chapters: buildDefaultChapters("Signal Zero: Sector 7", 46),
@@ -2158,7 +2002,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 15,
         en: "ZARA: Sector 7 substation is offline—switch the metro array to analog relay!",
-        bn: "জারা: সেক্টর ৭ সাবস্টেশন বন্ধ—মেট্রো নেটওয়ার্ক অ্যানালগ রিলেতে নিয়ে যাও!",
       },
     ],
     seasons: [
@@ -2169,20 +2012,17 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         episodes: buildSeriesEpisodes(1, [
           {
             titleEn: "432 Hertz",
-            titleBn: "৪৩২ হার্জ",
             runtimeMinutes: 46,
             synopsisEn:
               "A 90-second power drop across Dhaka's metro rail conceals an encrypted acoustic payload.",
           },
           {
             titleEn: "Substation Ghost",
-            titleBn: "সাবস্টেশনের ছায়া",
             runtimeMinutes: 45,
             synopsisEn: "Zara and Ira trace the rogue packet to an abandoned telegraph bunker.",
           },
           {
             titleEn: "Red Grid",
-            titleBn: "রেড গ্রিড",
             runtimeMinutes: 48,
             synopsisEn: "The team races to isolate the coastal cable landing before midnight.",
           },
@@ -2195,14 +2035,12 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         episodes: buildSeriesEpisodes(2, [
           {
             titleEn: "Silent Viaduct",
-            titleBn: "নীরব উড়ালসেতু",
             runtimeMinutes: 47,
             synopsisEn:
               "An orbital satellite handshake links the blackout code to a wider global syndicate.",
           },
           {
             titleEn: "Analog Heartbeat",
-            titleBn: "অ্যানালগ স্পন্দন",
             runtimeMinutes: 49,
             synopsisEn:
               "Using 1970s copper switchboards, Zara builds an unhackable counter-network.",
@@ -2221,12 +2059,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 52,
     maturityRating: "PG",
     localizedTitleEn: "The Curzon Chronicles",
-    localizedTitleBn: "কার্জন ক্রনিকলস",
     tagline: "A century of scholars, ciphers, and secret observatories.",
     synopsisEn:
       "Spanning 1924 and 2024 in parallel timelines, Professor Nadia Sen unravels an astronomical society's century-old archive hidden beneath Dhaka's red-brick domes.",
-    synopsisBn:
-      "১৯২৪ ও ২০২৪ সালের সমান্তরাল সময়ে অধ্যাপক নাদিয়া সেন কার্জন হলের গম্বুজের নিচে লুকানো এক শতবর্ষী জ্যোতির্বিজ্ঞান সমাজের রহস্য উন্মোচন করেন।",
     cinevaScore: 91,
     rawRating: 8.8,
     votesCount: "11.2K",
@@ -2261,8 +2096,8 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       badgeKind: "stream_allowed",
     },
     genres: [
-      { slug: "mystery", nameEn: "Mystery", nameBn: "রহস্য" },
-      { slug: "drama", nameEn: "Drama", nameBn: "নাটক" },
+      { slug: "mystery", nameEn: "Mystery" },
+      { slug: "drama", nameEn: "Drama" },
     ],
     credits: [
       {
@@ -2270,7 +2105,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 1,
         personSlug: "kamal-hossain",
         nameEn: "Kamal Hossain",
-        nameBn: "কামাল হোসেন",
       },
       {
         department: "ACTOR",
@@ -2278,7 +2112,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "aupee-karim",
         nameEn: "Aupee Karim",
-        nameBn: "অপি করিম",
       },
       {
         department: "ACTOR",
@@ -2286,7 +2119,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 3,
         personSlug: "tariq-anam",
         nameEn: "Tariq Anam",
-        nameBn: "তারিক আনাম",
       },
     ],
     chapters: buildDefaultChapters("The Curzon Chronicles", 52),
@@ -2295,7 +2127,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 16,
         en: "NADIA: Two brass astrolabes forged a hundred years apart—and both point to the same meridian.",
-        bn: "নাদিয়া: একশো বছরের ব্যবধানে গড়া দুটি পিতলের অ্যাস্ট্রোলেব—অথচ দুটিই একই দ্রাঘিমায় স্থির।",
       },
     ],
     seasons: [
@@ -2306,20 +2137,17 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         episodes: buildSeriesEpisodes(1, [
           {
             titleEn: "The 1924 Transit",
-            titleBn: "১৯২৪-এর পরিক্রমা",
             runtimeMinutes: 53,
             synopsisEn:
               "A sealed copper cylinder inside the west dome reveals an unpublished solar-eclipse notebook.",
           },
           {
             titleEn: "The Eleventh Keystone",
-            titleBn: "এগারোতম খিলানপাথর",
             runtimeMinutes: 51,
             synopsisEn: "Nadia reconstructs the acoustic geometry of the lecture rotunda.",
           },
           {
             titleEn: "Meridian of Light",
-            titleBn: "আলোর দ্রাঘিমা",
             runtimeMinutes: 54,
             synopsisEn:
               "Series finale: past and present converge as the equinox beam strikes the vault floor.",
@@ -2338,12 +2166,9 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
     runtimeMinutes: 44,
     maturityRating: "U",
     localizedTitleEn: "Delta Odyssey: Living Rivers",
-    localizedTitleBn: "বদ্বীপ ওডিসি: জীবন্ত নদী",
     tagline: "Seven hundred rivers filmed in 4K from monsoon swell to winter mist.",
     synopsisEn:
       "Narrated with binaural hydrophone soundscapes, this open-access documentary series journeys from Himalayan meltwaters through the braided Meghna estuary to the Bay of Bengal.",
-    synopsisBn:
-      "হিমালয়ের বরফগলা জল থেকে মেঘনার মোহনা হয়ে বঙ্গোপসাগর পর্যন্ত সাতশো নদীর ৪কে প্রামাণ্য সিরিজ।",
     cinevaScore: 93,
     rawRating: 9.1,
     votesCount: "12.4K",
@@ -2377,14 +2202,13 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
       metadataAllowed: true,
       badgeKind: "download_allowed",
     },
-    genres: [{ slug: "documentary", nameEn: "Documentary", nameBn: "প্রামাণ্যচিত্র" }],
+    genres: [{ slug: "documentary", nameEn: "Documentary" }],
     credits: [
       {
         department: "DIRECTOR",
         billingOrder: 1,
         personSlug: "rafiq-azad",
         nameEn: "Rafiq Azad",
-        nameBn: "রফিক আজাদ",
       },
       {
         department: "ACTOR",
@@ -2392,7 +2216,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         billingOrder: 2,
         personSlug: "aupee-karim",
         nameEn: "Aupee Karim",
-        nameBn: "অপি করিম",
       },
     ],
     chapters: buildDefaultChapters("Delta Odyssey", 44),
@@ -2401,7 +2224,6 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         start: 0,
         end: 18,
         en: "NARRATOR: Before borders had names, silt and monsoon wrote the map of Bengal.",
-        bn: "বর্ণনাকারী: সীমানার নামকরণের বহু আগে পলি আর বর্ষাই এঁকেছিল বাংলার মানচিত্র।",
       },
     ],
     seasons: [
@@ -2412,20 +2234,17 @@ export const CINEVA_DATABASE_FILMS: readonly CinevaDatabaseFilm[] = [
         episodes: buildSeriesEpisodes(1, [
           {
             titleEn: "Monsoon Arrival",
-            titleBn: "বর্ষার আগমন",
             runtimeMinutes: 45,
             synopsisEn:
               "FirstJune cloudbanks transform dry sandbars into inland seas within seventy-two hours.",
           },
           {
             titleEn: "Floating Markets of Barishal",
-            titleBn: "বরিশালের ভাসমান হাট",
             runtimeMinutes: 43,
             synopsisEn: "Dawn timber and guava boats converge across tidal canals.",
           },
           {
             titleEn: "Mangrove Choir",
-            titleBn: "ম্যানগ্রোভের ঐকতান",
             runtimeMinutes: 44,
             synopsisEn:
               "Submerged hydrophones capture dolphin clicks and tidal currents at Hiron Point.",
@@ -2441,7 +2260,6 @@ export const CINEVA_COLLECTIONS: readonly CinevaCuratedCollection[] = [
     id: "col-monsoon-noir-archive",
     slug: "monsoon-noir-archive",
     titleEn: "Monsoon Noir & Archival Vault",
-    titleBn: "বর্ষা নোয়ার ও আর্কাইভ ভল্ট",
     eyebrow: "Signature Collection · 01",
     description:
       "Rain-swept mysteries, riverfront investigations, and nocturnal cinema forged across Old Dhaka and the Bengal delta.",
@@ -2459,7 +2277,6 @@ export const CINEVA_COLLECTIONS: readonly CinevaCuratedCollection[] = [
     id: "col-heroic-and-vigilante",
     slug: "heroic-and-vigilante-sagas",
     titleEn: "Heroic Multiverse & Dark Vigilante Sagas",
-    titleBn: "হিরোইক মাল্টিভার্স ও ডার্ক ভিজিল্যান্টে গাথা",
     eyebrow: "Signature Collection · 02",
     description:
       "Armored orbital guardians, tachyon rift expeditions, and masked rooftop watchmen across Vanguard Mythic Studios and Obsidian Knight Works.",
@@ -2475,7 +2292,6 @@ export const CINEVA_COLLECTIONS: readonly CinevaCuratedCollection[] = [
     id: "col-orbital-frontiers",
     slug: "orbital-frontiers",
     titleEn: "Orbital Signals & Deep-Horizon Sci-Fi",
-    titleBn: "মহাজাগতিক সংকেত ও কল্পবিজ্ঞান",
     eyebrow: "Signature Collection · 03",
     description:
       "Hard-science expeditions, subterranean acoustic relays, and deep-ocean observatories framed in 2.39:1 anamorphic widescreen.",
@@ -2492,7 +2308,6 @@ export const CINEVA_COLLECTIONS: readonly CinevaCuratedCollection[] = [
     id: "col-public-domain-masters",
     slug: "public-domain-masters",
     titleEn: "4K Public-Domain World Cinema Vault",
-    titleBn: "৪কে পাবলিক ডোমেইন বিশ্ব চলচ্চিত্র ভল্ট",
     eyebrow: "Signature Collection · 04",
     description:
       "Pre-1929 gothic and suspense milestones newly scanned with bespoke orchestral scores and verified open distribution rights.",
@@ -2508,7 +2323,6 @@ export const CINEVA_COLLECTIONS: readonly CinevaCuratedCollection[] = [
     id: "col-midnight-thrillers",
     slug: "midnight-thrillers",
     titleEn: "After-Hours Suspense & Night Trains",
-    titleBn: "মধ্যরাতের থ্রিলার ও রাত্রিকালীন যাত্রা",
     eyebrow: "Signature Collection · 05",
     description:
       "Locked sleeper carriages, blackout observatories, fogbound barges, and all-night radio frequencies.",

@@ -71,9 +71,6 @@ export default function PeoplePage() {
                   <h3 className="font-display text-text group-hover:text-accent text-xl font-bold transition-colors motion-reduce:transition-none">
                     {person.nameEn}
                   </h3>
-                  <p className="text-text-secondary text-sm" lang="bn">
-                    {person.nameBn}
-                  </p>
                 </div>
                 <p className="text-text-secondary line-clamp-3 text-xs leading-relaxed">
                   {person.bio}

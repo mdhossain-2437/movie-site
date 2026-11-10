@@ -44,7 +44,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-text-secondary hover:bg-surface-2 hover:text-text inline-flex min-h-9 items-center rounded-sm px-3 py-1.5 text-xs font-medium"
+                    className="text-text-secondary hover:bg-surface-2 hover:text-text inline-flex min-h-11 items-center rounded-sm px-3 py-1.5 text-xs font-medium transition-colors motion-reduce:transition-none sm:min-h-9"
                   >
                     {item.label}
                   </Link>

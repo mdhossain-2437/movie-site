@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createLogger, createRequestId, redactSensitive } from "./index";
+import { createLogger, createRequestId, redactSensitive, redactString } from "./index";
 
 describe("@movie/observability", () => {
   it("redacts passwords, tokens, OAuth refresh tokens, cookies, and private object keys", () => {
@@ -51,5 +51,27 @@ describe("@movie/observability", () => {
     expect(line).not.toContain(sampleJwt);
     expect(line).not.toContain("rawBearer987");
     expect(line).toContain("[REDACTED]");
+  });
+
+  it("redacts OMDb and general apikey query parameters and context keys", () => {
+    const rawUrl = "https://www.omdbapi.com/?apikey=super-secret-key&i=tt3896198";
+    expect(redactString(rawUrl)).toBe("https://www.omdbapi.com/?apikey=[REDACTED]&i=tt3896198");
+
+    const secondaryUrl = "https://www.omdbapi.com/?i=tt3896198&apikey=super-secret-key";
+    expect(redactString(secondaryUrl)).toBe(
+      "https://www.omdbapi.com/?i=tt3896198&apikey=[REDACTED]",
+    );
+
+    const rawObj = {
+      omdbApiKey: "super-secret-key",
+      nested: {
+        apikey: "another-secret",
+        omdb_api_key: "third-secret",
+      },
+    };
+    const sanitized = redactSensitive(rawObj) as Record<string, unknown>;
+    expect(sanitized.omdbApiKey).toBe("[REDACTED]");
+    expect((sanitized.nested as Record<string, unknown>).apikey).toBe("[REDACTED]");
+    expect((sanitized.nested as Record<string, unknown>).omdb_api_key).toBe("[REDACTED]");
   });
 });

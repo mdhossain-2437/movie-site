@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { KeyArt } from "@/components/art/key-art";
 import { Badge } from "@/components/ui";
 import {
@@ -60,19 +60,62 @@ const CURATED_TASTE_PROFILES = [
 export function PersonalizedRecommendationsRail() {
   const [activeProfile, setActiveProfile] =
     useState<(typeof CURATED_TASTE_PROFILES)[number]["id"]>("history");
+  const [serverHistorySeeds, setServerHistorySeeds] = useState<readonly string[]>(EMPTY_SEEDS);
   const historySeeds = useSyncExternalStore(
     subscribeStorage,
     getClientSeedSnapshot,
     getServerSeedSnapshot,
   );
 
+  useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+
+    fetch("/api/v1/recommendations?limit=4", {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then(async (res) => {
+        if (!res.ok) return null;
+        return (await res.json()) as {
+          seedSource?: string;
+          seedSlugs?: string[];
+        };
+      })
+      .then((payload) => {
+        if (
+          !cancelled &&
+          payload?.seedSource === "watch_history" &&
+          Array.isArray(payload.seedSlugs) &&
+          payload.seedSlugs.length > 0
+        ) {
+          setServerHistorySeeds(payload.seedSlugs);
+        }
+      })
+      .catch(() => {
+        // Fallback to local or editorial preset seeds
+      });
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, []);
+
   const effectiveSeeds = useMemo(() => {
-    if (activeProfile === "history" && historySeeds.length > 0) {
-      return historySeeds;
+    if (activeProfile === "history") {
+      if (serverHistorySeeds.length > 0) {
+        return serverHistorySeeds;
+      }
+      if (historySeeds.length > 0) {
+        return historySeeds;
+      }
     }
     const preset = CURATED_TASTE_PROFILES.find((p) => p.id === activeProfile);
     return preset ? [...preset.defaultSeeds] : ["the-last-monsoon"];
-  }, [activeProfile, historySeeds]);
+  }, [activeProfile, historySeeds, serverHistorySeeds]);
 
   const recommendations = useMemo(
     () => getCinevaPersonalizedRecommendations(effectiveSeeds, 4),

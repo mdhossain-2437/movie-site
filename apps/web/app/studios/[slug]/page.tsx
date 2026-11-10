@@ -43,7 +43,6 @@ async function StudioDetailBody({ params }: { params: Promise<{ slug: string }> 
     id: t.id,
     slug: t.slug,
     titleEn: t.localizedTitleEn,
-    titleBn: t.localizedTitleBn,
     releaseYear: t.releaseYear,
     runtimeMinutes: t.runtimeMinutes,
     maturityRating: t.maturityRating,
@@ -93,12 +92,6 @@ async function StudioDetailBody({ params }: { params: Promise<{ slug: string }> 
               {studioTitle}
             </h2>
           )}
-
-          {studioMeta?.nameBn ? (
-            <p className="font-display text-text-secondary mt-2 text-2xl font-semibold" lang="bn">
-              {studioMeta.nameBn}
-            </p>
-          ) : null}
 
           {studioMeta ? (
             <p className="cg-prose text-text-secondary mt-4 text-base leading-relaxed sm:text-lg">
